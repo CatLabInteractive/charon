@@ -1,8 +1,8 @@
 <?php
 
-namespace CatLab\Petstore\Definitions;
+namespace Tests\Petstore\Definitions;
 
-use CatLab\Petstore\Models\Pet;
+use Tests\Petstore\Models\Pet;
 use CatLab\Charon\Models\ResourceDefinition;
 
 /**

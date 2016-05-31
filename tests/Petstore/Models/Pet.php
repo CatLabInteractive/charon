@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\Petstore\Models;
+namespace Tests\Petstore\Models;
 
 /**
  * Class Pet

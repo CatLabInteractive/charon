@@ -6,7 +6,7 @@
  * Time: 15:35
  */
 
-namespace CatLab\Petstore\Models;
+namespace Tests\Petstore\Models;
 
 
 class Photo

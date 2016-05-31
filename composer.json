@@ -24,7 +24,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "CatLab\\Petstore\\": "tests/Petstore"
+      "Tests\\Petstore\\": "tests/Petstore"
     }
   },
   "minimum-stability" : "dev"
