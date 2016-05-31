@@ -1,15 +1,27 @@
 {
-    "name": "catlabinteractive/charon",
-    "description": "Charon is a framework for building self documented RESTfull API's.",
-    "type": "library",
-    "require": {
-        "catlabinteractive/base": "^0.1.10"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Thijs Van der Schaeghe",
-            "email": "info@catlab.be"
-        }
-    ]
+  "name": "catlabinteractive/charon",
+  "description": "Charon is a framework for building self documented RESTfull API's.",
+  "type": "library",
+  "require": {
+    "php": ">=7.0.0",
+    "catlabinteractive/base": "0.1.*",
+    "catlabinteractive/requirements": "0.1.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.3.*",
+    "catlabinteractive/laravel-petstore" : "dev-master"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thijs Van der Schaeghe",
+      "email": "info@catlab.be"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "CatLab\\Charon\\": "src/CatLab/Charon"
+    }
+  },
+  "minimum-stability" : "dev"
 }
