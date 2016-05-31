@@ -7,8 +7,8 @@ use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
-use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
  * Class PropertyResolver
@@ -63,11 +63,13 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
 
         $models = $this->resolveProperty($transformer, $entity, $field, $context);
 
-        if ($field->getRecords()) {
-            $models->take($field->getRecords());
-        }
+        if ($field instanceof Relation) {
+            if ($field->getRecords()) {
+                $models->take($field->getRecords());
+            }
 
-        $models = $models->get();
+            $models = $models->get();
+        }
 
         return $transformer->toResources(
             $field->getChildResource(),
