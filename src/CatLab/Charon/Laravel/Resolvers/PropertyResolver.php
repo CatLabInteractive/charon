@@ -29,6 +29,11 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
             return call_user_func_array(array($entity, 'get'.ucfirst($name)), $getterParameters);
         }
 
+        // Check for laravel "relationship" method
+        elseif (method_exists($entity, $name)) {
+            return call_user_func_array(array($entity, $name), $getterParameters);
+        }
+
         elseif (method_exists($entity, 'is'.ucfirst($name))) {
             return call_user_func_array(array($entity, 'is'.ucfirst($name)), $getterParameters);
         }
