@@ -2,11 +2,11 @@
 
 namespace CatLab\RESTResource\Tests;
 
-use CatLab\LaravelPetstore\Definitions\PetDefinition;
-use CatLab\LaravelPetstore\Models\Category;
-use CatLab\LaravelPetstore\Models\Pet;
-use CatLab\LaravelPetstore\Models\Photo;
-use CatLab\LaravelPetstore\Models\Tag;
+use CatLab\Petstore\Definitions\PetDefinition;
+use CatLab\Petstore\Models\Category;
+use CatLab\Petstore\Models\Pet;
+use CatLab\Petstore\Models\Photo;
+use CatLab\Petstore\Models\Tag;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Laravel\Transformers\ResourceTransformer;
 use CatLab\Charon\Models\Context;
