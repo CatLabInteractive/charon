@@ -1,0 +1,15 @@
+{
+    "name": "catlabinteractive/charon",
+    "description": "Charon is a framework for building self documented RESTfull API's.",
+    "type": "library",
+    "require": {
+        "catlabinteractive/base": "^0.1.10"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thijs Van der Schaeghe",
+            "email": "info@catlab.be"
+        }
+    ]
+}

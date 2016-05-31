@@ -1,0 +1,132 @@
+<?php
+
+namespace CatLab\Charon\Models;
+
+use CatLab\Charon\Collections\ResourceFieldCollection;
+use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
+use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Charon\Models\Properties\IdentifierField;
+
+/**
+ * Class ResourceDefinition
+ * @package CatLab\RESTResource\Models
+ */
+class ResourceDefinition implements ResourceDefinitionContract
+{
+    /**
+     * @var ResourceFieldCollection
+     */
+    private $fields;
+
+    /**
+     * @var string
+     */
+    private $entityClassName;
+
+    /**
+     * @var string
+     */
+    private $url;
+
+    /**
+     * ResourceDefinition constructor.
+     * @param string $entityClassName
+     */
+    public function __construct($entityClassName)
+    {
+        $this->entityClassName = $entityClassName;
+        $this->fields = new ResourceFieldCollection();
+    }
+
+    /**
+     * @param $name
+     * @return IdentifierField
+     */
+    public function identifier($name)
+    {
+        $field = new IdentifierField($this, $name);
+        $this->fields->add($field);
+
+        return $field;
+    }
+
+    /**
+     * @param string $name
+     * @return ResourceField
+     */
+    public function field($name)
+    {
+        $field = new ResourceField($this, $name);
+        $this->fields->add($field);
+
+        return $field;
+    }
+
+    /**
+     * @param string $name
+     * @param string $resourceDefinition
+     * @return RelationshipField
+     */
+    public function relationship($name, $resourceDefinition)
+    {
+        $field = new RelationshipField($this, $name, $resourceDefinition);
+        $this->fields->add($field);
+        
+        return $field;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityClassName()
+    {
+        return $this->entityClassName;
+    }
+
+    /**
+     * @return ResourceFieldCollection
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param SwaggerBuilder $builder
+     * @param string $action
+     * @return mixed[]
+     */
+    public function toSwagger(SwaggerBuilder $builder, $action)
+    {
+        $out = [
+            'type' => 'object',
+            'properties' => []
+        ];
+
+        foreach ($this->getFields() as $field) {
+            /** @var ResourceField $field */
+            if ($field->hasAction($action)) {
+                $out['properties'][$field->getDisplayName()] = $field->toSwagger($builder, $action);
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl(string $url)
+    {
+        $this->url = $url;
+    }
+}
