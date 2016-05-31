@@ -63,7 +63,7 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
 
         $models = $this->resolveProperty($transformer, $entity, $field, $context);
 
-        if ($field instanceof Relation) {
+        if ($models instanceof Relation) {
             if ($field->getRecords()) {
                 $models->take($field->getRecords());
             }
