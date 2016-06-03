@@ -86,4 +86,42 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
             $entity
         );
     }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param mixed $entity
+     * @param RelationshipValue $value
+     * @param Context $context
+     * @return RESTResource
+     * @throws InvalidPropertyException
+     */
+    public function resolveOneRelationship(
+        ResourceTransformer $transformer,
+        $entity,
+        RelationshipValue $value,
+        Context $context
+    ) {
+        $field = $value->getField();
+
+        $child = null;
+        try {
+            $child = $this->resolveProperty($transformer, $entity, $field, $context);
+        } catch (InvalidPropertyException $e) {
+            return null;
+        }
+
+        if ($child instanceof BelongsTo) {
+            $child = $child->get()->first();
+        }
+
+        if ($child) {
+            return $transformer->toResource(
+                $field->getChildResource(),
+                $child,
+                $context->getChildContext($field, $field->getExpandContext()),
+                $value,
+                $entity
+            );
+        }
+    }
 }
