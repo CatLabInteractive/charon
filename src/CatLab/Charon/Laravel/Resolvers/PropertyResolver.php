@@ -2,12 +2,13 @@
 
 namespace CatLab\Charon\Laravel\Resolvers;
 
-
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
@@ -31,7 +32,13 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
 
         // Check for laravel "relationship" method
         elseif (method_exists($entity, $name)) {
-            return call_user_func_array(array($entity, $name), $getterParameters);
+            $child = call_user_func_array(array($entity, $name), $getterParameters);
+
+            if ($child instanceof BelongsTo) {
+                $child = $child->get()->first();
+            }
+
+            return $child;
         }
 
         elseif (method_exists($entity, 'is'.ucfirst($name))) {

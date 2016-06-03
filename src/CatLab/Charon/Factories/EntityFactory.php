@@ -1,6 +1,7 @@
 <?php
 
 namespace CatLab\Charon\EntityFactory;
+
 use CatLab\Charon\Interfaces\Context;
 use Exception;
 
