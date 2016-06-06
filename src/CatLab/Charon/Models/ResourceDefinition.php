@@ -7,6 +7,10 @@ use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\Properties\IdentifierField;
+use CatLab\Requirements\Collections\RequirementCollection;
+use CatLab\Requirements\Collections\ValidatorCollection;
+use CatLab\Requirements\Interfaces\Requirement as RequirementInterface;
+use CatLab\Requirements\Interfaces\Validator;
 
 /**
  * Class ResourceDefinition
@@ -30,6 +34,11 @@ class ResourceDefinition implements ResourceDefinitionContract
     private $url;
 
     /**
+     * @var ValidatorCollection
+     */
+    private $validators;
+
+    /**
      * ResourceDefinition constructor.
      * @param string $entityClassName
      */
@@ -37,6 +46,7 @@ class ResourceDefinition implements ResourceDefinitionContract
     {
         $this->entityClassName = $entityClassName;
         $this->fields = new ResourceFieldCollection();
+        $this->validators = new ValidatorCollection();
     }
 
     /**
@@ -90,6 +100,24 @@ class ResourceDefinition implements ResourceDefinitionContract
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * @param Validator $validator
+     * @return $this
+     */
+    public function validator(Validator $validator)
+    {
+        $this->validators->add($validator);
+        return $this;
+    }
+
+    /**
+     * @return ValidatorCollection
+     */
+    public function getValidators() : ValidatorCollection
+    {
+        return $this->validators;
     }
 
     /**

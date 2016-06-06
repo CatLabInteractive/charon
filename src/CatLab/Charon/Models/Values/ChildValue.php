@@ -35,6 +35,14 @@ class ChildValue extends RelationshipValue
     }
 
     /**
+     * @return array
+     */
+    public function getValue()
+    {
+        return $this->child->toArray();
+    }
+
+    /**
      * @return mixed
      */
     public function toArray()

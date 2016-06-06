@@ -4,6 +4,7 @@ namespace Tests\Petstore\Definitions;
 
 use Tests\Petstore\Models\Pet;
 use CatLab\Charon\Models\ResourceDefinition;
+use Tests\Petstore\Validators\PetValidator;
 
 /**
  * Class PetDefinition
@@ -24,6 +25,7 @@ class PetDefinition extends ResourceDefinition
                 ->display('pet-id')
             
             ->field('name')
+                ->writeable()
                 ->required()
                 ->visible()
             
@@ -36,6 +38,7 @@ class PetDefinition extends ResourceDefinition
                 ->many()
                 ->visible()
                 ->expandable()
+                ->writeable()
             
             ->relationship('tags', TagDefinition::class)
                 ->many()
@@ -46,6 +49,8 @@ class PetDefinition extends ResourceDefinition
             ->field('status')
                 ->enum([ Pet::STATUS_AVAILABLE, Pet::STATUS_ENDING, Pet::STATUS_SOLD ])
                 ->visible()
+
+            ->validator(new PetValidator())
         ;
     }
 }

@@ -23,6 +23,8 @@ class PhotoDefinition extends ResourceDefinition
                 ->display('photo-id')
 
             ->field('url')
-                ->visible(true, true);
+                ->visible(true, true)
+                ->writeable()
+        ;
     }
 }

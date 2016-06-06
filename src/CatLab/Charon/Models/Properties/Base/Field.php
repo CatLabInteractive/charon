@@ -12,6 +12,8 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Models\SwaggerBuilder;
+use CatLab\Requirements\Interfaces\Requirement;
+use CatLab\Requirements\Interfaces\Validator;
 
 class Field implements Property
 {
@@ -200,6 +202,15 @@ class Field implements Property
     public function relationship($name, $resourceDefinitionClass)
     {
         return $this->resourceDefinition->relationship($name, $resourceDefinitionClass);
+    }
+
+    /**
+     * @param Validator $validator
+     * @return ResourceDefinition
+     */
+    public function validator(Validator $validator)
+    {
+        return $this->resourceDefinition->validator($validator);
     }
 
     /**

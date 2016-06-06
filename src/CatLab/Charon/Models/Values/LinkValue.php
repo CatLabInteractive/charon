@@ -49,6 +49,14 @@ class LinkValue extends Value
     }
 
     /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->link;
+    }
+
+    /**
      * @return mixed
      */
     public function toArray()

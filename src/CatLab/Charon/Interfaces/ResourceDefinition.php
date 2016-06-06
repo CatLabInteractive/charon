@@ -4,6 +4,8 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Models\SwaggerBuilder;
+use CatLab\Requirements\Collections\RequirementCollection;
+use CatLab\Requirements\Collections\ValidatorCollection;
 
 /**
  * Interface ResourceDefinition
@@ -23,14 +25,19 @@ interface ResourceDefinition
     public function getFields();
 
     /**
+     * @return string
+     */
+    public function getUrl();
+
+    /**
+     * @return ValidatorCollection
+     */
+    public function getValidators() : ValidatorCollection;
+
+    /**
      * @param SwaggerBuilder $builder
      * @param string $action
      * @return mixed[]
      */
     public function toSwagger(SwaggerBuilder $builder, $action);
-
-    /**
-     * @return string
-     */
-    public function getUrl();
 }

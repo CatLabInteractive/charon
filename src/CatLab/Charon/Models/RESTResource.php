@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models;
 
+use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
@@ -9,9 +10,9 @@ use CatLab\Charon\Collections\PropertyValues;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
-use CatLab\Charon\Library\PrettyEntityNameLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Requirements\Exceptions\ValidatorValidationException;
 
 /**
  * Class Resource
@@ -65,7 +66,7 @@ class RESTResource implements ResourceContract
 
     /**
      * @param Field $field
-     * @return CatLab\Kharon\Models\Values\ChildValue
+     * @return \CatLab\Charon\Models\Values\ChildValue
      */
     public function touchChildProperty(Field $field)
     {
@@ -74,7 +75,7 @@ class RESTResource implements ResourceContract
 
     /**
      * @param Field $field
-     * @return CatLab\Kharon\Models\Values\ChildrenValue
+     * @return \CatLab\Charon\Models\Values\ChildrenValue
      */
     public function touchChildrenProperty(Field $field)
     {
@@ -169,7 +170,7 @@ class RESTResource implements ResourceContract
     }
 
     /**
-     * @return CatLab\Kharon\Models\Values\PropertyValue[]
+     * @return PropertyValue[]
      */
     public function getIdentifiers()
     {
@@ -198,6 +199,13 @@ class RESTResource implements ResourceContract
             } catch(PropertyValidationException $e) {
                 $messages->merge($e->getMessages());
             }
+        }
+
+        // Also check all resource wide requirements
+        try {
+            $this->getResourceDefinition()->getValidators()->validate($this);
+        } catch(ResourceValidationException $e) {
+            $messages->merge($e->getMessages());
         }
 
         if (count($messages) > 0) {

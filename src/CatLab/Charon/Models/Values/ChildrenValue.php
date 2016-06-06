@@ -33,6 +33,15 @@ class ChildrenValue extends RelationshipValue
     }
 
     /**
+     * @return array
+     */
+    public function getValue()
+    {
+        $items = $this->children->toArray();
+        return $items[ResourceTransformer::RELATIONSHIP_ITEMS];
+    }
+
+    /**
      * @return mixed
      */
     public function toArray()
