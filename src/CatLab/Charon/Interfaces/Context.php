@@ -55,4 +55,9 @@ interface Context
      * @return ProcessorCollection
      */
     public function getProcessors() : ProcessorCollection;
+
+    /**
+     * @return string
+     */
+    public function getUrl();
 }

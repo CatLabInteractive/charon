@@ -131,6 +131,8 @@ class PaginationProcessor implements Processor
             
             if ($parent) {
                 $url = $parent->getField()->getUrl();
+            } elseif($context->getUrl()) {
+                $url = $context->getUrl();
             } else {
                 $url = $definition->getUrl();
             }

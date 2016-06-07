@@ -45,6 +45,11 @@ class Context implements ContextContract
      */
     private $processors;
 
+    /**
+     * @var string
+     */
+    private $url;
+
     const FIELD_PATH_DELIMITER = '.';
 
     /**
@@ -209,6 +214,22 @@ class Context implements ContextContract
     public function getProcessors() : ProcessorCollection
     {
         return $this->processors;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl(string $url)
+    {
+        $this->url = $url;
     }
 
     /**

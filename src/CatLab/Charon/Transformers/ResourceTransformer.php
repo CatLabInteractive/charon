@@ -18,7 +18,7 @@ use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\EntityFactory as EntityFactoryContract;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
-use CatLab\RESTResource\Exceptions\InvalidContextAction;
+use CatLab\Charon\Exceptions\InvalidContextAction;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Exceptions\InvalidEntityException;
