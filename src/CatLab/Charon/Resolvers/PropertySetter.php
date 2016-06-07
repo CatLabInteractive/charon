@@ -46,7 +46,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param $parameters
      * @throws InvalidPropertyException
      */
-    protected function removeChildrenFromEntity($entity, $name, array $childEntities, $parameters = [])
+    protected function removeChildrenFromEntity($entity, $name, $childEntities, $parameters = [])
     {
         // Check for add method
         if (method_exists($entity, 'remove'.ucfirst($name))) {
@@ -169,7 +169,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         ResourceTransformer $transformer,
         $entity,
         RelationshipField $field,
-        array $childEntities,
+        $childEntities,
         Context $context
     ) {
         list($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);

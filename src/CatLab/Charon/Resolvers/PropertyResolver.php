@@ -200,7 +200,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
     public function getChildByIdentifiers(
         ResourceTransformer $transformer,
         RelationshipField $field,
-        &$parentEntity,
+        $parentEntity,
         PropertyValues $identifiers,
         Context $context
     ) {

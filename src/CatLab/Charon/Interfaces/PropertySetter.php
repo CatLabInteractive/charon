@@ -103,7 +103,7 @@ interface PropertySetter
         ResourceTransformer $transformer,
         $entity,
         RelationshipField $field,
-        array $childEntities,
+        $childEntities,
         Context $context
     );
 }

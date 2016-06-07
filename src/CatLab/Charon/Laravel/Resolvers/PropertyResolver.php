@@ -2,10 +2,12 @@
 
 namespace CatLab\Charon\Laravel\Resolvers;
 
+use CatLab\Charon\Collections\PropertyValues;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -71,6 +73,9 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
         $models = $this->resolveProperty($transformer, $entity, $field, $context);
 
         if ($models instanceof Relation) {
+            // Clone to avoid setting multiple filters
+            $models = clone $models;
+
             if ($field->getRecords()) {
                 $models->take($field->getRecords());
             }
@@ -85,5 +90,43 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
             $value,
             $entity
         );
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param RelationshipField $field
+     * @param mixed $parentEntity
+     * @param PropertyValues $identifiers
+     * @param Context $context
+     * @return mixed
+     */
+    public function getChildByIdentifiers(
+        ResourceTransformer $transformer,
+        RelationshipField $field,
+        $parentEntity,
+        PropertyValues $identifiers,
+        Context $context
+    ) {
+        $entities = $this->resolveProperty($transformer, $parentEntity, $field, $context);
+
+        if ($entities instanceof Relation) {
+            // Clone to avoid setting multiple filters
+            $entities = clone $entities;
+            foreach ($identifiers->toMap() as $k => $v) {
+                $entities->where($k, $v);
+            }
+
+            $entity = $entities->get()->first();
+            if (!$entity) {
+                return null;
+            }
+            return $entity;
+        }
+
+        foreach ($entities as $entity) {
+            if ($this->entityEquals($transformer, $entity, $identifiers, $context)) {
+                return $entity;
+            }
+        }
     }
 }

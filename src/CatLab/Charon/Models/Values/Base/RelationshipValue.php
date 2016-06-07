@@ -122,15 +122,15 @@ abstract class RelationshipValue extends Value
          */
         $identifiersToKeep = [];
 
+        /** @var RelationshipField $field */
+        $field = $this->getField();
+
         foreach ($children as $child) {
             if (!$child) {
                 continue;
             }
 
             /** @var RESTResource $child */
-
-            /** @var RelationshipField $field */
-            $field = $this->getField();
 
             /** @var bool $isNew */
             $isNew = $child->isNew();

@@ -124,7 +124,7 @@ interface PropertyResolver
     public function getChildByIdentifiers(
         ResourceTransformer $transformer,
         RelationshipField $field,
-        &$parentEntity,
+        $parentEntity,
         PropertyValues $identifiers,
         Context $context
     );

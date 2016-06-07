@@ -2,9 +2,16 @@
 
 namespace CatLab\Charon\Laravel\Resolvers;
 
+use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
+use CatLab\Charon\Models\Properties\IdentifierField;
+use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Charon\Interfaces\PropertyResolver as PropertyResolverContract;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
  * Class PropertySetter
@@ -73,13 +80,65 @@ class PropertySetter extends \CatLab\Charon\Resolvers\PropertySetter
     }
 
     /**
+     * @param ResourceTransformer $transformer
+     * @param PropertyResolverContract $propertyResolver
+     * @param $entity
+     * @param RelationshipField $field
+     * @param PropertyValues[] $identifiers
+     * @param Context $context
+     * @return mixed
+     */
+    public function removeAllChildrenExcept(
+        ResourceTransformer $transformer,
+        PropertyResolverContract $propertyResolver,
+        $entity,
+        RelationshipField $field,
+        array $identifiers,
+        Context $context
+    ) {
+        list ($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+        $existingChildren = $this->getValueFromEntity($entity, $name, $parameters);
+
+        if ($existingChildren instanceof Relation) {
+            $children = clone $existingChildren;
+
+            $children->where(function($builder) use ($identifiers) {
+                foreach ($identifiers as $item) {
+                    /** @var PropertyValues $item */
+                    $builder->where(function($builder) use ($item) {
+                        foreach ($item->toMap() as $k => $v) {
+                            $builder->orWhere($k, '!=', $v);
+                        }
+                    });
+                }
+            });
+
+
+            $toRemove = $children->get();
+            if (count($toRemove) > 0) {
+                $this->removeChildren($transformer, $entity, $field, $toRemove, $context);
+            }
+
+        } else {
+            return parent::removeAllChildrenExcept(
+                $transformer,
+                $propertyResolver,
+                $entity,
+                $field,
+                $identifiers,
+                $context
+            );
+        }
+    }
+
+    /**
      * @param $entity
      * @param $name
      * @param array $childEntities
      * @param $parameters
      * @throws InvalidPropertyException
      */
-    protected function removeChildrenFromEntity($entity, $name, array $childEntities, $parameters = [])
+    protected function removeChildrenFromEntity($entity, $name, $childEntities, $parameters = [])
     {
         // Check for add method
         if (method_exists($entity, 'remove'.ucfirst($name))) {
