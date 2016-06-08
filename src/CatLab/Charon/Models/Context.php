@@ -128,7 +128,7 @@ class Context implements ContextContract
      * @return \mixed
      * @throws VariableNotFoundInContext
      */
-    public function getParameter(string $name, $entity)
+    public function getParameter(string $name, $entity = null)
     {
         return $this->parameters[$name] ?? null;
     }

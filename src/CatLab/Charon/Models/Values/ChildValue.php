@@ -47,6 +47,9 @@ class ChildValue extends RelationshipValue
      */
     public function toArray()
     {
+        if ($this->child === null) {
+            return null;
+        }
         return $this->child->toArray();
     }
 

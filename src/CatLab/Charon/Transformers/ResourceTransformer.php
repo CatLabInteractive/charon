@@ -367,8 +367,7 @@ class ResourceTransformer implements ResourceTransformerContract
                     $context
                 );
 
-                $childrenProperty = $resource->getProperties()->getChildren($field);
-                $childrenProperty->setChildren($children);
+                $resource->setChildrenProperty($field, $children, true);
                 break;
 
             case Cardinality::ONE:
