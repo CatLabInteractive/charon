@@ -11,7 +11,7 @@ use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\ResourceDefinition;
-use CatLab\Charon\Models\SwaggerBuilder;
+use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Interfaces\Validator;
 

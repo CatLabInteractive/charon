@@ -111,6 +111,16 @@ abstract class RouteProperties implements RouteMutator
     }
 
     /**
+     * @param $name
+     * @return mixed|null
+     */
+    public function getOption($name)
+    {
+        $options = $this->getOptions();
+        return isset($options[$name]) ? $options[$name] : null;
+    }
+
+    /**
      * @param string $type
      * @param string $action
      * @return ReturnValue

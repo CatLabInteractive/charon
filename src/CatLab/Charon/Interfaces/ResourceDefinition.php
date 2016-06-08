@@ -3,7 +3,7 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\ResourceFieldCollection;
-use CatLab\Charon\Models\SwaggerBuilder;
+use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Collections\RequirementCollection;
 use CatLab\Requirements\Collections\ValidatorCollection;
 

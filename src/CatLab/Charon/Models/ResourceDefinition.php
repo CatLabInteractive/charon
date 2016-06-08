@@ -7,6 +7,7 @@ use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\Properties\IdentifierField;
+use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Collections\RequirementCollection;
 use CatLab\Requirements\Collections\ValidatorCollection;
 use CatLab\Requirements\Interfaces\Requirement as RequirementInterface;

@@ -10,7 +10,7 @@ use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
-use CatLab\Charon\Models\SwaggerBuilder;
+use CatLab\Charon\Swagger\SwaggerBuilder;
 
 /**
  * Class RelationshipField

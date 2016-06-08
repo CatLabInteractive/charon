@@ -115,6 +115,11 @@ class Route extends RouteProperties implements RouteMutator
             $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
         }
 
+        $security = $this->getOption('security');
+        if (isset($security)) {
+            $out['security'] = $security;
+        }
+
         return $out;
     }
 }

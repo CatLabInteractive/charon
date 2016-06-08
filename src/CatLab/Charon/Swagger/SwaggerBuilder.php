@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\Charon\Models;
+namespace CatLab\Charon\Swagger;
 
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -8,12 +8,12 @@ use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Exceptions\RouteAlreadyDefined;
 use CatLab\Charon\Library\PrettyEntityNameLibrary;
-use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Routing\Route;
+use CatLab\Charon\Swagger\Authentication\Authentication;
 
 /**
  * Class SwaggerBuilder
- * @package CatLab\RESTResource\Models
+ * @package CatLab\Charon\Swagger
  */
 class SwaggerBuilder implements DescriptionBuilder
 {
@@ -73,6 +73,11 @@ class SwaggerBuilder implements DescriptionBuilder
     private $version;
 
     /**
+     * @var Authentication[]
+     */
+    private $authentications;
+
+    /**
      * SwaggerBuilder constructor.
      * @param string $host
      * @param string $basePath
@@ -81,6 +86,8 @@ class SwaggerBuilder implements DescriptionBuilder
     {
         $this->paths = [];
         $this->schemas = [];
+        $this->authentications = [];
+
         $this->entityNameLibrary = new PrettyEntityNameLibrary();
 
         $this->host = $host;
@@ -282,6 +289,16 @@ class SwaggerBuilder implements DescriptionBuilder
     }
 
     /**
+     * @param Authentication $authentication
+     * @return $this
+     */
+    public function addAuthentication(Authentication $authentication)
+    {
+        $this->authentications[] = $authentication;
+        return $this;
+    }
+
+    /**
      *
      */
     public function build()
@@ -294,6 +311,13 @@ class SwaggerBuilder implements DescriptionBuilder
         $out['info'] = $this->getInfoObject();
         $out['paths'] = $this->paths;
         $out['definitions'] = $this->schemas;
+
+        if (count($this->authentications) > 0) {
+            $out['securityDefinitions'] = [];
+            foreach ($this->authentications as $security) {
+                $out['securityDefinitions'][$security->getName()] = $security->toArray();
+            }
+        }
 
         return $out;
     }
