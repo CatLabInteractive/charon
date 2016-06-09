@@ -265,7 +265,7 @@ class RelationshipField extends Field
      */
     public function toSwagger(SwaggerBuilder $builder, $action)
     {
-        if ($this->isExpanded()) {
+        if (Action::isReadContext($action) && $this->isExpanded()) {
             return [
                 'type' => 'object',
                 'schema' => $builder->getRelationshipSchema(
@@ -274,6 +274,26 @@ class RelationshipField extends Field
                     $this->cardinality
                 )
             ];
+        } elseif (Action::isWriteContext($action)) {
+            if ($this->linkOnly) {
+                return [
+                    'type' => 'object',
+                    'schema' => $builder->getRelationshipSchema(
+                        ResourceDefinitionLibrary::make($this->childResource),
+                        Action::IDENTIFIER,
+                        $this->cardinality
+                    )
+                ];
+            } else {
+                return [
+                    'type' => 'object',
+                    'schema' => $builder->getRelationshipSchema(
+                        ResourceDefinitionLibrary::make($this->childResource),
+                        Action::CREATE,
+                        $this->cardinality
+                    )
+                ];
+            }
         } else {
             return [
                 'type' => 'object',

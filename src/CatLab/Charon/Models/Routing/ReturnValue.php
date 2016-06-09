@@ -221,6 +221,8 @@ class ReturnValue implements RouteMutator
      */
     public function toSwagger(DescriptionBuilder $builder)
     {
+        $response = [];
+
         // Is this a native type?
         if (PropertyType::isNative($this->getType())) {
             /*
