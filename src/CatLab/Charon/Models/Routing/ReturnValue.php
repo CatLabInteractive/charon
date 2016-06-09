@@ -4,6 +4,7 @@ namespace CatLab\Charon\Models\Routing;
 
 use CatLab\Charon\Collections\HeaderCollection;
 use CatLab\Charon\Collections\ParameterCollection;
+use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Enums\Action;
@@ -140,6 +141,10 @@ class ReturnValue implements RouteMutator
     {
         if (isset($this->context)) {
             return $this->context;
+        }
+
+        if (!isset($this->cardinality)) {
+            $this->cardinality = Cardinality::ONE;
         }
 
         return Method::toAction($this->parent->getMethod(), $this->cardinality);

@@ -6,6 +6,7 @@ use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 use CatLab\Charon\Models\Routing\Parameters\BodyParameter;
 use CatLab\Charon\Models\Routing\Parameters\PathParameter;
+use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
 use CatLab\Charon\Models\Routing\Route;
 
 /**
@@ -35,7 +36,7 @@ class ParameterCollection
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return PathParameter
      */
     public function path($name)
@@ -49,7 +50,7 @@ class ParameterCollection
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return PathParameter
      */
     public function body($name)
@@ -59,6 +60,20 @@ class ParameterCollection
 
         $this->parameters[$name] = $parameter;
 
+        return $parameter;
+    }
+
+    /**
+     * @param string $name
+     * @return QueryParameter
+     */
+    public function query($name)
+    {
+        $parameter = new QueryParameter($name);
+        $parameter->setRoute($this->route);
+
+        $this->parameters[$name] = $parameter;
+        
         return $parameter;
     }
 
