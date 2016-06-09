@@ -115,6 +115,7 @@ abstract class RelationshipValue extends Value
     ) {
         $children = $this->getChildrenToProcess();
         $childrenToAdd = [];
+        $childrenToEdit = [];
 
         /**
          * Keep a list of all identifies we've touched, so we can removed those we haven't
@@ -185,6 +186,8 @@ abstract class RelationshipValue extends Value
 
             if (!isset($childEntity)) {
                 $childrenToAdd[] = $entity;
+            } else {
+                $childrenToEdit[] = $entity;
             }
         }
 
@@ -195,6 +198,17 @@ abstract class RelationshipValue extends Value
                 $parent,
                 $this->getField(),
                 $childrenToAdd,
+                $context
+            );
+        }
+
+        if (count($childrenToEdit) > 0) {
+            $this->editChildren(
+                $resourceTransformer,
+                $propertySetter,
+                $parent,
+                $this->getField(),
+                $childrenToEdit,
                 $context
             );
         }

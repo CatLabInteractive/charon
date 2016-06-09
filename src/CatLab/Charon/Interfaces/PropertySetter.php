@@ -74,6 +74,22 @@ interface PropertySetter
     );
 
     /**
+     * Edit a child to a colleciton
+     * @param ResourceTransformer $transformer
+     * @param $entity
+     * @param RelationshipField $field
+     * @param $childEntities
+     * @param Context $context
+     */
+    public function editChildren(
+        ResourceTransformer $transformer,
+        $entity,
+        RelationshipField $field,
+        array $childEntities,
+        Context $context
+    );
+
+    /**
      * @param ResourceTransformer $transformer
      * @param PropertyResolverContract $propertyResolver
      * @param $entity

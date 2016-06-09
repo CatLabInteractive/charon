@@ -46,6 +46,24 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param $parameters
      * @throws InvalidPropertyException
      */
+    protected function editChildrenInEntity($entity, $name, array $childEntities, $parameters = [])
+    {
+        // Check for add method
+        if (method_exists($entity, 'edit'.ucfirst($name))) {
+            array_unshift($parameters, $childEntities);
+            call_user_func_array(array($entity, 'edit'.ucfirst($name)), $parameters);
+        } else {
+            throw InvalidPropertyException::create($name, get_class($entity));
+        }
+    }
+
+    /**
+     * @param $entity
+     * @param $name
+     * @param array $childEntities
+     * @param $parameters
+     * @throws InvalidPropertyException
+     */
     protected function removeChildrenFromEntity($entity, $name, $childEntities, $parameters = [])
     {
         // Check for add method
@@ -155,6 +173,26 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     ) {
         list($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
         $this->addChildrenToEntity($entity, $name, $childEntities, $parameters);
+    }
+
+    /**
+     * Edit a child to a colleciton
+     * @param ResourceTransformer $transformer
+     * @param $entity
+     * @param RelationshipField $field
+     * @param $childEntities
+     * @param Context $context
+     */
+    public function editChildren(
+        ResourceTransformer $transformer,
+        $entity,
+        RelationshipField $field,
+        array $childEntities,
+        Context $context
+    )
+    {
+        list($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+        $this->editChildrenInEntity($entity, $name, $childEntities, $parameters);
     }
 
     /**

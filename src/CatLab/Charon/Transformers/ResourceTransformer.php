@@ -219,7 +219,8 @@ class ResourceTransformer implements ResourceTransformerContract
 
         $this->parents->push($entity);
 
-        foreach ($resource->getProperties()->getValues() as $property) {
+        $values = $resource->getProperties()->getValues();
+        foreach ($values as $property) {
             $property->toEntity($entity, $this, $this->propertyResolver, $this->propertySetter, $factory, $context);
         }
 
