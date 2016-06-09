@@ -41,14 +41,14 @@ $routes->group(
                 Pet::STATUS_ENDING,
                 Pet::STATUS_SOLD
             ])
-            ->returns(PetDefinition::class, Action::VIEW)
+            ->returns(PetDefinition::class, Action::VIEW)->many()
         ;
 
         $routes
             ->get('pets/{id}', 'PetController@show')
             ->summary('Get a pet')
             ->parameters()->path('id')->int()->required()
-            ->returns(PetDefinition::class, Action::INDEX)
+            ->returns(PetDefinition::class, Action::INDEX)->one()
         ;
     }
 );

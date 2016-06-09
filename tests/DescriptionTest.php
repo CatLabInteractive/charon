@@ -4,11 +4,6 @@ namespace CatLab\RESTResource\Tests;
 
 use CatLab\Charon\Swagger\Authentication\OAuth2Authentication;
 use CatLab\Charon\Swagger\SwaggerBuilder;
-use CatLab\Charon\Transformers\ResourceTransformer;
-use Tests\Petstore\Definitions\PetDefinition;
-use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Models\Context;
-
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -44,6 +39,10 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
         foreach ($routes->getRoutes() as $route) {
             $builder->addRoute($route);
         }
+
+        $actual = $builder->build();
+
+        echo json_encode($actual);
 
         $expected = json_decode('
             {
@@ -138,7 +137,7 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                         "responses":{
                            "200":{
                               "schema":{
-                                 "$ref":"#\/definitions\/Pet_view"
+                                 "$ref":"#\/definitions\/Pet_index_items"
                               },
                               "headers":[
             
@@ -217,6 +216,25 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                   }
                },
                "definitions":{
+                  "Pet_index":{
+                     "type":"object",
+                     "properties":{
+                        "pet-id":{
+                           "type":"integer"
+                        }
+                     }
+                  },
+                  "Pet_index_items":{
+                     "type":"object",
+                     "properties":{
+                        "items":{
+                           "type":"array",
+                           "items":{
+                              "$ref":"#\/definitions\/Pet_index"
+                           }
+                        }
+                     }
+                  },
                   "Pet_view":{
                      "type":"object",
                      "properties":{
@@ -276,6 +294,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
         
         ', true);
 
-        $this->assertEquals($expected, $builder->build());
+        $this->assertEquals($expected, $actual);
     }
 }
