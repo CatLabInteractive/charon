@@ -106,6 +106,8 @@ class ResourceTransformer implements ResourceTransformerContract
             throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities.');
         }
 
+        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+
         $out = new ResourceCollection();
 
         foreach ($entities as $entity) {
@@ -269,6 +271,54 @@ class ResourceTransformer implements ResourceTransformerContract
         }
 
         return $resource;
+    }
+
+    /**
+     * @param $resourceDefinition
+     * @param $content
+     * @param EntityFactoryContract $factory
+     * @param ContextContract $context
+     * @return array
+     * @throws InvalidContextAction
+     */
+    public function fromIdentifiers(
+        $resourceDefinition,
+        $content,
+        EntityFactoryContract $factory,
+        ContextContract $context
+    ) {
+        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        if (!Action::isWriteContext($context->getAction())) {
+            throw InvalidContextAction::create('Writeable', $context->getAction());
+        }
+
+        $out = [];
+        if (isset($content[self::RELATIONSHIP_ITEMS])) {
+            // This is a list of items
+            foreach ($content[self::RELATIONSHIP_ITEMS] as $item) {
+                $out[] = $this->fromIdentifier($resourceDefinition, $item, $factory, $context);
+            }
+        } else {
+            $out[] = $this->fromIdentifier($resourceDefinition, $content, $factory, $context);
+        }
+        return $out;
+    }
+
+    /**
+     * @param ResourceDefinition $resourceDefinition
+     * @param $content
+     * @param EntityFactoryContract $factory
+     * @param ContextContract $context
+     * @return mixed
+     */
+    private function fromIdentifier(
+        ResourceDefinition $resourceDefinition,
+        $content,
+        EntityFactoryContract $factory,
+        ContextContract $context
+    ) {
+        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        return $factory->resolveFromIdentifier($resourceDefinition->getEntityClassName(), $content, $context);
     }
 
     /**

@@ -107,7 +107,7 @@ class SwaggerBuilder implements DescriptionBuilder
             $this->paths[$path] = [];
         }
 
-        $method = $route->getMethod();
+        $method = $route->getHttpMethod();
         if (isset($this->paths[$path][$method])) {
             throw new RouteAlreadyDefined('Route ' . $method . ' ' . $path . ' is already defined.');
         }
@@ -120,17 +120,31 @@ class SwaggerBuilder implements DescriptionBuilder
     /**
      * @param ResourceDefinition $resourceDefinition
      * @param string $action
+     * @param string $cardinality
      * @return $this
      */
-    public function addResourceDefinition(ResourceDefinition $resourceDefinition, string $action)
-    {
+    public function addResourceDefinition(
+        ResourceDefinition $resourceDefinition,
+        string $action,
+        string $cardinality = Cardinality::ONE
+    ) {
         $name = $this->entityNameLibrary->toPretty($resourceDefinition->getEntityClassName()) . '_' . $action;
         if (!array_key_exists($name, $this->schemas)) {
             $this->schemas[$name] = null; // Set key to avoid circular references
             $this->schemas[$name] = $resourceDefinition->toSwagger($this, $action);
         }
 
-        return '#/definitions/' . $name;
+        $refId = '#/definitions/' . $name;
+
+        if ($cardinality === Cardinality::ONE) {
+            return $refId;
+        } else {
+            return $this->addItemListDefinition(
+                $this->entityNameLibrary->toPretty($resourceDefinition->getEntityClassName()),
+                $refId,
+                $action
+            );
+        }
     }
 
     /**
@@ -175,21 +189,9 @@ class SwaggerBuilder implements DescriptionBuilder
      */
     public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
     {
-        $refId = $this->addResourceDefinition($resourceDefinition, $action);
-
-        if ($cardinality === Cardinality::ONE) {
-            return [
-                '$ref' => $refId
-            ];
-        } else {
-            return [
-                '$ref' => $this->addItemListDefinition(
-                    $this->entityNameLibrary->toPretty($resourceDefinition->getEntityClassName()),
-                    $refId,
-                    $action
-                )
-            ];
-        }
+        return [
+            '$ref' => $this->addResourceDefinition($resourceDefinition, $action, $cardinality)
+        ];
     }
 
     /**
@@ -267,7 +269,8 @@ class SwaggerBuilder implements DescriptionBuilder
     /**
      * @param string $name
      * @param string $reference
-     * @return mixed
+     * @param string $action
+     * @return mixed|string
      */
     private function addItemListDefinition(string $name, string $reference, string $action) : string
     {

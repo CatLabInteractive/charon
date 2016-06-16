@@ -156,7 +156,9 @@ class Field implements Property
      */
     public function hasAction($context)
     {
-        if ($context === Action::IDENTIFIER) {
+        if (
+            $context === Action::IDENTIFIER
+        ) {
             return $this instanceof IdentifierField;
         }
 

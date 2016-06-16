@@ -5,6 +5,7 @@ namespace CatLab\Charon\Laravel\Controllers;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Base\Models\Grammar\AndConjunction;
 use CatLab\Base\Models\Grammar\OrConjunction;
+use CatLab\Charon\Factories\EntityFactory;
 use CatLab\Laravel\Database\SelectQueryTransformer;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -56,6 +57,10 @@ trait ResourceController
         return $models;
     }
 
+    /**
+     * @param Builder $query
+     * @param $wheres
+     */
     private function processWhere(Builder $query, $wheres)
     {
         $self = $this;
@@ -111,26 +116,38 @@ trait ResourceController
      * @param Context $context
      * @return RESTResource
      */
-    public function toResource($entity, Context $context)
+    public function toResource($entity, Context $context, $resourceDefinition = null)
     {
-        return $this->resourceTransformer->toResource($this->resourceDefinition, $entity, $context);
+        return $this->resourceTransformer->toResource(
+            $resourceDefinition ?? $this->resourceDefinition,
+            $entity,
+            $context
+        );
     }
 
     /**
      * @param mixed $entities
      * @param Context $context
+     * @param null $resourceDefinition
      * @return RESTResource
+     * @throws \CatLab\Charon\Exceptions\InvalidEntityException
      */
-    public function toResources($entities, Context $context)
+    public function toResources($entities, Context $context, $resourceDefinition = null)
     {
-        return $this->resourceTransformer->toResources($this->resourceDefinition, $entities, $context);
+        return $this->resourceTransformer->toResources(
+            $resourceDefinition ?? $this->resourceDefinition,
+            $entities,
+            $context
+        );
     }
 
     /**
-     * @param $context
+     * @param Context $context
+     * @param null $resourceDefinition
      * @return RESTResource
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function jsonToResource(Context $context)
+    public function bodyToResource(Context $context, $resourceDefinition = null)
     {
         $content = Request::instance()->getContent();
         switch (mb_strtolower(Request::header('content-type'))) {
@@ -142,8 +159,41 @@ trait ResourceController
                     throw new \InvalidArgumentException("Could not decode body.");
                 }
 
-                return $this->resourceTransformer->fromArray($this->resourceDefinition, $content, $context);
-                break;
+                return $this->resourceTransformer->fromArray(
+                    $resourceDefinition ?? $this->resourceDefinition,
+                    $content,
+                    $context
+                );
+
+            default:
+                throw new \InvalidArgumentException("Could not decode body.");
+        }
+    }
+
+    /**
+     * @param Context $context
+     * @param $resourceDefinition
+     * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     */
+    public function bodyIdentifiersToResource(Context $context, $resourceDefinition = null)
+    {
+        $content = Request::instance()->getContent();
+        switch (mb_strtolower(Request::header('content-type'))) {
+            case 'application/json':
+            case 'text/json':
+                $content = json_decode($content, true);
+
+                if (!$content) {
+                    throw new \InvalidArgumentException("Could not decode body.");
+                }
+
+                return $this->resourceTransformer->fromIdentifiers(
+                    $resourceDefinition ?? $this->resourceDefinition,
+                    $content,
+                    new EntityFactory(),
+                    $context
+                );
 
             default:
                 throw new \InvalidArgumentException("Could not decode body.");

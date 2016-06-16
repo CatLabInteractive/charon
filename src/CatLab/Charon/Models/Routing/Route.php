@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Routing;
 
 use CatLab\Charon\Collections\RouteCollection;
+use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Requirements\Enums\PropertyType;
@@ -61,6 +62,23 @@ class Route extends RouteProperties implements RouteMutator
     public function getMethod()
     {
         return $this->method;
+    }
+
+    /**
+     * Return a HTTP safe method.
+     * @return string
+     */
+    public function getHttpMethod()
+    {
+        switch ($this->method) {
+            case Method::LINK:
+                return Method::POST;
+            case Method::UNLINK:
+                return Method::DELETE;
+
+            default:
+                return $this->method;
+        }
     }
 
     /**

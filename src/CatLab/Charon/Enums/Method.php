@@ -13,6 +13,8 @@ class Method
     const PUT = 'put';
     const DELETE = 'delete';
     const HEAD = 'head';
+    const LINK = 'link';
+    const UNLINK = 'unlink';
 
     /**
      * @param string $method
@@ -29,19 +31,19 @@ class Method
                 } else {
                     return Action::VIEW;
                 }
-                break;
+
+            case self::LINK:
+            case self::UNLINK:
+                return Action::IDENTIFIER;
 
             case self::POST:
                 return Action::CREATE;
-                break;
 
             case self::PUT:
                 return Action::EDIT;
-                break;
 
             default:
                 return Action::VIEW;
-                break;
         }
     }
 }

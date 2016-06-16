@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Interfaces;
 
+use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Models\Routing\Route;
 
 /**
@@ -19,9 +20,14 @@ interface DescriptionBuilder
     /**
      * @param ResourceDefinition $resourceDefinition
      * @param string $action
+     * @param string $cardinality
      * @return $this
      */
-    public function addResourceDefinition(ResourceDefinition $resourceDefinition, string $action);
+    public function addResourceDefinition(
+        ResourceDefinition $resourceDefinition,
+        string $action,
+        string $cardinality = Cardinality::ONE
+    );
 
     /**
      * @param ResourceDefinition $resourceDefinition

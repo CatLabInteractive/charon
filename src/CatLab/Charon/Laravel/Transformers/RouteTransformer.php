@@ -26,7 +26,7 @@ class RouteTransformer
     {
         foreach ($routes->getRoutes() as $route) {
             $options = $route->getOptions();
-            $route = Route::match([ $route->getMethod() ], $route->getPath(), $route->getAction());
+            $route = Route::match([ $route->getHttpMethod() ], $route->getPath(), $route->getAction());
 
             if (isset($options['middleware'])) {
                 $route->middleware($options['middleware']);

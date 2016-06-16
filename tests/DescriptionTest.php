@@ -42,8 +42,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
 
         $actual = $builder->build();
 
-        echo json_encode($actual);
-
         $expected = json_decode('
             {
                "swagger":"2.0",

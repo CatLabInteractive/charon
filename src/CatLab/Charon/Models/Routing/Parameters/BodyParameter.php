@@ -19,6 +19,11 @@ class BodyParameter extends Parameter
      * @var mixed
      */
     private $resourceDefinition;
+
+    /**
+     * @var string
+     */
+    private $cardinality = Cardinality::ONE;
     
     /**
      * PathParameter constructor.
@@ -31,6 +36,24 @@ class BodyParameter extends Parameter
     }
 
     /**
+     * @return $this
+     */
+    public function one()
+    {
+        $this->cardinality = Cardinality::ONE;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function many()
+    {
+        $this->cardinality = Cardinality::MANY;
+        return $this;
+    }
+
+    /**
      * @param DescriptionBuilder $builder
      * @return array
      */
@@ -40,11 +63,10 @@ class BodyParameter extends Parameter
         unset($out['type']);
 
         $resourceDefinition = ResourceDefinitionLibrary::make($this->resourceDefinition);
-        $context = Method::toAction($this->route->getMethod(), Cardinality::ONE);
+        $context = Method::toAction($this->route->getMethod(), $this->cardinality);
 
-        $ref = $builder->addResourceDefinition($resourceDefinition, $context);
         $out['schema'] = [
-            '$ref' => $ref
+            '$ref' => $builder->addResourceDefinition($resourceDefinition, $context, $this->cardinality)
         ];
 
         return $out;

@@ -51,7 +51,7 @@ class ParameterCollection
 
     /**
      * @param string $name
-     * @return PathParameter
+     * @return BodyParameter
      */
     public function body($name)
     {

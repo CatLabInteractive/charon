@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Collections;
 
+use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Models\Routing\RouteProperties;
 
@@ -94,6 +95,30 @@ class RouteCollection extends RouteProperties
     public function delete($path, $action, array $options = [])
     {
         return $this->action('delete', $path, $action, $options);
+    }
+
+    /**
+     * Represents a request to link resources with eachother
+     * @param $path
+     * @param $action
+     * @param array $options
+     * @return Route
+     */
+    public function link($path, $action, array $options = [])
+    {
+        return $this->action(Method::LINK, $path, $action, $options);
+    }
+
+    /**
+     * Represents a request to link resources with eachother
+     * @param $path
+     * @param $action
+     * @param array $options
+     * @return Route
+     */
+    public function unlink($path, $action, array $options = [])
+    {
+        return $this->action(Method::UNLINK, $path, $action, $options);
     }
 
     /**

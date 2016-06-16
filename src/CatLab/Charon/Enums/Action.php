@@ -13,6 +13,7 @@ class Action
     // Readable
     const INDEX = 'index';
     const VIEW = 'view';
+
     const IDENTIFIER = 'identifier';
 
     // Writable
