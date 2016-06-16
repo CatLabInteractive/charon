@@ -43,7 +43,12 @@ trait ResourceController
      */
     public function filterAndGet($model, $resourceDefinition, Context $context, $records = 10)
     {
-        $filter = $this->resourceTransformer->getFilters(Request::input(), $resourceDefinition, $context, $records);
+        $filter = $this->resourceTransformer->getFilters(
+            Request::query(),
+            $resourceDefinition,
+            $context,
+            $records
+        );
 
         // Translate parameters to larevel query
         SelectQueryTransformer::toLaravel($model, $filter);
