@@ -281,7 +281,7 @@ class ResourceTransformer implements ResourceTransformerContract
      * @return array
      * @throws InvalidContextAction
      */
-    public function fromIdentifiers(
+    public function entitiesFromIdentifiers(
         $resourceDefinition,
         $content,
         EntityFactoryContract $factory,
@@ -296,10 +296,16 @@ class ResourceTransformer implements ResourceTransformerContract
         if (isset($content[self::RELATIONSHIP_ITEMS])) {
             // This is a list of items
             foreach ($content[self::RELATIONSHIP_ITEMS] as $item) {
-                $out[] = $this->fromIdentifier($resourceDefinition, $item, $factory, $context);
+                $entity = $this->fromIdentifier($resourceDefinition, $item, $factory, $context);
+                if ($entity) {
+                    $out[] = $entity;
+                }
             }
         } else {
-            $out[] = $this->fromIdentifier($resourceDefinition, $content, $factory, $context);
+            $entity = $this->fromIdentifier($resourceDefinition, $content, $factory, $context);
+            if ($entity) {
+                $out[] = $entity;
+            }
         }
         return $out;
     }

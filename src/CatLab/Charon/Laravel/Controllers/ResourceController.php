@@ -181,7 +181,7 @@ trait ResourceController
      * @return array
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function bodyIdentifiersToResource(Context $context, $resourceDefinition = null)
+    public function bodyIdentifiersToEntities(Context $context, $resourceDefinition = null)
     {
         $content = Request::instance()->getContent();
         switch (mb_strtolower(Request::header('content-type'))) {
@@ -193,7 +193,7 @@ trait ResourceController
                     throw new \InvalidArgumentException("Could not decode body.");
                 }
 
-                return $this->resourceTransformer->fromIdentifiers(
+                return $this->resourceTransformer->entitiesFromIdentifiers(
                     $resourceDefinition ?? $this->resourceDefinition,
                     $content,
                     new EntityFactory(),
