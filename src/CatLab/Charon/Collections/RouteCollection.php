@@ -41,6 +41,11 @@ class RouteCollection extends RouteProperties
      */
     public function group($options, callable $callback = null)
     {
+        if (!isset($callback) && is_callable($options)) {
+            $callback = $options;
+            $options = [];
+        }
+
         $child = new self($options);
         $child->setParent($this);
 
