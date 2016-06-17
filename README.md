@@ -1,9 +1,24 @@
 # Charon
+[![Build Status](https://travis-ci.org/CatLabInteractive/charon.svg?branch=master)](https://travis-ci.org/CatLabInteractive/charon)
+
 *Fractal on steroids.*
 
 What?
 =====
 Charon is a framework for building self documented RESTfull API's.
+
+Getting started
+===============
+While Charon can be used with any framework, I have created a laravel
+skeleton project to get you started fast.
+
+Installation
+------------
+`composer create-project catlabinteractive/laravel-charon api`
+
+Configuration
+-------------
+https://github.com/CatLabInteractive/laravel-charon
 
 Why?
 ====
