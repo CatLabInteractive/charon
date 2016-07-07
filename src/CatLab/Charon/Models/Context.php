@@ -257,6 +257,24 @@ class Context implements ContextContract
     private function arrayPathExists(array &$source, array $path)
     {
         $key = array_shift($path);
+        // Check for recursive
+        if (isset($source[$key . '*'])) {
+            $recursive = true;
+            $key = $key . '*';
+        } else {
+            $recursive = false;
+        }
+
+        // Create ourselves
+        if ($recursive && isset($source[$key])) {
+            if (is_array($source[$key])) {
+                $source[$key][$key] = true;
+            } else {
+                $source[$key] = array(
+                    $key => true
+                );
+            }
+        }
 
         if (isset($source[$key])) {
             if (count($source[$key]) === 0) {

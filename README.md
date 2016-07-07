@@ -52,3 +52,8 @@ so that it can be incorporated in other frameworks.
 
 An ORM is not required, but makes implementing certain functionality
 (like pagination and filtering) a lot easier.
+
+Context options
+===============
+For both fields and expand parameters: add a * to repeat the field (for 
+recursive models).
