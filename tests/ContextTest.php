@@ -31,12 +31,22 @@ class ContextTest extends PHPUnit_Framework_TestCase
     public function testExpandParameterRecursive()
     {
         $context = new Context(Action::VIEW);
+        $context->showField('id*');
+        $context->showField('children*');
+
         $context->expandField('children*');
+
 
         $this->assertTrue($context->shouldExpandField([ 'children' ]));
         $this->assertTrue($context->shouldExpandField([ 'children', 'children' ]));
         $this->assertTrue($context->shouldExpandField([ 'children', 'children', 'children' ]));
         $this->assertTrue($context->shouldExpandField([ 'children', 'children', 'children', 'children' ]));
+
+        $this->assertTrue($context->shouldShowField([ 'id' ]));
+        $this->assertTrue($context->shouldShowField([ 'children', 'id' ]));
+        $this->assertTrue($context->shouldShowField([ 'children', 'children', 'id' ]));
+        $this->assertTrue($context->shouldShowField([ 'children', 'children', 'children', 'id' ]));
+        $this->assertTrue($context->shouldShowField([ 'children', 'children', 'children', 'children', 'id' ]));
     }
 
     /**
