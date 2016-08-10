@@ -259,7 +259,12 @@ class Context implements ContextContract
         $key = array_shift($path);
 
         // Check for recursive (always valid; currently we don't allow recursive on non leave nodes)
-        if (isset($source[$key . '*']) && count($source[$key . '*']) === 0) {
+        if (
+            isset($source[$key . '*']) &&
+            count($source[$key . '*']) === 0 /*&&
+            count($path) === 0*/
+
+        ) {
             return true;
         }
 

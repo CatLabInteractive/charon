@@ -38,6 +38,8 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
 
             if ($child instanceof BelongsTo) {
                 $child = $child->get()->first();
+            } elseif ($child instanceof HasOne) {
+                $child = $child->get()->first();
             }
 
             return $child;
