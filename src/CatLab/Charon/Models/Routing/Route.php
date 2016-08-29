@@ -133,6 +133,12 @@ class Route extends RouteProperties implements RouteMutator
             $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
         }
 
+        // Check consumes
+        $consumes = $this->getConsumeValues();
+        if ($consumes) {
+            $out['consumes'] = $consumes;
+        }
+
         $security = $this->getOption('security');
         if (isset($security)) {
             $out['security'] = $security;

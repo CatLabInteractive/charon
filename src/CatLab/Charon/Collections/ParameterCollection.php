@@ -6,6 +6,7 @@ use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 use CatLab\Charon\Models\Routing\Parameters\BodyParameter;
 use CatLab\Charon\Models\Routing\Parameters\PathParameter;
+use CatLab\Charon\Models\Routing\Parameters\PostParameter;
 use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
 use CatLab\Charon\Models\Routing\Route;
 
@@ -74,6 +75,20 @@ class ParameterCollection
 
         $this->parameters[$name] = $parameter;
         
+        return $parameter;
+    }
+
+    /**
+     * @param string $name
+     * @return PostParameter
+     */
+    public function post($name)
+    {
+        $parameter = new PostParameter($name);
+        $parameter->setRoute($this->route);
+
+        $this->parameters[$name] = $parameter;
+
         return $parameter;
     }
 

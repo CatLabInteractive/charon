@@ -44,11 +44,23 @@ abstract class RouteProperties implements RouteMutator
     private $summary;
 
     /**
+     * @var string[]
+     */
+    private $consumes;
+
+    /**
      * RouteCollection constructor.
      * @param array $options
      */
     public function __construct(array $options = [])
     {
+        $this->consumes = [];
+
+        if (isset($options['consumes'])) {
+            $this->consumes = $options['consumes'];
+        }
+        unset ($options['consumes']);
+
         $this->options = $options;
         $this->parameters = new ParameterCollection($this);
         $this->returnValues = [];
@@ -136,6 +148,16 @@ abstract class RouteProperties implements RouteMutator
     }
 
     /**
+     * @param string $mimetype
+     * @return RouteMutator
+     */
+    public function consumes(string $mimetype) : RouteMutator
+    {
+        $this->consumes[] = $mimetype;
+        return $this;
+    }
+
+    /**
      * @return ReturnValue[]
      */
     public function getReturnValues()
@@ -146,6 +168,20 @@ abstract class RouteProperties implements RouteMutator
         }
 
         return $out;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getConsumeValues()
+    {
+        if (count($this->consumes) > 0) {
+            return $this->consumes;
+        } elseif ($this->parent && count($parentValues = $this->parent->getConsumeValues()) > 0) {
+            return $parentValues;
+        } else {
+            return [];
+        }
     }
 
     /**

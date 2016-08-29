@@ -33,4 +33,10 @@ interface RouteMutator
      * @return RouteMutator
      */
     public function summary(string $summary) : RouteMutator;
+
+    /**
+     * @param string $mimetype
+     * @return RouteMutator
+     */
+    public function consumes(string $mimetype) : RouteMutator;
 }

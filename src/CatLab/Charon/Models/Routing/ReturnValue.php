@@ -260,4 +260,13 @@ class ReturnValue implements RouteMutator
 
         return $response;
     }
+
+    /**
+     * @param string $mimetype
+     * @return RouteMutator
+     */
+    public function consumes(string $mimetype) : RouteMutator
+    {
+        return call_user_func_array([ $this->parent, 'consumes' ], func_get_args());
+    }
 }

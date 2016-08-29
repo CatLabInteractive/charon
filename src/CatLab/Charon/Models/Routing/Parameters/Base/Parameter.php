@@ -20,7 +20,7 @@ abstract class Parameter implements RouteMutator
     const IN_QUERY = 'query';
     const IN_HEADER = 'header';
     const IN_BODY = 'body';
-    const IN_FORM = 'form';
+    const IN_FORM = 'formData';
 
     /**
      * @var string
@@ -239,5 +239,14 @@ abstract class Parameter implements RouteMutator
         }
 
         return $out;
+    }
+
+    /**
+     * @param string $mimetype
+     * @return RouteMutator
+     */
+    public function consumes(string $mimetype) : RouteMutator
+    {
+        return call_user_func_array([ $this->route, 'consumes' ], func_get_args());
     }
  }
