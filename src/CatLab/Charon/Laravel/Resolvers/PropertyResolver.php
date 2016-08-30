@@ -11,6 +11,7 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
@@ -37,6 +38,8 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
             $child = call_user_func_array(array($entity, $name), $getterParameters);
 
             if ($child instanceof BelongsTo) {
+                $child = $child->get()->first();
+            } elseif ($child instanceof HasOne) {
                 $child = $child->get()->first();
             }
 
