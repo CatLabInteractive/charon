@@ -56,6 +56,11 @@ class ResourceTransformer implements ResourceTransformerContract
     private $parents;
 
     /**
+     * @var int
+     */
+    private $maxDepth = 50;
+
+    /**
      * ResourceTransformer constructor.
      * @param PropertyResolver $propertyResolver
      * @param PropertySetter $propertySetter
@@ -337,7 +342,7 @@ class ResourceTransformer implements ResourceTransformerContract
     public function getFilters($request, $resourceDefinition, Context $context, int $records = 10)
     {
         $definition = ResourceDefinitionLibrary::make($resourceDefinition);
-        
+
         $queryBuilder = new SelectQueryParameters();
 
         // Now check for query parameters
@@ -352,10 +357,10 @@ class ResourceTransformer implements ResourceTransformerContract
                 }
             }
         }
-        
+
         // Processors
         $context->getProcessors()->processFilters($this, $queryBuilder, $request, $definition, $context, $records);
-        
+
         return $queryBuilder;
     }
 
@@ -374,6 +379,11 @@ class ResourceTransformer implements ResourceTransformerContract
         Context $context,
         $visible = true
     ) {
+        if (count($this->parents) > $this->maxDepth) {
+            $this->linkRelationship($field, $entity, $resource, $context, $visible);
+            return;
+        }
+
         switch ($field->getCardinality()) {
             case Cardinality::MANY:
                 $children = $this->propertyResolver->resolveManyRelationship(
