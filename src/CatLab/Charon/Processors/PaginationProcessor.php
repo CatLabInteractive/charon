@@ -6,6 +6,7 @@ use CatLab\Base\Interfaces\Pagination\PaginationBuilder;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\OrderParameter;
 use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Base\Models\Database\DB;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
@@ -31,6 +32,9 @@ class PaginationProcessor implements Processor
      * @var string
      */
     private $paginationClass;
+
+    const RANDOM = 'random';
+    const RANDOM_SEED_QUERY = 'seed';
 
     /**
      * PaginationProcessor constructor.
@@ -276,9 +280,25 @@ class PaginationProcessor implements Processor
 
                 $field = $definition->getFields()->getFromDisplayName($sortField);
 
-                if ($field->isSortable()) {
-                    $sortedOn[$field->getName()] = true;
-                    $builder->orderBy(new OrderParameter($field->getName(), $direction));
+                if ($field) {
+                    if ($field->isSortable()) {
+                        $sortedOn[$field->getName()] = true;
+                        $builder->orderBy(new OrderParameter($field->getName(), $direction));
+                    }
+                } else {
+                    // Check sortable
+                    switch($sortField) {
+
+                        case self::RANDOM:
+                            $this->handleRandomOrder(
+                                $builder,
+                                $direction,
+                                $request
+                            );
+
+                            break;
+
+                    }
                 }
             }
         }
@@ -296,5 +316,27 @@ class PaginationProcessor implements Processor
         }
 
         return $builder;
+    }
+
+    /**
+     * @param PaginationBuilder $builder
+     * @param $direction
+     * @param $request
+     */
+    private function handleRandomOrder(PaginationBuilder $builder, $direction, &$request)
+    {
+        if (isset($request) && isset($request[self::RANDOM_SEED_QUERY])) {
+            $random = intval($request[self::RANDOM_SEED_QUERY]);
+        } else {
+            $random = mt_rand(0, PHP_INT_MAX);
+        }
+
+
+        $builder->orderBy(new OrderParameter(
+                DB::raw('RAND(' . $random . ')'),
+                $direction)
+        );
+
+        $request[self::RANDOM_SEED_QUERY] = $random;
     }
 }
