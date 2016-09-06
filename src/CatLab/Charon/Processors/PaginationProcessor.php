@@ -36,6 +36,8 @@ class PaginationProcessor implements Processor
     const RANDOM = 'random';
     const RANDOM_SEED_QUERY = 'seed';
 
+    const MAX_INT = 2147483647;
+
     /**
      * PaginationProcessor constructor.
      * @param string $builder
@@ -328,7 +330,7 @@ class PaginationProcessor implements Processor
         if (isset($request) && isset($request[self::RANDOM_SEED_QUERY])) {
             $random = intval($request[self::RANDOM_SEED_QUERY]);
         } else {
-            $random = mt_rand(0, PHP_INT_MAX);
+            $random = mt_rand(0, self::MAX_INT);
         }
 
 
