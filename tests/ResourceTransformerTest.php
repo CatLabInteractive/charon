@@ -14,7 +14,8 @@ class ResourceTransformerTest
      */
     public function testResourceTransformer()
     {
-        $model = new MockEntityModel(1);
+        MockEntityModel::clearNextId();
+        $model = new MockEntityModel();
         $model->addChildren();
 
         $definition = MockResourceDefinition::class;

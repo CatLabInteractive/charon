@@ -19,6 +19,7 @@ use CatLab\Charon\Interfaces\EntityFactory as EntityFactoryContract;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Exceptions\InvalidContextAction;
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Exceptions\InvalidEntityException;
@@ -46,7 +47,7 @@ class ResourceTransformer implements ResourceTransformerContract
     private $propertySetter;
 
     /**
-     * @var string[]
+     * @var CurrentPath
      */
     private $currentPath;
 
@@ -80,6 +81,8 @@ class ResourceTransformer implements ResourceTransformerContract
         $this->propertyResolver = $propertyResolver;
         $this->propertySetter = $propertySetter;
         $this->parents = new ParentEntities();
+
+        $this->currentPath = new CurrentPath();
     }
 
     /**
@@ -170,7 +173,7 @@ class ResourceTransformer implements ResourceTransformerContract
         $this->parents->push($entity);
 
         foreach ($fields as $field) {
-            $this->currentPath[] = $field->getDisplayName();
+            $this->currentPath->push($field);
             $visible = $this->shouldInclude($field, $context);
             if ($visible || $field->isSortable()) {
                 if ($field instanceof RelationshipField) {
@@ -187,7 +190,7 @@ class ResourceTransformer implements ResourceTransformerContract
                     );
                 }
             }
-            array_pop($this->currentPath);
+            $this->currentPath->pop();
         }
 
         $context->getProcessors()->processResource(
@@ -256,7 +259,7 @@ class ResourceTransformer implements ResourceTransformerContract
         $fields = $resourceDefinition->getFields();
 
         foreach ($fields as $field) {
-            $this->currentPath[] = $field->getDisplayName();
+            $this->currentPath->push($field);
 
             if ($this->isWritable($field, $context)) {
                 if ($field instanceof RelationshipField) {
@@ -272,7 +275,7 @@ class ResourceTransformer implements ResourceTransformerContract
                     $resource->setProperty($field, $value, true);
                 }
             }
-            array_pop($this->currentPath);
+            $this->currentPath->pop();
         }
 
         return $resource;

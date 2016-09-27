@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Properties\Base;
 
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Interfaces\Property;
 use CatLab\Charon\Enums\Action;
@@ -167,10 +168,10 @@ class Field implements Property
 
     /**
      * @param Context $context
-     * @param string[] $currentPath
+     * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldInclude(Context $context, array $currentPath)
+    public function shouldInclude(Context $context, CurrentPath $currentPath)
     {
         $contextVisible = $context->shouldShowField($currentPath);
 

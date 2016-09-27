@@ -4,6 +4,7 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\ProcessorCollection;
 use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 
 /**
@@ -40,16 +41,16 @@ interface Context
     public function getAction() : string;
 
     /**
-     * @param string[] $fieldPath
+     * @param CurrentPath $fieldPath
      * @return bool|null
      */
-    public function shouldShowField(array $fieldPath);
+    public function shouldShowField(CurrentPath $fieldPath);
 
     /**
-     * @param string[] $fieldPath
+     * @param CurrentPath $fieldPath
      * @return bool|null
      */
-    public function shouldExpandField(array $fieldPath);
+    public function shouldExpandField(CurrentPath $fieldPath);
 
     /**
      * @return ProcessorCollection

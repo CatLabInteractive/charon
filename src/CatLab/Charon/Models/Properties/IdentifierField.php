@@ -5,6 +5,7 @@ namespace CatLab\Charon\Models\Properties;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Exceptions\NotImplementedException;
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Models\ValidationBuilder;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -31,10 +32,10 @@ class IdentifierField extends ResourceField
 
     /**
      * @param Context $context
-     * @param array $currentPath
+     * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldInclude(Context $context, array $currentPath)
+    public function shouldInclude(Context $context, CurrentPath $currentPath)
     {
         return true;
     }

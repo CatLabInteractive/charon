@@ -8,6 +8,7 @@ use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Swagger\SwaggerBuilder;
@@ -62,6 +63,11 @@ class RelationshipField extends Field
      * @var mixed
      */
     private $meta;
+
+    /**
+     * @var int
+     */
+    private $maxDepth = 1;
 
     /**
      * RelationshipField constructor.
@@ -215,12 +221,30 @@ class RelationshipField extends Field
 
     /**
      * @param Context $context
-     * @param string[] $currentPath
+     * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldExpand(Context $context, array $currentPath)
+    public function shouldExpand(Context $context, CurrentPath $currentPath)
     {
         return $this->isExpanded() || ($context->shouldExpandField($currentPath) && $this->isExpandable());
+    }
+
+    /**
+     * @param Context $context
+     * @param CurrentPath $currentPath
+     * @return bool
+     */
+    public function shouldInclude(Context $context, CurrentPath $currentPath)
+    {
+        // Check for max depth.
+        if ($maxDepth = $this->getMaxDepth()) {
+            $existing = $currentPath->countSame($this);
+            if ($existing > $maxDepth) {
+                return false;
+            }
+        }
+
+        return parent::shouldInclude($context, $currentPath);
     }
 
     /**
@@ -256,6 +280,24 @@ class RelationshipField extends Field
     {
         $this->meta = array_merge($this->meta, [ $key => $value ]);
         return $this;
+    }
+
+    /**
+     * @param int $depth
+     * @return $this
+     */
+    public function maxDepth(int $depth)
+    {
+        $this->maxDepth = $depth;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxDepth()
+    {
+        return $this->maxDepth;
     }
 
     /**

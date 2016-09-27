@@ -12,13 +12,33 @@ class MockEntityModel
      */
     private $children;
 
+    private static $_nextId;
+
+    /**
+     * @return int
+     */
+    private static function getNextId()
+    {
+        if (!isset(self::$_nextId)) {
+            self::$_nextId = 0;
+        }
+
+        return ++self::$_nextId;
+    }
+
+    public static function clearNextId()
+    {
+        if (isset(self::$_nextId)) {
+            self::$_nextId = 0;
+        }
+    }
+
     /**
      * MockEntityModel constructor.
-     * @param $id
      */
-    public function __construct($id)
+    public function __construct()
     {
-        $this->id = $id;
+        $this->id = self::getNextId();
         $this->children = [];
     }
 
@@ -27,9 +47,9 @@ class MockEntityModel
      */
     public function addChildren()
     {
-        $this->children[] = new MockEntityModel(2);
-        $this->children[] = new MockEntityModel(3);
-        $this->children[] = new MockEntityModel(4);
+        $this->children[] = new MockEntityModel($this->id + 1);
+        $this->children[] = new MockEntityModel($this->id + 2);
+        $this->children[] = new MockEntityModel($this->id + 3);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace CatLab\RESTResource\Tests;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
 
+use CatLab\Charon\Models\CurrentPath;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -21,8 +22,8 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context = new Context(Action::VIEW);
         $context->expandField('children');
 
-        $this->assertTrue($context->shouldExpandField([ 'children' ]));
-        $this->assertNull($context->shouldExpandField([ 'children', 'children' ]));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children' ])));
+        $this->assertNull($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children' ])));
     }
 
     /**
@@ -36,32 +37,33 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
         $context->expandField('children*');
 
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children' ])));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children' ])));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children', 'children' ])));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children', 'children', 'children' ])));
 
-        $this->assertTrue($context->shouldExpandField([ 'children' ]));
-        $this->assertTrue($context->shouldExpandField([ 'children', 'children' ]));
-        $this->assertTrue($context->shouldExpandField([ 'children', 'children', 'children' ]));
-        $this->assertTrue($context->shouldExpandField([ 'children', 'children', 'children', 'children' ]));
-
-        $this->assertTrue($context->shouldShowField([ 'id' ]));
-        $this->assertTrue($context->shouldShowField([ 'children', 'id' ]));
-        $this->assertTrue($context->shouldShowField([ 'children', 'children', 'id' ]));
-        $this->assertTrue($context->shouldShowField([ 'children', 'children', 'children', 'id' ]));
-        $this->assertTrue($context->shouldShowField([ 'children', 'children', 'children', 'children', 'id' ]));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'id' ])));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'id' ])));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'id' ])));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'id' ])));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'children', 'id' ])));
 
         // Nothing should have a name.
+
+        // @TODO THIS SHOULD WORK TOO
         /*
-         * TODO THIS SHOULD WORK TOO
-        $this->assertFalse((bool) $context->shouldShowField([ 'asset' ]));
-        $this->assertFalse((bool) $context->shouldShowField([ 'children', 'asset' ]));
-        $this->assertFalse((bool) $context->shouldShowField([ 'children', 'children', 'asset' ]));
-        $this->assertFalse((bool) $context->shouldShowField([ 'children', 'children', 'children', 'asset' ]));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'asset' ])));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset' ])));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset' ])));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset' ])));
 
         // Nothing should have an asset
-        $this->assertFalse((bool) $context->shouldShowField([ 'asset', 'id' ]));
-        $this->assertFalse((bool) $context->shouldShowField([ 'children', 'asset', 'id' ]));
-        $this->assertFalse((bool) $context->shouldShowField([ 'children', 'children', 'asset', 'id' ]));
-        $this->assertFalse((bool) $context->shouldShowField([ 'children', 'children', 'children', 'asset', 'id' ]));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'asset', 'id' ])));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset', 'id' ])));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset', 'id' ])));
+        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset', 'id' ])));
         */
+
     }
 
     /**
@@ -73,16 +75,16 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $context->expandField('foobar');
         $context->expandField('children*');
 
-        $this->assertTrue($context->shouldExpandField([ 'children' ]));
-        $this->assertTrue($context->shouldExpandField([ 'foobar' ]));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children' ])));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'foobar' ])));
 
-        $this->assertTrue($context->shouldExpandField([ 'children', 'children' ]));
-        $this->assertNull($context->shouldExpandField([ 'foobar', 'foobar' ]));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children' ])));
+        $this->assertNull($context->shouldExpandField(CurrentPath::fromArray([ 'foobar', 'foobar' ])));
 
-        $this->assertTrue($context->shouldExpandField([ 'children', 'children', 'children' ]));
-        $this->assertNull($context->shouldExpandField([ 'foobar', 'foobar', 'foobar' ]));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children', 'children' ])));
+        $this->assertNull($context->shouldExpandField(CurrentPath::fromArray([ 'foobar', 'foobar', 'foobar' ])));
 
-        $this->assertTrue($context->shouldExpandField([ 'children', 'children', 'children', 'children' ]));
-        $this->assertNull($context->shouldExpandField([ 'foobar', 'foobar', 'foobar', 'foobar' ]));
+        $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children', 'children', 'children' ])));
+        $this->assertNull($context->shouldExpandField(CurrentPath::fromArray([ 'foobar', 'foobar', 'foobar', 'foobar' ])));
     }
 }

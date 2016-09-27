@@ -183,29 +183,29 @@ class Context implements ContextContract
     }
 
     /**
-     * @param string[] $fieldPath
+     * @param CurrentPath $fieldPath
      * @return bool|null
      */
-    public function shouldShowField(array $fieldPath)
+    public function shouldShowField(CurrentPath $fieldPath)
     {
         if (count($this->fieldsToShow) === 0) {
             return null;
         }
 
-        return $this->arrayPathExists($this->fieldsToShow, $fieldPath);
+        return $this->arrayPathExists($this->fieldsToShow, $fieldPath->toArray());
     }
 
     /**
-     * @param string[] $fieldPath
+     * @param CurrentPath $fieldPath
      * @return bool|null
      */
-    public function shouldExpandField(array $fieldPath)
+    public function shouldExpandField(CurrentPath $fieldPath)
     {
         if (count($this->fieldsToExpand) === 0) {
             return null;
         }
 
-        return $this->arrayPathExists($this->fieldsToExpand, $fieldPath);
+        return $this->arrayPathExists($this->fieldsToExpand, $fieldPath->toArray());
     }
 
     /**

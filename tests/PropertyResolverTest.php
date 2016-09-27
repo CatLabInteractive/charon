@@ -58,7 +58,8 @@ class PropertyResolverTest extends PHPUnit_Framework_TestCase
         $propertyResolver = new \CatLab\Charon\Resolvers\PropertyResolver();
         $transformer = new \CatLab\Charon\Transformers\ResourceTransformer($propertyResolver);
 
-        $model = new MockEntityModel(1);
+        MockEntityModel::clearNextId();
+        $model = new MockEntityModel();
         $model->addChildren();
 
         $context = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::VIEW);
