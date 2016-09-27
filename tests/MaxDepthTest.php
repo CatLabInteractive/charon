@@ -7,7 +7,16 @@ use MockEntityModel;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
 
+use MockResourceDefinitionDepthFour;
+use MockResourceDefinitionDepthOne;
+use MockResourceDefinitionDepthThree;
+use MockResourceDefinitionDepthTwo;
 use PHPUnit_Framework_TestCase;
+
+require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthOne.php';
+require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthTwo.php';
+require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthThree.php';
+require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthFour.php';
 
 /**
  * Class MaxDepthTest
@@ -18,6 +27,9 @@ use PHPUnit_Framework_TestCase;
  */
 class MaxDepthTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @return MockEntityModel
+     */
     private function getDeepChildren()
     {
         MockEntityModel::clearNextId();
@@ -37,307 +49,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @return mixed
      */
-    public function testOutputMaxDepthOne()
+    private function getDeepArray()
     {
-        $transformer = new ResourceTransformer();
-
-        $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(MockResourceDefinitionDepthOne::class, $mockEntity, new Context(Action::VIEW));
-
-        $expected = json_decode('
-            {
-               "name":1,
-               "children":{
-                  "items":[
-                     {
-                        "name":2
-                     },
-                     {
-                        "name":3
-                     },
-                     {
-                        "name":4
-                     }
-                  ]
-               }
-            }
-        ', true);
-
-        $this->assertEquals($expected, $resource->toArray());
-    }
-
-    /**
-     *
-     */
-    public function testOutputMaxDepthTwo()
-    {
-        $transformer = new ResourceTransformer();
-
-        $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(MockResourceDefinitionDepthTwo::class, $mockEntity, new Context(Action::VIEW));
-
-        $expected = json_decode('
-            {
-               "name":1,
-               "children":{
-                  "items":[
-                     {
-                        "name":2,
-                        "children":{
-                           "items":[
-                              {
-                                 "name":5
-                              },
-                              {
-                                 "name":6
-                              },
-                              {
-                                 "name":7
-                              }
-                           ]
-                        }
-                     },
-                     {
-                        "name":3,
-                        "children":{
-                           "items":[
-                              {
-                                 "name":17
-                              },
-                              {
-                                 "name":18
-                              },
-                              {
-                                 "name":19
-                              }
-                           ]
-                        }
-                     },
-                     {
-                        "name":4,
-                        "children":{
-                           "items":[
-                              {
-                                 "name":29
-                              },
-                              {
-                                 "name":30
-                              },
-                              {
-                                 "name":31
-                              }
-                           ]
-                        }
-                     }
-                  ]
-               }
-            }
-        ', true);
-
-        $this->assertEquals($expected, $resource->toArray());
-    }
-
-    /**
-     *
-     */
-    public function testOutputMaxDepthThree()
-    {
-        $transformer = new ResourceTransformer();
-
-        $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(MockResourceDefinitionDepthThree::class, $mockEntity, new Context(Action::VIEW));
-
-        $expected = json_decode('
-            {
-               "name":1,
-               "children":{
-                  "items":[
-                     {
-                        "name":2,
-                        "children":{
-                           "items":[
-                              {
-                                 "name":5,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":8
-                                       },
-                                       {
-                                          "name":9
-                                       },
-                                       {
-                                          "name":10
-                                       }
-                                    ]
-                                 }
-                              },
-                              {
-                                 "name":6,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":11
-                                       },
-                                       {
-                                          "name":12
-                                       },
-                                       {
-                                          "name":13
-                                       }
-                                    ]
-                                 }
-                              },
-                              {
-                                 "name":7,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":14
-                                       },
-                                       {
-                                          "name":15
-                                       },
-                                       {
-                                          "name":16
-                                       }
-                                    ]
-                                 }
-                              }
-                           ]
-                        }
-                     },
-                     {
-                        "name":3,
-                        "children":{
-                           "items":[
-                              {
-                                 "name":17,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":20
-                                       },
-                                       {
-                                          "name":21
-                                       },
-                                       {
-                                          "name":22
-                                       }
-                                    ]
-                                 }
-                              },
-                              {
-                                 "name":18,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":23
-                                       },
-                                       {
-                                          "name":24
-                                       },
-                                       {
-                                          "name":25
-                                       }
-                                    ]
-                                 }
-                              },
-                              {
-                                 "name":19,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":26
-                                       },
-                                       {
-                                          "name":27
-                                       },
-                                       {
-                                          "name":28
-                                       }
-                                    ]
-                                 }
-                              }
-                           ]
-                        }
-                     },
-                     {
-                        "name":4,
-                        "children":{
-                           "items":[
-                              {
-                                 "name":29,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":32
-                                       },
-                                       {
-                                          "name":33
-                                       },
-                                       {
-                                          "name":34
-                                       }
-                                    ]
-                                 }
-                              },
-                              {
-                                 "name":30,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":35
-                                       },
-                                       {
-                                          "name":36
-                                       },
-                                       {
-                                          "name":37
-                                       }
-                                    ]
-                                 }
-                              },
-                              {
-                                 "name":31,
-                                 "children":{
-                                    "items":[
-                                       {
-                                          "name":38
-                                       },
-                                       {
-                                          "name":39
-                                       },
-                                       {
-                                          "name":40
-                                       }
-                                    ]
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  ]
-               }
-            }
-        ', true);
-
-        $this->assertEquals($expected, $resource->toArray());
-    }
-
-    /**
-     *
-     */
-    public function testOutputMaxDepthFour()
-    {
-        $transformer = new ResourceTransformer();
-
-        $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(MockResourceDefinitionDepthFour::class, $mockEntity, new Context(Action::VIEW));
-
-        $expected = json_decode('
+        return json_decode('
             {
                "name":1,
                "children":{
@@ -646,88 +362,390 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                }
             }
         ', true);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDeepData3()
+    {
+        return json_decode('
+            {
+               "name":1,
+               "children":{
+                  "items":[
+                     {
+                        "name":2,
+                        "children":{
+                           "items":[
+                              {
+                                 "name":5,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":8
+                                       },
+                                       {
+                                          "name":9
+                                       },
+                                       {
+                                          "name":10
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "name":6,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":11
+                                       },
+                                       {
+                                          "name":12
+                                       },
+                                       {
+                                          "name":13
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "name":7,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":14
+                                       },
+                                       {
+                                          "name":15
+                                       },
+                                       {
+                                          "name":16
+                                       }
+                                    ]
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name":3,
+                        "children":{
+                           "items":[
+                              {
+                                 "name":17,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":20
+                                       },
+                                       {
+                                          "name":21
+                                       },
+                                       {
+                                          "name":22
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "name":18,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":23
+                                       },
+                                       {
+                                          "name":24
+                                       },
+                                       {
+                                          "name":25
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "name":19,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":26
+                                       },
+                                       {
+                                          "name":27
+                                       },
+                                       {
+                                          "name":28
+                                       }
+                                    ]
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name":4,
+                        "children":{
+                           "items":[
+                              {
+                                 "name":29,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":32
+                                       },
+                                       {
+                                          "name":33
+                                       },
+                                       {
+                                          "name":34
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "name":30,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":35
+                                       },
+                                       {
+                                          "name":36
+                                       },
+                                       {
+                                          "name":37
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "name":31,
+                                 "children":{
+                                    "items":[
+                                       {
+                                          "name":38
+                                       },
+                                       {
+                                          "name":39
+                                       },
+                                       {
+                                          "name":40
+                                       }
+                                    ]
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               }
+            }
+        ', true);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDeepData2()
+    {
+        return json_decode('
+            {
+               "name":1,
+               "children":{
+                  "items":[
+                     {
+                        "name":2,
+                        "children":{
+                           "items":[
+                              {
+                                 "name":5
+                              },
+                              {
+                                 "name":6
+                              },
+                              {
+                                 "name":7
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name":3,
+                        "children":{
+                           "items":[
+                              {
+                                 "name":17
+                              },
+                              {
+                                 "name":18
+                              },
+                              {
+                                 "name":19
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name":4,
+                        "children":{
+                           "items":[
+                              {
+                                 "name":29
+                              },
+                              {
+                                 "name":30
+                              },
+                              {
+                                 "name":31
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               }
+            }
+        ', true);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDeepData1()
+    {
+        return json_decode('
+            {
+               "name":1,
+               "children":{
+                  "items":[
+                     {
+                        "name":2
+                     },
+                     {
+                        "name":3
+                     },
+                     {
+                        "name":4
+                     }
+                  ]
+               }
+            }
+        ', true);
+    }
+
+
+    /**
+     *
+     */
+    public function testOutputMaxDepthOne()
+    {
+        $transformer = new ResourceTransformer();
+
+        $mockEntity = $this->getDeepChildren();
+        $resource = $transformer->toResource(\MockResourceDefinitionDepthOne::class, $mockEntity, new Context(Action::VIEW));
+
+        $expected = $this->getDeepData1();
 
         $this->assertEquals($expected, $resource->toArray());
     }
-}
 
-
-class MockResourceDefinitionDepthOne extends \CatLab\Charon\Models\ResourceDefinition
-{
-    public function __construct()
+    /**
+     *
+     */
+    public function testOutputMaxDepthTwo()
     {
-        parent::__construct(MockEntityModel::class);
+        $transformer = new ResourceTransformer();
 
-        $this
-            ->field('id')
-            ->display('name')
-            ->visible(true)
+        $mockEntity = $this->getDeepChildren();
+        $resource = $transformer->toResource(\MockResourceDefinitionDepthTwo::class, $mockEntity, new Context(Action::VIEW));
 
-            ->relationship('children', MockResourceDefinitionDepthOne::class)
-            ->expanded()
-            ->visible()
-            ->many()
-        ;
+        $expected = $this->getDeepData2();
+
+        $this->assertEquals($expected, $resource->toArray());
     }
-}
 
-class MockResourceDefinitionDepthTwo extends \CatLab\Charon\Models\ResourceDefinition
-{
-    public function __construct()
+    /**
+     *
+     */
+    public function testOutputMaxDepthThree()
     {
-        parent::__construct(MockEntityModel::class);
+        $transformer = new ResourceTransformer();
 
-        $this
-            ->field('id')
-            ->display('name')
-            ->visible(true)
+        $mockEntity = $this->getDeepChildren();
+        $resource = $transformer->toResource(\MockResourceDefinitionDepthThree::class, $mockEntity, new Context(Action::VIEW));
 
-            ->relationship('children', MockResourceDefinitionDepthTwo::class)
-            ->expanded()
-            ->visible()
-            ->many()
-            ->maxDepth(2)
-        ;
+        $expected = $this->getDeepData3();
+
+        $this->assertEquals($expected, $resource->toArray());
     }
-}
 
-
-class MockResourceDefinitionDepthThree extends \CatLab\Charon\Models\ResourceDefinition
-{
-    public function __construct()
+    /**
+     *
+     */
+    public function testOutputMaxDepthFour()
     {
-        parent::__construct(MockEntityModel::class);
+        $transformer = new ResourceTransformer();
 
-        $this
-            ->field('id')
-            ->display('name')
-            ->visible(true)
+        $mockEntity = $this->getDeepChildren();
+        $resource = $transformer->toResource(MockResourceDefinitionDepthFour::class, $mockEntity, new Context(Action::VIEW));
 
-            ->relationship('children', MockResourceDefinitionDepthThree::class)
-            ->expanded()
-            ->visible()
-            ->many()
-            ->maxDepth(3)
-        ;
+        $expected = $this->getDeepArray();
+
+        $this->assertEquals($expected, $resource->toArray());
     }
-}
 
-class MockResourceDefinitionDepthFour extends \CatLab\Charon\Models\ResourceDefinition
-{
-    public function __construct()
+    /**
+     *
+     */
+    public function testInputDepthOne()
     {
-        parent::__construct(MockEntityModel::class);
+        $transformer = new ResourceTransformer();
 
-        $this
-            ->field('id')
-            ->display('name')
-            ->visible(true)
+        $input = $this->getDeepArray();
 
-            ->relationship('children', MockResourceDefinitionDepthFour::class)
-            ->expanded()
-            ->visible()
-            ->many()
-            ->maxDepth(4)
-        ;
+        $resource = $transformer->fromArray(
+            MockResourceDefinitionDepthOne::class,
+            $input,
+            new Context(Action::CREATE)
+        );
+
+        $this->assertEquals($this->getDeepData1(), $resource->toArray());
+    }
+
+    /**
+     *
+     */
+    public function testInputDepthTwo()
+    {
+        $transformer = new ResourceTransformer();
+
+        $input = $this->getDeepArray();
+
+        $resource = $transformer->fromArray(
+            MockResourceDefinitionDepthTwo::class,
+            $input,
+            new Context(Action::CREATE)
+        );
+
+        $this->assertEquals($this->getDeepData2(), $resource->toArray());
+    }
+
+    /**
+     *
+     */
+    public function testInputDepthThree()
+    {
+        $transformer = new ResourceTransformer();
+
+        $input = $this->getDeepArray();
+
+        $resource = $transformer->fromArray(
+            MockResourceDefinitionDepthThree::class,
+            $input,
+            new Context(Action::CREATE)
+        );
+
+        $this->assertEquals($this->getDeepData3(), $resource->toArray());
     }
 }
