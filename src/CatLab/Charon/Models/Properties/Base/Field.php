@@ -2,7 +2,9 @@
 
 namespace CatLab\Charon\Models\Properties\Base;
 
+use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
 use CatLab\Charon\Models\CurrentPath;
+use CatLab\Charon\Models\Values\Base\RelationshipValue;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Interfaces\Property;
 use CatLab\Charon\Enums\Action;
@@ -16,7 +18,7 @@ use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Interfaces\Validator;
 
-class Field implements Property
+class Field implements Property, ResourceDefinitionManipulator
 {
     use \CatLab\Requirements\Traits\RequirementSetter;
 
@@ -202,16 +204,16 @@ class Field implements Property
      * @param string $resourceDefinitionClass
      * @return RelationshipField
      */
-    public function relationship($name, $resourceDefinitionClass)
+    public function relationship($name, $resourceDefinitionClass) : RelationshipField
     {
         return $this->resourceDefinition->relationship($name, $resourceDefinitionClass);
     }
 
     /**
      * @param Validator $validator
-     * @return ResourceDefinition
+     * @return ResourceDefinitionManipulator
      */
-    public function validator(Validator $validator)
+    public function validator(Validator $validator) : ResourceDefinitionManipulator
     {
         return $this->resourceDefinition->validator($validator);
     }
@@ -276,5 +278,19 @@ class Field implements Property
     public function isSortable()
     {
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray() : array
+    {
+        $out = [
+            'name' => $this->getPropertyName(),
+            'type' => $this->getType(),
+            'access' => $this->actions
+        ];
+
+        return $out;
     }
 }

@@ -4,6 +4,8 @@ namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
+use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
+use CatLab\Charon\Models\Properties\Base\PropertyGroup;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\Properties\IdentifierField;
@@ -17,7 +19,7 @@ use CatLab\Requirements\Interfaces\Validator;
  * Class ResourceDefinition
  * @package CatLab\RESTResource\Models
  */
-class ResourceDefinition implements ResourceDefinitionContract
+class ResourceDefinition implements ResourceDefinitionContract, ResourceDefinitionManipulator
 {
     /**
      * @var ResourceFieldCollection
@@ -64,14 +66,24 @@ class ResourceDefinition implements ResourceDefinitionContract
 
     /**
      * @param string $name
-     * @return ResourceField
+     * @return ResourceField|PropertyGroup
      */
     public function field($name)
     {
-        $field = new ResourceField($this, $name);
-        $this->fields->add($field);
+        if (is_array($name)) {
+            $fields = [];
+            foreach ($name as $v) {
+                $field = new ResourceField($this, $v);
+                $fields[] = $field;
+                $this->fields->add($field);
+            }
+            return new PropertyGroup($this, $fields);
+        } else {
+            $field = new ResourceField($this, $name);
+            $this->fields->add($field);
 
-        return $field;
+            return $field;
+        }
     }
 
     /**
@@ -79,7 +91,7 @@ class ResourceDefinition implements ResourceDefinitionContract
      * @param string $resourceDefinition
      * @return RelationshipField
      */
-    public function relationship($name, $resourceDefinition)
+    public function relationship($name, $resourceDefinition) : RelationshipField
     {
         $field = new RelationshipField($this, $name, $resourceDefinition);
         $this->fields->add($field);
@@ -105,9 +117,9 @@ class ResourceDefinition implements ResourceDefinitionContract
 
     /**
      * @param Validator $validator
-     * @return $this
+     * @return ResourceDefinitionManipulator
      */
-    public function validator(Validator $validator)
+    public function validator(Validator $validator) : ResourceDefinitionManipulator
     {
         $this->validators->add($validator);
         return $this;
