@@ -29,6 +29,20 @@ class ContextTest extends PHPUnit_Framework_TestCase
     /**
      *
      */
+    public function testSelectiveExpand()
+    {
+        $context = new Context(Action::VIEW);
+        $context->showField('children.id');
+        $context->expandField('children');
+
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'id' ])));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'id' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'name' ])));
+    }
+
+    /**
+     *
+     */
     public function testExpandParameterRecursive()
     {
         $context = new Context(Action::VIEW);
@@ -37,32 +51,30 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
         $context->expandField('children*');
 
+        // All children should be included
         $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children' ])));
         $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children' ])));
         $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children', 'children' ])));
         $this->assertTrue($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children', 'children', 'children' ])));
 
+        // All children ids should be included
         $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'id' ])));
         $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'id' ])));
         $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'id' ])));
         $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'id' ])));
         $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'children', 'id' ])));
 
-        // Nothing should have a name.
+        // Nothing should have an asset.
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'asset' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset' ])));
 
-        // @TODO THIS SHOULD WORK TOO
-        /*
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'asset' ])));
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset' ])));
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset' ])));
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset' ])));
-
-        // Nothing should have an asset
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'asset', 'id' ])));
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset', 'id' ])));
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset', 'id' ])));
-        $this->assertFalse((bool) $context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset', 'id' ])));
-        */
+        // Nothing should have an asset id (since nothing should have an asset :))
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'asset', 'id' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset', 'id' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset', 'id' ])));
+        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset', 'id' ])));
 
     }
 

@@ -250,24 +250,44 @@ class Context implements ContextContract
     }
 
     /**
-     * @param array $source
+     * @param array $fieldsToShow
      * @param array $path
+     * @param array $recursivePath
      * @return bool
      */
-    private function arrayPathExists(array &$source, array $path)
+    private function arrayPathExists(array &$fieldsToShow, array $path, array $recursivePath = [])
     {
+        // We need to start from the right and mvoe to the left.
         $key = array_shift($path);
 
-        // Check for recursive (always valid; currently we don't allow recursive on non leave nodes)
-        if (isset($source[$key . '*']) && count($source[$key . '*']) === 0) {
-            return true;
+        // Check for recursive
+        if (isset($recursivePath[$key])) {
+            if (count($path) == 0) {
+                return true;
+            } else {
+                return $this->arrayPathExists($fieldsToShow, $path, $recursivePath);
+            }
         }
 
-        if (isset($source[$key])) {
-            if (count($source[$key]) === 0) {
+        if (isset($fieldsToShow[$key . '*'])) {
+            if (count($path) == 0) {
+                return true;
+            } else {
+                // Check for all keys on this level that are recursive
+                foreach ($fieldsToShow as $k => $v) {
+                    if (mb_substr($k, -1) === '*') {
+                        $recursivePath[mb_substr($k, 0, -1)] = true;
+                    }
+                }
+                return $this->arrayPathExists($fieldsToShow[$key . '*'], $path, $recursivePath);
+            }
+        }
+
+        if (isset($fieldsToShow[$key])) {
+            if (count($fieldsToShow[$key]) === 0) {
                 return count($path) > 0 ? null : true;
             } elseif (count($path) > 0) {
-                return $this->arrayPathExists($source[$key], $path);
+                return $this->arrayPathExists($fieldsToShow[$key], $path);
             } else {
                 return true;
             }
