@@ -26,6 +26,18 @@ class ContextTest extends PHPUnit_Framework_TestCase
         $this->assertNull($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children' ])));
     }
 
+    public function testSelectiveShow()
+    {
+        $context = new Context(Action::VIEW);
+        $context->showField('children*');
+
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children' ])));
+        $this->assertTrue($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children' ])));
+
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'id' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'id' ])));
+    }
+
     /**
      *
      */
@@ -66,15 +78,15 @@ class ContextTest extends PHPUnit_Framework_TestCase
 
         // Nothing should have an asset.
         $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'asset' ])));
-        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset' ])));
-        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset' ])));
-        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset' ])));
 
         // Nothing should have an asset id (since nothing should have an asset :))
         $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'asset', 'id' ])));
-        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset', 'id' ])));
-        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset', 'id' ])));
-        $this->assertFalse($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset', 'id' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'asset', 'id' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'asset', 'id' ])));
+        $this->assertNull($context->shouldShowField(CurrentPath::fromArray([ 'children', 'children', 'children', 'asset', 'id' ])));
 
     }
 

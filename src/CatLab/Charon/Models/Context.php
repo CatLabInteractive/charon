@@ -269,6 +269,10 @@ class Context implements ContextContract
             }
         }
 
+        if (count($fieldsToShow) == 0) {
+            return null;
+        }
+
         if (isset($fieldsToShow[$key . '*'])) {
             if (count($path) == 0) {
                 return true;
