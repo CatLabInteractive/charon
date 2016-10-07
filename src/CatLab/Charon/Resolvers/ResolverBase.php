@@ -77,6 +77,10 @@ class ResolverBase
         $curI = 0;
 
         foreach ($matches[0] as $v) {
+            if ($v == self::CHILDPATH_PARAMETER_SEPARATOR) {
+                $curI --;
+            }
+
             if (!isset($out[$curI])) {
                 $out[$curI] = $v;
             } else {

@@ -30,6 +30,11 @@ class PropertyResolverTest extends PHPUnit_Framework_TestCase
             [ '{variable}', 'parameter', '{variable.parent.bla}' ],
             $propertyResolver->splitPathParameters('{variable}.parameter.{variable.parent.bla}')
         );
+
+        $this->assertEquals(
+            [ 'filteredAttachments:{context.revision}:{context.currentUser}' ],
+            $propertyResolver->splitPathParameters('filteredAttachments:{context.revision}:{context.currentUser}')
+        );
     }
 
     /**
