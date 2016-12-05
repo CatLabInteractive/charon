@@ -4,6 +4,7 @@ namespace CatLab\Charon\Resolvers;
 
 use CatLab\Charon\Collections\PropertyValues;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 use CatLab\Charon\Interfaces\DynamicContext;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Enums\Action;
@@ -294,7 +295,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         Context $context
     ) {
         $children = $this->resolvePropertyInput($transformer, $input, $field, $context);
-        
+
         if (
             $children &&
             isset($children[ResourceTransformer::RELATIONSHIP_ITEMS]) &&
@@ -324,7 +325,12 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         // Child field
         $fieldName = array_shift($path);
 
-        list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+        try {
+            list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+        } catch (VariableNotFoundInContext $e) {
+            return;
+        }
+
 
         // Entity class name
         $entityClassName = $field->getResourceDefinition()->getEntityClassName();
