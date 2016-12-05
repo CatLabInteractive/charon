@@ -16,6 +16,7 @@ use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 use CatLab\Charon\Models\Values\PropertyValue;
+use ReflectionMethod;
 
 /**
  * Class PropertyResolver
@@ -244,6 +245,15 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
     }
 
     /**
+     * @param Field $field
+     * @return string
+     */
+    public function getQualifiedName(Field $field)
+    {
+        return $field->getResourceDefinition()->getEntityClassName() . '.' . $field->getName();
+    }
+
+    /**
      * Return TRUE if the input has an id, and thus is an edit of an existing field.
      * @param ResourceTransformer $transformer
      * @param ResourceDefinition $resourceDefinition
@@ -294,5 +304,36 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
             return $children[ResourceTransformer::RELATIONSHIP_ITEMS];
         }
         return null;
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param $entityCollection
+     * @param RelationshipField $field
+     * @param Context $context
+     * @return void
+     */
+    public function eagerLoadRelationship(
+        ResourceTransformer $transformer,
+        $entityCollection,
+        RelationshipField $field,
+        Context $context
+    ) {
+        $path = $this->splitPathParameters($field->getName());
+
+        // Child field
+        $fieldName = array_shift($path);
+
+        list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+
+        // Entity class name
+        $entityClassName = $field->getResourceDefinition()->getEntityClassName();
+        $method = self::EAGER_LOAD_METHOD_PREFIX . ucfirst($name);
+
+        // Check if method exist
+        if (method_exists($entityClassName, $method)) {
+            $eagerLoadMethod = $entityClassName . '::' . $method;
+            call_user_func_array($eagerLoadMethod, array_merge([ $entityCollection ], $parameters));
+        }
     }
 }

@@ -7,6 +7,7 @@ use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
@@ -35,15 +36,21 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
 
         // Check for laravel "relationship" method
         elseif (method_exists($entity, $name)) {
-            $child = call_user_func_array(array($entity, $name), $getterParameters);
 
-            if ($child instanceof BelongsTo) {
-                $child = $child->get()->first();
-            } elseif ($child instanceof HasOne) {
-                $child = $child->get()->first();
+            if ($entity->relationLoaded($name)) {
+                return $entity->$name;
+            } else {
+
+                $child = call_user_func_array(array($entity, $name), $getterParameters);
+
+                if ($child instanceof BelongsTo) {
+                    $child = $child->get()->first();
+                } elseif ($child instanceof HasOne) {
+                    $child = $child->get()->first();
+                }
+
+                return $child;
             }
-
-            return $child;
         }
 
         elseif (method_exists($entity, 'is'.ucfirst($name))) {
@@ -131,5 +138,17 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
                 return $entity;
             }
         }
+    }
+
+    /**
+     * @param Field $field
+     * @return string
+     */
+    public function getQualifiedName(Field $field)
+    {
+        $name = $field->getResourceDefinition()->getEntityClassName();
+        $obj = new $name;
+
+        return $obj->getTable() . '.' . $field->getName();
     }
 }

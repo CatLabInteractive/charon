@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Interfaces;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
@@ -100,4 +101,18 @@ interface ResourceTransformer
      * @return PropertySetter
      */
     public function getPropertySetter() : PropertySetter;
+
+    /**
+     * @param Field $field
+     * @return string
+     */
+    public function getQualifiedName(Field $field) : string;
+
+    /**
+     * @param $entities
+     * @param $resourceDefinition
+     * @param Context $context
+     * @return void
+     */
+    public function processEagerLoading($entities, $resourceDefinition, Context $context);
 }

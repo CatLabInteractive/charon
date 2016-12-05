@@ -154,4 +154,24 @@ interface PropertyResolver
         string $key,
         $default = null
     );
+
+    /**
+     * @param Field $field
+     * @return mixed
+     */
+    public function getQualifiedName(Field $field);
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param $entityCollection
+     * @param RelationshipField $field
+     * @param Context $context
+     * @return void
+     */
+    public function eagerLoadRelationship(
+        ResourceTransformer $transformer,
+        $entityCollection,
+        RelationshipField $field,
+        Context $context
+    );
 }

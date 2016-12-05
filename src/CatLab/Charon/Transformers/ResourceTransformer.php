@@ -368,6 +368,35 @@ class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
+     * Given a querybuilder or a list of items, process eager loading for each relationship that should be visible.
+     * This method should be called before calling toEntities, and is also called for each relationship that needs
+     * to be loaded.
+     * @param $entities
+     * @param $resourceDefinition
+     * @param ContextContract $context
+     */
+    public function processEagerLoading($entities, $resourceDefinition, Context $context)
+    {
+        $definition = ResourceDefinitionLibrary::make($resourceDefinition);
+
+        // Now check for query parameters
+        foreach ($definition->getFields() as $field) {
+
+            $this->currentPath->push($field);
+
+            if (
+                $field instanceof RelationshipField &&
+                $this->shouldInclude($field, $context) &&
+                $this->shouldExpand($field, $context)
+            ) {
+                $this->propertyResolver->eagerLoadRelationship($this, $entities, $field, $context);
+            }
+
+            $this->currentPath->pop();
+        }
+    }
+
+    /**
      * @param RelationshipField $field
      * @param mixed $entity
      * @param RESTResource $resource
@@ -543,5 +572,14 @@ class ResourceTransformer implements ResourceTransformerContract
     public function getPropertySetter() : PropertySetter
     {
         return $this->propertySetter;
+    }
+
+    /**
+     * @param Field $field
+     * @return string
+     */
+    public function getQualifiedName(Field $field) : string
+    {
+        return $this->getPropertyResolver()->getQualifiedName($field);
     }
 }

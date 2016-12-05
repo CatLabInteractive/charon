@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Properties\Base;
 
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
+use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -18,6 +19,10 @@ use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Interfaces\Validator;
 
+/**
+ * Class Field
+ * @package CatLab\Charon\Models\Properties\Base
+ */
 class Field implements Property, ResourceDefinitionManipulator
 {
     use \CatLab\Requirements\Traits\RequirementSetter;

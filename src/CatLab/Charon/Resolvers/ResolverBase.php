@@ -30,6 +30,8 @@ class ResolverBase
     const REGEX_ACCOLADE_PARAMETER = '\{(?:[^{}]|(?R))+\}';
     const REGEX_REGULAR_PARAMETER = '[^{}.\s]+';
 
+    const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
+
     /**
      * @param ResourceTransformer $transformer
      * @param $entity
@@ -215,6 +217,7 @@ class ResolverBase
      * @param $name
      * @param Context $context
      * @param Field $field
+     * @param $entity
      * @return array
      * @throws VariableNotFoundInContext
      */
@@ -223,7 +226,7 @@ class ResolverBase
         $name,
         Context $context,
         Field $field,
-        $entity
+        $entity = null
     ) {
         $parameters = explode(self::CHILDPATH_PARAMETER_SEPARATOR, $name);
         $name = array_shift($parameters);

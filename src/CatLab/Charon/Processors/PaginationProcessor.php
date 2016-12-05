@@ -285,7 +285,7 @@ class PaginationProcessor implements Processor
                 if ($field) {
                     if ($field->isSortable()) {
                         $sortedOn[$field->getName()] = true;
-                        $builder->orderBy(new OrderParameter($field->getName(), $direction));
+                        $builder->orderBy(new OrderParameter($transformer->getQualifiedName($field), $direction));
                     }
                 } else {
                     // Check sortable
@@ -308,7 +308,7 @@ class PaginationProcessor implements Processor
         // Add all
         foreach ($definition->getFields() as $field) {
             if ($field instanceof IdentifierField && !isset($sortedOn[$field->getName()])) {
-                $builder->orderBy(new OrderParameter($field->getName(), OrderParameter::ASC));
+                $builder->orderBy(new OrderParameter($transformer->getQualifiedName($field), OrderParameter::ASC));
             }
         }
 
