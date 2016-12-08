@@ -134,7 +134,7 @@ class PaginationProcessor implements Processor
             }
 
             $cursor = $builder->getNavigation();
-            
+
             if ($parent) {
                 $url = $parent->getField()->getUrl();
             } elseif($context->getUrl()) {
@@ -169,7 +169,7 @@ class PaginationProcessor implements Processor
         $properties = $resource->getProperties();
 
         $out = [];
-        
+
         foreach ($sortOrder as $sort) {
             $value = $properties->getFromName($sort->getColumn());
             if ($value) {
@@ -308,7 +308,7 @@ class PaginationProcessor implements Processor
         // Add all
         foreach ($definition->getFields() as $field) {
             if ($field instanceof IdentifierField && !isset($sortedOn[$field->getName()])) {
-                $builder->orderBy(new OrderParameter($transformer->getQualifiedName($field), OrderParameter::ASC));
+                $builder->orderBy(new OrderParameter($field->getName(), OrderParameter::ASC));
             }
         }
 
