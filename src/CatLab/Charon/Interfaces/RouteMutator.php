@@ -1,6 +1,7 @@
 <?php
 
 namespace CatLab\Charon\Interfaces;
+use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Models\Routing\ReturnValue;
 
@@ -39,4 +40,11 @@ interface RouteMutator
      * @return RouteMutator
      */
     public function consumes(string $mimetype) : RouteMutator;
+
+    /**
+     * @param string $order
+     * @param $direction
+     * @return mixed
+     */
+    public function defaultOrder(string $order, $direction = OrderParameter::ASC) : RouteMutator;
 }

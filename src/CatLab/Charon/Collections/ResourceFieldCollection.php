@@ -39,4 +39,34 @@ class ResourceFieldCollection extends Collection
         }
         return null;
     }
+
+    /**
+     * @return array|ResourceFieldCollection
+     */
+    public function getSortable()
+    {
+        $out = new self();
+        foreach ($this as $v) {
+            if ($v->isSortable()) {
+                $out[] = $v;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return array|ResourceFieldCollection
+     */
+    public function getExpendable()
+    {
+        $out = new self();
+        foreach ($this as $v) {
+            if ($v->isExpendable()) {
+                $out[] = $v;
+            }
+        }
+
+        return $out;
+    }
 }

@@ -5,7 +5,11 @@ namespace CatLab\Charon\Models\Routing;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
+use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RouteMutator;
+use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
+use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
 use CatLab\Requirements\Enums\PropertyType;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 
@@ -99,6 +103,18 @@ class Route extends RouteProperties implements RouteMutator
 
         $out = [];
 
+        $parameters = $this->getParameters();
+
+        // Check return
+        $returnValues = $this->getReturnValues();
+        foreach ($returnValues as $returnValue) {
+            $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
+        }
+
+        foreach ($this->getExtraParameters() as $parameter) {
+            $parameters[] = $parameter;
+        }
+
         $out['summary'] = $this->getSummary();
         $out['parameters'] = [];
 
@@ -110,7 +126,7 @@ class Route extends RouteProperties implements RouteMutator
             }
         }
 
-        foreach ($this->getParameters() as $parameter) {
+        foreach ($parameters as $parameter) {
             $out['parameters'][] = $parameter->toSwagger($builder);
         }
 
@@ -125,14 +141,6 @@ class Route extends RouteProperties implements RouteMutator
             }
         });
 
-        $out['responses'] = [];
-
-        // Check return
-        $returnValues = $this->getReturnValues();
-        foreach ($returnValues as $returnValue) {
-            $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
-        }
-
         // Check consumes
         $consumes = $this->getConsumeValues();
         if ($consumes) {
@@ -145,5 +153,61 @@ class Route extends RouteProperties implements RouteMutator
         }
 
         return $out;
+    }
+
+    /**
+     * @return Parameter[]
+     */
+    private function getExtraParameters()
+    {
+        $returnValues = $this->getReturnValues();
+
+        $sortValues = [];
+        $expandValues = [];
+        $selectValues = [];
+
+        foreach ($returnValues as $returnValue) {
+
+            // Look for sortable fields
+            $resourceDefinition = $returnValue->getResourceDefinition();
+            if ($resourceDefinition) {
+
+                foreach ($resourceDefinition->getFields() as $field) {
+                    if ($field->isSortable()) {
+                        $sortValues[] = $field->getDisplayName();
+                        $sortValues[] = '!' . $field->getDisplayName();
+                    }
+
+                    if ($field instanceof RelationshipField) {
+                        if ($field->isExpandable()) {
+                            $expandValues[] = $field->getDisplayName();
+                        }
+                    }
+
+                    $selectValues[] = $field->getDisplayName();
+                }
+            }
+        }
+
+        $parameters = [];
+
+        if (count($sortValues) > 0) {
+            $parameters[] = (new QueryParameter(ResourceTransformer::SORT_PARAMETER))
+                ->setType('string')
+                ->enum($sortValues)
+                ->describe('Define the sort parameter. Separate multiple values with comma.')
+            ;
+        }
+
+        if (count($expandValues) > 0) {
+            $parameters[] = (new QueryParameter(ResourceTransformer::EXPAND_PARAMETER))
+                ->setType('string')
+                ->enum($expandValues)
+                ->describe('Expand relationships. Separate multiple values with comma.')
+            ;
+        }
+
+
+        return $parameters;
     }
 }

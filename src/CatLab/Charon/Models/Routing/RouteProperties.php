@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Routing;
 
+use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Interfaces\RouteMutator;
@@ -47,6 +48,11 @@ abstract class RouteProperties implements RouteMutator
      * @var string[]
      */
     private $consumes;
+
+    /**
+     * @var string[]
+     */
+    private $defaultOrder;
 
     /**
      * RouteCollection constructor.
@@ -211,6 +217,28 @@ abstract class RouteProperties implements RouteMutator
     public function getSummary()
     {
         return $this->summary;
+    }
+
+    /**
+     * @param string $order
+     * @param string $direction
+     * @return RouteMutator
+     */
+    public function defaultOrder(string $order, $direction = OrderParameter::ASC) : RouteMutator
+    {
+        $this->defaultOrder = [
+            [ $order, $direction ]
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getDefaultOrder()
+    {
+        return $this->defaultOrder;
     }
 
     /**

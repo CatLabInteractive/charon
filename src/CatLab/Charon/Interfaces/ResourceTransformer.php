@@ -16,6 +16,7 @@ interface ResourceTransformer
     const RELATIONSHIP_LINK = 'link';
     const RELATIONSHIP_ITEMS = 'items';
     const SORT_PARAMETER = 'sort';
+    const EXPAND_PARAMETER = 'expand';
     const LIMIT_PARAMETER = 'records';
 
     /**

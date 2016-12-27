@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Routing\Parameters\Base;
 
+use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
@@ -63,6 +64,11 @@ abstract class Parameter implements RouteMutator
     private $default;
 
     /**
+     * @var bool
+     */
+    private $allowMultiple;
+
+    /**
      * Parameter constructor.
      * @param string $name
      * @param $type
@@ -101,6 +107,16 @@ abstract class Parameter implements RouteMutator
     public function enum(array $values)
     {
         $this->values = $values;
+        return $this;
+    }
+
+    /**
+     * @param bool $multiple
+     * @return $this
+     */
+    public function allowMultiple($multiple = true)
+    {
+        $this->allowMultiple = $multiple;
         return $this;
     }
 
@@ -238,6 +254,10 @@ abstract class Parameter implements RouteMutator
             $out['default'] = $this->default;
         }
 
+        if (isset($this->allowMultiple)) {
+            $out['allowMultiple'] = $this->allowMultiple;
+        }
+
         return $out;
     }
 
@@ -248,5 +268,15 @@ abstract class Parameter implements RouteMutator
     public function consumes(string $mimetype) : RouteMutator
     {
         return call_user_func_array([ $this->route, 'consumes' ], func_get_args());
+    }
+
+    /**
+     * @param string $order
+     * @param string $direction
+     * @return RouteMutator
+     */
+    public function defaultOrder(string $order, $direction = OrderParameter::ASC) : RouteMutator
+    {
+        return $this->route->defaultOrder($order, $direction);
     }
  }

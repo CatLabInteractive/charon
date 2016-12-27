@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Routing;
 
+use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\HeaderCollection;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Enums\Cardinality;
@@ -221,6 +222,18 @@ class ReturnValue implements RouteMutator
     }
 
     /**
+     * @return \CatLab\Charon\Interfaces\ResourceDefinition|null
+     */
+    public function getResourceDefinition()
+    {
+        if (PropertyType::isNative($this->getType())) {
+            return null;
+        } else {
+            return ResourceDefinitionLibrary::make($this->getType());
+        }
+    }
+
+    /**
      * @param DescriptionBuilder $builder
      * @return array
      */
@@ -268,5 +281,15 @@ class ReturnValue implements RouteMutator
     public function consumes(string $mimetype) : RouteMutator
     {
         return call_user_func_array([ $this->parent, 'consumes' ], func_get_args());
+    }
+
+    /**
+     * @param string $order
+     * @param string $direction
+     * @return RouteMutator
+     */
+    public function defaultOrder(string $order, $direction = OrderParameter::ASC) : RouteMutator
+    {
+        return $this->parent->defaultOrder($order, $direction);
     }
 }
