@@ -90,6 +90,15 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
                 $models->take($field->getRecords());
             }
 
+            // Handle the order
+            $orderBys = $field->getOrderBy();
+            foreach ($orderBys as $orderBy) {
+                $sortField = $field->getChildResource()->getFields()->getFromDisplayName($orderBy[0]);
+                if ($sortField) {
+                    $models->orderBy($transformer->getQualifiedName($sortField, $orderBy[1]));
+                }
+            }
+
             $models = $models->get();
         }
 

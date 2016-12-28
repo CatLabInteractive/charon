@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Properties;
 
+use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -68,6 +69,11 @@ class RelationshipField extends Field
      * @var int
      */
     private $maxDepth = 1;
+
+    /**
+     * @var array[]
+     */
+    private $sortBy = [];
 
     /**
      * RelationshipField constructor.
@@ -301,6 +307,25 @@ class RelationshipField extends Field
     }
 
     /**
+     * @param $field
+     * @param string $direction
+     * @return $this
+     */
+    public function orderBy($field, $direction = OrderParameter::ASC)
+    {
+        $this->sortBy[] = [ $field, $direction ];
+        return $this;
+    }
+
+    /**
+     * @return \array[]
+     */
+    public function getOrderBy()
+    {
+        return $this->sortBy;
+    }
+
+    /**
      * @param SwaggerBuilder $builder
      * @param $action
      * @return mixed[]
@@ -344,7 +369,7 @@ class RelationshipField extends Field
                         ResourceTransformer::RELATIONSHIP_LINK => [
                             'type' => 'string'
                         ]
-                    ]   
+                    ]
                 ]
             ];
         }
