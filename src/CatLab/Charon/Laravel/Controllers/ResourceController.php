@@ -56,7 +56,11 @@ trait ResourceController
         // Process eager loading
         $this->resourceTransformer->processEagerLoading($model, $resourceDefinition, $context);
 
-        $models = $model->get();
+        if ($model instanceof Builder) {
+            $models = $model->get();
+        } else {
+            $models = $model;
+        }
 
         if ($filter->isReverse()) {
             $models = $models->reverse();
