@@ -60,6 +60,20 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                "paths":{
                   "api\/v1\/description.{format}":{
                      "get":{
+                        "responses":{
+                           "403":{
+                              "description":"Authentication error",
+                              "headers":[
+            
+                              ]
+                           },
+                           "404":{
+                              "description":"Entity not found",
+                              "headers":[
+            
+                              ]
+                           }
+                        },
                         "summary":"Get swagger API description",
                         "parameters":[
                            {
@@ -77,7 +91,24 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                         "tags":[
                            "swagger"
                         ],
+                        "security":{
+                           "oauth2":[
+                              "full"
+                           ]
+                        }
+                     }
+                  },
+                  "api\/v1\/pets.{format}":{
+                     "get":{
                         "responses":{
+                           "200":{
+                              "schema":{
+                                 "$ref":"#\/definitions\/Pet_index_items"
+                              },
+                              "headers":[
+            
+                              ]
+                           },
                            "403":{
                               "description":"Authentication error",
                               "headers":[
@@ -91,15 +122,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               ]
                            }
                         },
-                        "security":{
-                           "oauth2":[
-                              "full"
-                           ]
-                        }
-                     }
-                  },
-                  "api\/v1\/pets.{format}":{
-                     "get":{
                         "summary":"Get all pet",
                         "parameters":[
                            {
@@ -130,30 +152,31 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                                  "json"
                               ],
                               "default":"json"
+                           },
+                           {
+                              "name":"sort",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Define the sort parameter. Separate multiple values with comma.",
+                              "enum":[
+                                 "pet-id",
+                                 "!pet-id"
+                              ]
+                           },
+                           {
+                              "name":"expand",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Expand relationships. Separate multiple values with comma.",
+                              "enum":[
+                                 "category",
+                                 "photos",
+                                 "tags"
+                              ]
                            }
                         ],
-                        "responses":{
-                           "200":{
-                              "schema":{
-                                 "$ref":"#\/definitions\/Pet_index_items"
-                              },
-                              "headers":[
-            
-                              ]
-                           },
-                           "403":{
-                              "description":"Authentication error",
-                              "headers":[
-            
-                              ]
-                           },
-                           "404":{
-                              "description":"Entity not found",
-                              "headers":[
-            
-                              ]
-                           }
-                        },
                         "security":{
                            "oauth2":[
                               "full"
@@ -163,26 +186,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                   },
                   "api\/v1\/pets\/{id}.{format}":{
                      "get":{
-                        "summary":"Get a pet",
-                        "parameters":[
-                           {
-                              "name":"id",
-                              "type":"integer",
-                              "in":"path",
-                              "required":true
-                           },
-                           {
-                              "name":"format",
-                              "type":"string",
-                              "in":"path",
-                              "required":false,
-                              "description":"Output format",
-                              "enum":[
-                                 "json"
-                              ],
-                              "default":"json"
-                           }
-                        ],
                         "responses":{
                            "200":{
                               "schema":{
@@ -205,6 +208,49 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               ]
                            }
                         },
+                        "summary":"Get a pet",
+                        "parameters":[
+                           {
+                              "name":"id",
+                              "type":"integer",
+                              "in":"path",
+                              "required":true
+                           },
+                           {
+                              "name":"format",
+                              "type":"string",
+                              "in":"path",
+                              "required":false,
+                              "description":"Output format",
+                              "enum":[
+                                 "json"
+                              ],
+                              "default":"json"
+                           },
+                           {
+                              "name":"sort",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Define the sort parameter. Separate multiple values with comma.",
+                              "enum":[
+                                 "pet-id",
+                                 "!pet-id"
+                              ]
+                           },
+                           {
+                              "name":"expand",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Expand relationships. Separate multiple values with comma.",
+                              "enum":[
+                                 "category",
+                                 "photos",
+                                 "tags"
+                              ]
+                           }
+                        ],
                         "security":{
                            "oauth2":[
                               "full"
