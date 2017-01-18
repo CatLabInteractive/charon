@@ -342,8 +342,12 @@ class ResourceTransformer implements ResourceTransformerContract
      * @param int $records
      * @return SelectQueryParameters
      */
-    public function getFilters($request, $resourceDefinition, Context $context, int $records = 10)
+    public function getFilters($request, $resourceDefinition, Context $context, int $records = null)
     {
+        if ($records === null) {
+            $records = 10;
+        }
+
         $definition = ResourceDefinitionLibrary::make($resourceDefinition);
 
         $queryBuilder = new SelectQueryParameters();
