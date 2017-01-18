@@ -16,6 +16,7 @@ use CatLab\Charon\Laravel\Resolvers\PropertySetter;
 use CatLab\Charon\Laravel\Transformers\ResourceTransformer;
 use CatLab\Charon\Models\RESTResource;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Request;
 
 /**
@@ -56,7 +57,10 @@ trait ResourceController
         // Process eager loading
         $this->resourceTransformer->processEagerLoading($model, $resourceDefinition, $context);
 
-        if ($model instanceof Builder) {
+        if (
+            $model instanceof Builder ||
+            $model instanceof Relation
+        ) {
             $models = $model->get();
         } else {
             $models = $model;
