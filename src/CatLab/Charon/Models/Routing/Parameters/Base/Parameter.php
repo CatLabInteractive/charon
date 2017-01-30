@@ -211,22 +211,22 @@ abstract class Parameter implements RouteMutator
         return $this->route->tag($tag);
     }
 
-     /**
-      * @return ParameterCollection
-      */
-     public function parameters() : ParameterCollection
-     {
-         return $this->route->parameters();
-     }
+    /**
+     * @return ParameterCollection
+     */
+    public function parameters() : ParameterCollection
+    {
+        return $this->route->parameters();
+    }
 
-     /**
-      * @param string $summary
-      * @return RouteMutator
-      */
-     public function summary(string $summary) : RouteMutator
-     {
-         return $this->route->summary($summary);
-     }
+    /**
+     * @param string $summary
+     * @return RouteMutator
+     */
+    public function summary(string $summary) : RouteMutator
+    {
+        return $this->route->summary($summary);
+    }
 
 
     /**
@@ -279,4 +279,4 @@ abstract class Parameter implements RouteMutator
     {
         return $this->route->defaultOrder($order, $direction);
     }
- }
+}

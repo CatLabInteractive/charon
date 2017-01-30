@@ -5,6 +5,7 @@ namespace CatLab\Charon\Collections;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 use CatLab\Charon\Models\Routing\Parameters\BodyParameter;
+use CatLab\Charon\Models\Routing\Parameters\FileParameter;
 use CatLab\Charon\Models\Routing\Parameters\PathParameter;
 use CatLab\Charon\Models\Routing\Parameters\PostParameter;
 use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
@@ -85,6 +86,20 @@ class ParameterCollection
     public function post($name)
     {
         $parameter = new PostParameter($name);
+        $parameter->setRoute($this->route);
+
+        $this->parameters[$name] = $parameter;
+
+        return $parameter;
+    }
+
+    /**
+     * @param $name
+     * @return FileParameter
+     */
+    public function file($name)
+    {
+        $parameter = new FileParameter($name);
         $parameter->setRoute($this->route);
 
         $this->parameters[$name] = $parameter;
