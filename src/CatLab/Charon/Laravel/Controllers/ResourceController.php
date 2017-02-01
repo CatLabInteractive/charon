@@ -166,7 +166,7 @@ trait ResourceController
     public function bodyToResource(Context $context, $resourceDefinition = null)
     {
         $content = Request::instance()->getContent();
-        switch (mb_strtolower(Request::header('content-type'))) {
+        switch ($this->getContentType()) {
             case 'application/json':
             case 'text/json':
                 $content = json_decode($content, true);
@@ -181,9 +181,32 @@ trait ResourceController
                     $context
                 );
 
+            case 'multipart/form-data':
+            case 'application/x-www-form-urlencoded':
+
+                $content = $_POST;
+
+                return $this->resourceTransformer->fromArray(
+                    $resourceDefinition ?? $this->resourceDefinition,
+                    $content,
+                    $context
+                );
+
+                break;
+
             default:
                 throw new \InvalidArgumentException("Could not decode body.");
         }
+    }
+
+    /**
+     * @return mixed|string
+     */
+    private function getContentType()
+    {
+        $contentType = mb_strtolower(Request::header('content-type'));
+        $parts = explode(';', $contentType);
+        return $parts[0];
     }
 
     /**
