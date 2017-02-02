@@ -107,11 +107,14 @@ class Route extends RouteProperties implements RouteMutator
 
         // Check return
         $returnValues = $this->getReturnValues();
+        $hasManyReturnValue = false;
         foreach ($returnValues as $returnValue) {
             $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
+            $hasManyReturnValue =
+                $hasManyReturnValue || $returnValue->getCardinality() == ReturnValue::CARDINALITY_MANY;
         }
 
-        foreach ($this->getExtraParameters() as $parameter) {
+        foreach ($this->getExtraParameters($hasManyReturnValue) as $parameter) {
             $parameters[] = $parameter;
         }
 
@@ -131,7 +134,7 @@ class Route extends RouteProperties implements RouteMutator
         }
 
         // Sort parameters: required first
-        usort($out['parameters'], function($a, $b) {
+        usort($out['parameters'], function ($a, $b) {
             if ($a['required'] && !$b['required']) {
                 return -1;
             } elseif ($b['required'] && !$a['required']) {
@@ -156,9 +159,10 @@ class Route extends RouteProperties implements RouteMutator
     }
 
     /**
+     * @param bool TRUE if at least one return value consists of multiple models.
      * @return Parameter[]
      */
-    private function getExtraParameters()
+    private function getExtraParameters($hasCardinalityMany)
     {
         $returnValues = $this->getReturnValues();
 
@@ -173,11 +177,14 @@ class Route extends RouteProperties implements RouteMutator
             if ($resourceDefinition) {
 
                 foreach ($resourceDefinition->getFields() as $field) {
-                    if ($field->isSortable()) {
+
+                    // Sortable field
+                    if ($field->isSortable() && $hasCardinalityMany) {
                         $sortValues[] = $field->getDisplayName();
                         $sortValues[] = '!' . $field->getDisplayName();
                     }
 
+                    // Expandable field
                     if ($field instanceof RelationshipField) {
                         if ($field->isExpandable()) {
                             $expandValues[] = $field->getDisplayName();
