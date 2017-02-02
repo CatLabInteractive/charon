@@ -228,17 +228,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "default":"json"
                            },
                            {
-                              "name":"sort",
-                              "type":"string",
-                              "in":"query",
-                              "required":false,
-                              "description":"Define the sort parameter. Separate multiple values with comma.",
-                              "enum":[
-                                 "pet-id",
-                                 "!pet-id"
-                              ]
-                           },
-                           {
                               "name":"expand",
                               "type":"string",
                               "in":"query",
