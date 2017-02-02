@@ -8,6 +8,9 @@ use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
+use CatLab\Requirements\Exists;
+use CatLab\Requirements\InArray;
+use CatLab\Requirements\Interfaces\Requirement;
 
 /**
  * Class Parameter
@@ -278,5 +281,22 @@ abstract class Parameter implements RouteMutator
     public function defaultOrder(string $order, $direction = OrderParameter::ASC) : RouteMutator
     {
         return $this->route->defaultOrder($order, $direction);
+    }
+
+    /**
+     * Set parameter requirements from a CatLab Requirement
+     * @param Requirement $requirement
+     */
+    public function setFromRequirement(Requirement $requirement)
+    {
+        $class = get_class($requirement);
+        switch ($class) {
+            case Exists::class:
+                $this->required();
+                return;
+
+            case InArray::class:
+                $this->enum($requirement->getValues());
+        }
     }
 }

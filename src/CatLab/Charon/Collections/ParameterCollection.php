@@ -139,7 +139,10 @@ class ParameterCollection
     {
         $post = $this->post($field->getDisplayName());
         $post->setType($field->getType());
-        $post->required($field->isRequired());
+
+        foreach ($field->getRequirements() as $v) {
+            $post->setFromRequirement($v);
+        }
 
         return $post;
     }
