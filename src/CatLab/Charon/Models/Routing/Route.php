@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Routing;
 
 use CatLab\Charon\Collections\RouteCollection;
+use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -111,7 +112,7 @@ class Route extends RouteProperties implements RouteMutator
         foreach ($returnValues as $returnValue) {
             $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
             $hasManyReturnValue =
-                $hasManyReturnValue || $returnValue->getCardinality() == ReturnValue::CARDINALITY_MANY;
+                $hasManyReturnValue || $returnValue->getCardinality() == Cardinality::MANY;
         }
 
         foreach ($this->getExtraParameters($hasManyReturnValue) as $parameter) {

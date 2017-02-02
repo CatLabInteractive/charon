@@ -2,10 +2,11 @@
 
 namespace CatLab\Charon\Collections;
 
+use CatLab\Charon\Enums\Cardinality;
+use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
-use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
@@ -104,8 +105,14 @@ class ParameterCollection
      * @param Context $context
      * @return RouteMutator
      */
-    public function postParametersFromResourceDefinition($resourceDefinition, Context $context)
+    public function postParametersFromResourceDefinition($resourceDefinition, Context $context = null)
     {
+        if (!$context) {
+            $context = new \CatLab\Charon\Models\Context(
+                Method::toAction($this->route->getMethod(), Cardinality::ONE)
+            );
+        }
+
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
 
         foreach ($resourceDefinition->getFields() as $field) {
@@ -115,7 +122,7 @@ class ParameterCollection
             }
 
             /** @var Field $field */
-            if ($field->shouldInclude($context, new CurrentPath())) {
+            if ($field->hasAction($context->getAction())) {
                 $this->postParameterFromField($field, $context);
             }
         }
@@ -132,6 +139,8 @@ class ParameterCollection
     {
         $post = $this->post($field->getDisplayName());
         $post->setType($field->getType());
+        $post->required($field->isRequired());
+
         return $post;
     }
 

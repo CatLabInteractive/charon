@@ -19,9 +19,6 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
  */
 class ReturnValue implements RouteMutator
 {
-    const CARDINALITY_MANY = 'many';
-    const CARDINALITY_ONE = 'one';
-
     /**
      * @var Route
      */
@@ -35,7 +32,7 @@ class ReturnValue implements RouteMutator
     /**
      * @var string
      */
-    private $cardinality = self::CARDINALITY_ONE;
+    private $cardinality = Cardinality::ONE;
 
     /**
      * @var string
@@ -84,7 +81,7 @@ class ReturnValue implements RouteMutator
      */
     public function one($type = null, $context = null) : ReturnValue
     {
-        $this->cardinality = self::CARDINALITY_ONE;
+        $this->cardinality = Cardinality::ONE;
         if (isset($type)) {
             $this->type = $type;
         }
@@ -105,7 +102,7 @@ class ReturnValue implements RouteMutator
      */
     public function many($type = null, $context = null) : ReturnValue
     {
-        $this->cardinality = self::CARDINALITY_MANY;
+        $this->cardinality = Cardinality::MANY;
         if (isset($type)) {
             $this->type = $type;
         }
