@@ -207,10 +207,12 @@ class ReturnValue implements RouteMutator
 
     /**
      * @param string $description
+     * @return $this
      */
     public function describe(string $description)
     {
         $this->description = $description;
+        return $this;
     }
 
     /**
