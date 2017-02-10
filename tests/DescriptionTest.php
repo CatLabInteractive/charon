@@ -154,6 +154,13 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "default":"json"
                            },
                            {
+                              "name":"pet-id",
+                              "type":"integer",
+                              "in":"query",
+                              "required":false,
+                              "description":"Filter results on pet-id"
+                           },
+                           {
                               "name":"sort",
                               "type":"string",
                               "in":"query",
