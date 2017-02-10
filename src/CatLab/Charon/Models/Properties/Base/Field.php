@@ -286,6 +286,14 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
+     * @return bool
+     */
+    public function isFilterable()
+    {
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function toArray() : array

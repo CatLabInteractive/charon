@@ -171,6 +171,8 @@ class Route extends RouteProperties implements RouteMutator
         $expandValues = [];
         $selectValues = [];
 
+        $parameters = [];
+
         foreach ($returnValues as $returnValue) {
 
             // Look for sortable fields
@@ -192,12 +194,17 @@ class Route extends RouteProperties implements RouteMutator
                         }
                     }
 
+                    // Filterable fields
+                    if ($field->isFilterable() && $hasCardinalityMany) {
+                        $parameters[] = (new QueryParameter($field->getDisplayName()))
+                            ->setType($field->getType())
+                            ->describe('Filter results on ' . $field->getDisplayName());
+                    }
+
                     $selectValues[] = $field->getDisplayName();
                 }
             }
         }
-
-        $parameters = [];
 
         if (count($sortValues) > 0) {
             $parameters[] = (new QueryParameter(ResourceTransformer::SORT_PARAMETER))
