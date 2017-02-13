@@ -221,6 +221,7 @@ class Route extends RouteProperties implements RouteMutator
             $parameters[] = (new QueryParameter(ResourceTransformer::SORT_PARAMETER))
                 ->setType('string')
                 ->enum($sortValues)
+                ->allowMultiple()
                 ->describe('Define the sort parameter. Separate multiple values with comma.')
             ;
         }
@@ -229,6 +230,7 @@ class Route extends RouteProperties implements RouteMutator
             $parameters[] = (new QueryParameter(ResourceTransformer::EXPAND_PARAMETER))
                 ->setType('string')
                 ->enum($expandValues)
+                ->allowMultiple()
                 ->describe('Expand relationships. Separate multiple values with comma. Values: '
                     . implode(', ', $expandValues))
             ;
@@ -238,6 +240,7 @@ class Route extends RouteProperties implements RouteMutator
             $parameters[] = (new QueryParameter(ResourceTransformer::FIELDS_PARAMETER))
                 ->setType('string')
                 ->enum($expandValues)
+                ->allowMultiple()
                 ->describe('Define fields to return. Separate multiple values with comma. Values: '
                     . implode(', ', $visibleValues))
             ;
