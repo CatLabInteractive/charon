@@ -8,11 +8,13 @@ use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RouteMutator;
+use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
 use CatLab\Requirements\Enums\PropertyType;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
+use CatLab\Requirements\InArray;
 
 /**
  * Class Route
@@ -196,9 +198,12 @@ class Route extends RouteProperties implements RouteMutator
 
                     // Filterable fields
                     if ($field->isFilterable() && $hasCardinalityMany) {
-                        $parameters[] = (new QueryParameter($field->getDisplayName()))
-                            ->setType($field->getType())
-                            ->describe('Filter results on ' . $field->getDisplayName());
+                        $parameters[] = $this->getFilterField($field);
+                    }
+
+                    // Searchable fields
+                    if ($field->isSearchable() && $hasCardinalityMany) {
+                        $parameters[] = $this->getSearchField($field);
                     }
 
                     $selectValues[] = $field->getDisplayName();
@@ -224,5 +229,38 @@ class Route extends RouteProperties implements RouteMutator
 
 
         return $parameters;
+    }
+
+    /**
+     * @param Field $field
+     * @return Parameter
+     */
+    private function getFilterField(Field $field)
+    {
+        $filter = (new QueryParameter($field->getDisplayName()))
+            ->setType($field->getType())
+            ->describe('Filter results on ' . $field->getDisplayName());
+
+        // Check for applicable requirements
+        foreach ($field->getRequirements() as $requirement) {
+            if ($requirement instanceof InArray) {
+                $filter->enum($requirement->getValues());
+            }
+        }
+
+        return $filter;
+    }
+
+    /**
+     * @param Field $field
+     * @return Parameter
+     */
+    private function getSearchField(Field $field)
+    {
+        $filter = (new QueryParameter($field->getDisplayName()))
+            ->setType($field->getType())
+            ->describe('Search results on ' . $field->getDisplayName());
+
+        return $filter;
     }
 }

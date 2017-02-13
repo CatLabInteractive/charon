@@ -4,7 +4,6 @@
   "type": "library",
   "require": {
     "php": ">=7.0.0",
-    "catlabinteractive/base": "0.1.*",
     "catlabinteractive/requirements": ">=0.1.13"
   },
   "require-dev": {

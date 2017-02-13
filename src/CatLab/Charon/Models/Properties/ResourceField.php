@@ -18,6 +18,11 @@ class ResourceField extends Field
      * @var bool
      */
     private $filterable;
+
+    /**
+     * @var bool
+     */
+    private $searchable;
     
     /**
      * @var bool
@@ -47,6 +52,25 @@ class ResourceField extends Field
     public function isFilterable()
     {
         return $this->filterable;
+    }
+
+    /**
+     * Searchable (text) field
+     * @param bool $searchable
+     * @return $this
+     */
+    public function searchable($searchable = true)
+    {
+        $this->searchable = $searchable;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSearchable()
+    {
+        return $this->searchable;
     }
 
     /**

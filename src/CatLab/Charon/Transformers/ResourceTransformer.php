@@ -354,14 +354,21 @@ class ResourceTransformer implements ResourceTransformerContract
 
         // Now check for query parameters
         foreach ($definition->getFields() as $field) {
-            if (
-                $field instanceof ResourceField &&
-                $field->isFilterable()
-            ) {
-                $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
-                if ($parameter) {
-                    $queryBuilder->where(new WhereParameter($field->getName(), Operator::EQ, $parameter));
+            if ($field instanceof ResourceField) {
+
+                // Filterable fields
+                if ($field->isFilterable()) {
+                    $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
+                    if ($parameter) {
+                        $queryBuilder->where(new WhereParameter($field->getName(), Operator::EQ, $parameter));
+                    }
+                } elseif ($field->isSearchable()) {
+                    $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
+                    if ($parameter) {
+                        $queryBuilder->where(new WhereParameter($field->getName(), Operator::SEARCH, $parameter));
+                    }
                 }
+
             }
         }
 

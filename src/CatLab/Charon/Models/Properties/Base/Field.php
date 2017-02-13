@@ -294,6 +294,14 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
+     * @return bool
+     */
+    public function isSearchable()
+    {
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function toArray() : array
