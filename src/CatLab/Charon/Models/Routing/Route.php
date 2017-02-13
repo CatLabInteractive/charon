@@ -172,6 +172,7 @@ class Route extends RouteProperties implements RouteMutator
         $sortValues = [];
         $expandValues = [];
         $selectValues = [];
+        $visibleValues = [];
 
         $parameters = [];
 
@@ -206,6 +207,11 @@ class Route extends RouteProperties implements RouteMutator
                         $parameters[] = $this->getSearchField($field);
                     }
 
+                    // Visible
+                    if ($field->isVisible()) {
+                        $visibleValues[] = $field->getDisplayName();
+                    }
+
                     $selectValues[] = $field->getDisplayName();
                 }
             }
@@ -227,6 +233,13 @@ class Route extends RouteProperties implements RouteMutator
             ;
         }
 
+        if (count($visibleValues) > 0) {
+            $parameters[] = (new QueryParameter(ResourceTransformer::FIELDS_PARAMETER))
+                ->setType('string')
+                ->describe('Define fields to return, comma separate. Values: '
+                    . implode(', ', $visibleValues))
+            ;
+        }
 
         return $parameters;
     }

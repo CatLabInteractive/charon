@@ -1,6 +1,7 @@
 <?php
 
 namespace CatLab\Charon\Interfaces;
+
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -18,6 +19,7 @@ interface ResourceTransformer
     const SORT_PARAMETER = 'sort';
     const EXPAND_PARAMETER = 'expand';
     const LIMIT_PARAMETER = 'records';
+    const FIELDS_PARAMETER = 'fields';
 
     /**
      * @return mixed
