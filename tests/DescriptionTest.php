@@ -176,7 +176,19 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "type":"string",
                               "in":"query",
                               "required":false,
-                              "description":"Expand relationships. Separate multiple values with comma.",
+                              "description":"Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+                              "enum":[
+                                 "category",
+                                 "photos",
+                                 "tags"
+                              ]
+                           },
+                           {
+                              "name":"fields",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
                               "enum":[
                                  "category",
                                  "photos",
@@ -239,7 +251,19 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "type":"string",
                               "in":"query",
                               "required":false,
-                              "description":"Expand relationships. Separate multiple values with comma.",
+                              "description":"Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+                              "enum":[
+                                 "category",
+                                 "photos",
+                                 "tags"
+                              ]
+                           },
+                           {
+                              "name":"fields",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
                               "enum":[
                                  "category",
                                  "photos",
@@ -333,6 +357,9 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
             }
         
         ', true);
+
+        echo json_encode($actual);
+        exit;
 
         $this->assertEquals($expected, $actual);
     }
