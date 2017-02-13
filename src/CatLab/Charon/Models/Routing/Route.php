@@ -239,7 +239,7 @@ class Route extends RouteProperties implements RouteMutator
         if (count($visibleValues) > 0) {
             $parameters[] = (new QueryParameter(ResourceTransformer::FIELDS_PARAMETER))
                 ->setType('string')
-                ->enum($expandValues)
+                ->enum($visibleValues)
                 ->allowMultiple()
                 ->describe('Define fields to return. Separate multiple values with comma. Values: '
                     . implode(', ', $visibleValues))
