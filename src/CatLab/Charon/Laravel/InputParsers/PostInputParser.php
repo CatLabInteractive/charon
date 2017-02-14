@@ -28,6 +28,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
         Context $context
     ) {
         // TODO: Implement getIdentifiers() method.
+        return null;
     }
 
     /**
