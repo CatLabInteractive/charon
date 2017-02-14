@@ -6,6 +6,7 @@ use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Base\Models\Grammar\AndConjunction;
 use CatLab\Base\Models\Grammar\OrConjunction;
+use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Factories\EntityFactory;
 use CatLab\Charon\Laravel\InputParsers\JsonBodyInputParser;
@@ -139,7 +140,7 @@ trait ResourceController
     /**
      * @param mixed $entity
      * @param Context $context
-     * @return RESTResource
+     * @return \CatLab\Charon\Interfaces\RESTResource
      */
     public function toResource($entity, Context $context, $resourceDefinition = null)
     {
@@ -154,7 +155,7 @@ trait ResourceController
      * @param mixed $entities
      * @param Context $context
      * @param null $resourceDefinition
-     * @return RESTResource
+     * @return ResourceCollection
      * @throws \CatLab\Charon\Exceptions\InvalidEntityException
      */
     public function toResources($entities, Context $context, $resourceDefinition = null)
