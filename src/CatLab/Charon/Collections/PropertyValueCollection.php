@@ -14,7 +14,7 @@ use CatLab\Charon\Models\Values\PropertyValue;
  * Class PropertyValues
  * @package CatLab\RESTResource\Collections
  */
-class PropertyValues
+class PropertyValueCollection
 {
     /**
      * @var PropertyValue[]
@@ -129,7 +129,7 @@ class PropertyValues
     }
 
     /**
-     * @return PropertyValues
+     * @return PropertyValueCollection
      */
     public function getIdentifiers()
     {

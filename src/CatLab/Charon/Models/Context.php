@@ -2,9 +2,11 @@
 
 namespace CatLab\Charon\Models;
 
+use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ProcessorCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
+use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Interfaces\Context as ContextContract;
@@ -50,6 +52,12 @@ class Context implements ContextContract
      */
     private $url;
 
+
+    /**
+     * @var InputParserCollection
+     */
+    private $inputParsers;
+
     const FIELD_PATH_DELIMITER = '.';
 
     /**
@@ -60,6 +68,7 @@ class Context implements ContextContract
     public function __construct($action, array $parameters = [])
     {
         $this->processors = new ProcessorCollection();
+        $this->inputParsers = new InputParserCollection();
 
         $this->action = $action;
         $this->parameters = $parameters;
@@ -75,6 +84,17 @@ class Context implements ContextContract
     public function addProcessor(Processor $processor)
     {
         $this->processors->add($processor);
+        return $this;
+    }
+
+
+    /**
+     * @param string $inputParser
+     * @return $this
+     */
+    public function addInputParser(string $inputParser)
+    {
+        $this->inputParsers->add($inputParser);
         return $this;
     }
 
@@ -298,5 +318,13 @@ class Context implements ContextContract
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return InputParser
+     */
+    public function getInputParser(): InputParser
+    {
+        return $this->inputParsers;
     }
 }

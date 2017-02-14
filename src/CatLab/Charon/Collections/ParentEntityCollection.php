@@ -6,7 +6,7 @@ namespace CatLab\Charon\Collections;
  * Class ParentEntities
  * @package CatLab\RESTResource\Collections
  */
-class ParentEntities
+class ParentEntityCollection
 {
     private $entities = [];
 

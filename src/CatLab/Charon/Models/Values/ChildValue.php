@@ -3,7 +3,7 @@
 namespace CatLab\Charon\Models\Values;
 
 use CatLab\Requirements\Exceptions\PropertyValidationException;
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
@@ -85,7 +85,7 @@ class ChildValue extends RelationshipValue
      * @param ResourceTransformer $transformer
      * @param PropertyResolver $propertyResolver
      * @param $parent
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -93,7 +93,7 @@ class ChildValue extends RelationshipValue
         ResourceTransformer $transformer,
         PropertyResolver $propertyResolver,
         &$parent,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     ) {
         $childEntity = $propertyResolver->resolveProperty($transformer, $parent, $this->getField(), $context);
@@ -119,7 +119,7 @@ class ChildValue extends RelationshipValue
      * @param PropertySetter $propertySetter
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValues[] $identifiers
+     * @param PropertyValueCollection[] $identifiers
      * @param Context $context
      * @return mixed
      */

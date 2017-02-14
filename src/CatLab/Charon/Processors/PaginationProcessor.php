@@ -5,7 +5,7 @@ namespace CatLab\Charon\Processors;
 use CatLab\Base\Interfaces\Pagination\PaginationBuilder;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\OrderParameter;
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Base\Models\Database\DB;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;

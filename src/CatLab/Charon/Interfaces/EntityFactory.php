@@ -2,6 +2,8 @@
 
 namespace CatLab\Charon\Interfaces;
 
+use CatLab\Charon\Models\Identifier;
+
 /**
  * Interface EntityFactory
  * @package CatLab\RESTResource\Contracts
@@ -26,9 +28,9 @@ interface EntityFactory
 
     /**
      * @param string $entityClassName
-     * @param array $identifiers
+     * @param Identifier $identifier
      * @param Context $context
      * @return mixed
      */
-    public function resolveFromIdentifier(string $entityClassName, array $identifiers, Context $context);
+    public function resolveFromIdentifier(string $entityClassName, Identifier $identifier, Context $context);
 }

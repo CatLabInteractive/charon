@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Interfaces;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
@@ -117,7 +117,7 @@ interface PropertyResolver
      * @param ResourceTransformer $transformer
      * @param RelationshipField $field
      * @param mixed $parentEntity
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -125,7 +125,7 @@ interface PropertyResolver
         ResourceTransformer $transformer,
         RelationshipField $field,
         $parentEntity,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     );
 

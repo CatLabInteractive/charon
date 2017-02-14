@@ -61,4 +61,9 @@ interface Context
      * @return string
      */
     public function getUrl();
+
+    /**
+     * @return InputParser
+     */
+    public function getInputParser() : InputParser;
 }

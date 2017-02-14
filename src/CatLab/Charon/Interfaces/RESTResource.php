@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Interfaces;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 
 /**
  * Class Resource
@@ -16,7 +16,7 @@ interface RESTResource
     public function toArray();
 
     /**
-     * @return PropertyValues
+     * @return PropertyValueCollection
      */
     public function getProperties();
 

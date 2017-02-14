@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Resolvers;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\PropertyResolver as PropertyResolverContract;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -284,7 +284,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param PropertyResolverContract $propertyResolver
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValues[] $identifiers
+     * @param PropertyValueCollection[] $identifiers
      * @param Context $context
      * @return mixed
      */

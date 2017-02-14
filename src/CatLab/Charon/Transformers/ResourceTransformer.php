@@ -6,10 +6,13 @@ use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
-use CatLab\Charon\Collections\ParentEntities;
+use CatLab\Charon\Collections\IdentifierCollection;
+use CatLab\Charon\Collections\InputParserCollection;
+use CatLab\Charon\Collections\ParentEntityCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DynamicContext;
+use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
@@ -20,6 +23,7 @@ use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Exceptions\InvalidContextAction;
 use CatLab\Charon\Models\CurrentPath;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Exceptions\InvalidEntityException;
@@ -80,9 +84,10 @@ class ResourceTransformer implements ResourceTransformerContract
 
         $this->propertyResolver = $propertyResolver;
         $this->propertySetter = $propertySetter;
-        $this->parents = new ParentEntities();
+        $this->parents = new ParentEntityCollection();
 
         $this->currentPath = new CurrentPath();
+        $this->inputParsers = new InputParserCollection();
     }
 
     /**
@@ -156,7 +161,7 @@ class ResourceTransformer implements ResourceTransformerContract
         $this->checkEntityType($resourceDefinition, $entity);
 
         if (!Action::isReadContext($context->getAction())) {
-            throw InvalidContextAction::create('Readable', $context->getAction());
+            throw InvalidContextAction::expectedReadable($context->getAction());
         }
 
         if ($resourceDefinition instanceof DynamicContext) {
@@ -252,7 +257,7 @@ class ResourceTransformer implements ResourceTransformerContract
     {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
         if (!Action::isWriteContext($context->getAction())) {
-            throw InvalidContextAction::create('Writeable', $context->getAction());
+            throw InvalidContextAction::expectedWriteable($context->getAction());
         }
 
         $resource = new RESTResource($resourceDefinition);
@@ -294,14 +299,23 @@ class ResourceTransformer implements ResourceTransformerContract
         $content,
         EntityFactoryContract $factory,
         ContextContract $context
-    ) {
+    )
+    {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
         if (!Action::isWriteContext($context->getAction())) {
-            throw InvalidContextAction::create('Writeable', $context->getAction());
+            throw InvalidContextAction::expectedWriteable($context->getAction());
         }
 
         $out = [];
-        if (isset($content[self::RELATIONSHIP_ITEMS])) {
+        if ($content instanceof IdentifierCollection) {
+            // Collection of Identifier objects
+            foreach ($content as $v) {
+                $entity = $this->fromIdentifier($resourceDefinition, $v, $factory, $context);
+                if ($entity) {
+                    $out[] = $entity;
+                }
+            }
+        } elseif (isset($content[self::RELATIONSHIP_ITEMS])) {
             // This is a list of items
             foreach ($content[self::RELATIONSHIP_ITEMS] as $item) {
                 $entity = $this->fromIdentifier($resourceDefinition, $item, $factory, $context);
@@ -320,19 +334,24 @@ class ResourceTransformer implements ResourceTransformerContract
 
     /**
      * @param ResourceDefinition $resourceDefinition
-     * @param $content
+     * @param $identifier
      * @param EntityFactoryContract $factory
      * @param ContextContract $context
      * @return mixed
      */
     private function fromIdentifier(
         ResourceDefinition $resourceDefinition,
-        $content,
+        $identifier,
         EntityFactoryContract $factory,
         ContextContract $context
     ) {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
-        return $factory->resolveFromIdentifier($resourceDefinition->getEntityClassName(), $content, $context);
+
+        if (! ($identifier instanceof Identifier)) {
+            $identifier = Identifier::fromArray($resourceDefinition, $identifier);
+        }
+
+        return $factory->resolveFromIdentifier($resourceDefinition->getEntityClassName(), $identifier, $context);
     }
 
     /**
@@ -592,5 +611,57 @@ class ResourceTransformer implements ResourceTransformerContract
     public function getQualifiedName(Field $field) : string
     {
         return $this->getPropertyResolver()->getQualifiedName($field);
+    }
+
+    /**
+     * Create resources from whatever is in the inputs defined from the input parsers.
+     * @param $resourceDefinition
+     * @param ContextContract $context
+     * @return ResourceCollection
+     */
+    public function fromInput(
+        $resourceDefinition,
+        ContextContract $context
+    ): ResourceCollection
+    {
+        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+
+        $resources = $context->getInputParser()->getResources(
+            $this,
+            $resourceDefinition,
+            $context
+        );
+
+        if (!$resources) {
+            throw new \InvalidArgumentException("No data found in body");
+        }
+
+        return $resources;
+    }
+
+    /**
+     * Create resource identifiers from whatever is in the inputs defined from the input parsers
+     * @param $resourceDefinition
+     * @param ContextContract $context
+     * @return mixed
+     */
+    public function identifiersFromInput(
+        $resourceDefinition,
+        ContextContract $context
+    ) : IdentifierCollection
+    {
+        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+
+        $identifiers = $context->getInputParser()->getIdentifiers(
+            $this,
+            $resourceDefinition,
+            $context
+        );
+
+        if (!$identifiers) {
+            throw new \InvalidArgumentException("No data found in body");
+        }
+
+        return $identifiers;
     }
 }

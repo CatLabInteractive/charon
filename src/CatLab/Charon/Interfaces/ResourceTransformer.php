@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Charon\Collections\IdentifierCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
@@ -118,4 +119,26 @@ interface ResourceTransformer
      * @return void
      */
     public function processEagerLoading($entities, $resourceDefinition, Context $context);
+
+    /**
+     * Create resources from whatever is in the inputs defined from the input parsers.
+     * @param $resourceDefinition
+     * @param Context $context
+     * @return ResourceCollection
+     */
+    public function fromInput(
+        $resourceDefinition,
+        Context $context
+    ) : ResourceCollection;
+
+    /**
+     * Create resource identifiers from whatever is in the inputs defined from the input parsers
+     * @param $resourceDefinition
+     * @param Context $context
+     * @return mixed
+     */
+    public function identifiersFromInput(
+        $resourceDefinition,
+        Context $context
+    ) : IdentifierCollection;
 }
