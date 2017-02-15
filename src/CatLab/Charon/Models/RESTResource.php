@@ -6,7 +6,7 @@ use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -26,7 +26,7 @@ class RESTResource implements ResourceContract
     private $resourceDefinition;
 
     /**
-     * @var PropertyValues
+     * @var PropertyValueCollection
      */
     private $properties;
 
@@ -37,7 +37,7 @@ class RESTResource implements ResourceContract
     public function __construct(ResourceDefinitionContract $resourceDefinition)
     {
         $this->resourceDefinition = $resourceDefinition;
-        $this->properties = new PropertyValues();
+        $this->properties = new PropertyValueCollection();
     }
 
     /**
@@ -140,7 +140,7 @@ class RESTResource implements ResourceContract
     }
 
     /**
-     * @return PropertyValues
+     * @return PropertyValueCollection
      */
     public function getProperties()
     {
@@ -170,7 +170,7 @@ class RESTResource implements ResourceContract
     }
 
     /**
-     * @return PropertyValue[]
+     * @return PropertyValueCollection
      */
     public function getIdentifiers()
     {

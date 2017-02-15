@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Models\Values;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\PropertyResolver;
@@ -115,7 +115,7 @@ class ChildrenValue extends RelationshipValue
      * @param ResourceTransformer $transformer
      * @param PropertyResolver $propertyResolver
      * @param $parent
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -123,7 +123,7 @@ class ChildrenValue extends RelationshipValue
         ResourceTransformer $transformer,
         PropertyResolver $propertyResolver,
         &$parent,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     ) {
         return $propertyResolver->getChildByIdentifiers(
@@ -141,7 +141,7 @@ class ChildrenValue extends RelationshipValue
      * @param PropertySetter $propertySetter
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValues[] $identifiers
+     * @param PropertyValueCollection[] $identifiers
      * @param Context $context
      * @return mixed
      */

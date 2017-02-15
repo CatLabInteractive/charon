@@ -50,6 +50,14 @@ $routes->group(
             ->parameters()->path('id')->int()->required()
             ->returns(PetDefinition::class, Action::INDEX)->one()
         ;
+
+        $routes
+            ->put('pets/{id}', 'PetController@show')
+            ->summary('Get a pet')
+            ->parameters()->path('id')->int()->required()
+            ->parameters()->resource(PetDefinition::class)
+            ->returns(PetDefinition::class, Action::INDEX)->one()
+        ;
     }
 );
 

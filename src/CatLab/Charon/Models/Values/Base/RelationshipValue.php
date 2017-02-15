@@ -7,7 +7,7 @@ use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\RequirementValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
 use CatLab\Requirements\Exists;
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Interfaces\Context;
@@ -57,7 +57,7 @@ abstract class RelationshipValue extends Value
      * @param PropertySetter $propertySetter
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValues[] $identifiers
+     * @param PropertyValueCollection[] $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -75,7 +75,7 @@ abstract class RelationshipValue extends Value
      * @param ResourceTransformer $transformer
      * @param PropertyResolver $propertyResolver
      * @param $parent
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -83,7 +83,7 @@ abstract class RelationshipValue extends Value
         ResourceTransformer $transformer,
         PropertyResolver $propertyResolver,
         &$parent,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     );
 
@@ -119,7 +119,7 @@ abstract class RelationshipValue extends Value
 
         /**
          * Keep a list of all identifies we've touched, so we can removed those we haven't
-         * @var PropertyValues[] $identifiersToKeep
+         * @var PropertyValueCollection[] $identifiersToKeep
          */
         $identifiersToKeep = [];
 

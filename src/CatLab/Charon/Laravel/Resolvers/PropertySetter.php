@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Laravel\Resolvers;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
@@ -84,7 +84,7 @@ class PropertySetter extends \CatLab\Charon\Resolvers\PropertySetter
      * @param PropertyResolverContract $propertyResolver
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValues[] $identifiers
+     * @param PropertyValueCollection[] $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -104,7 +104,7 @@ class PropertySetter extends \CatLab\Charon\Resolvers\PropertySetter
 
             $children->where(function($builder) use ($identifiers) {
                 foreach ($identifiers as $item) {
-                    /** @var PropertyValues $item */
+                    /** @var PropertyValueCollection $item */
                     $builder->where(function($builder) use ($item) {
                         foreach ($item->toMap() as $k => $v) {
                             $builder->orWhere($k, '!=', $v);

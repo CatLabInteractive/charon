@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Laravel\Resolvers;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
@@ -115,7 +115,7 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
      * @param ResourceTransformer $transformer
      * @param RelationshipField $field
      * @param mixed $parentEntity
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -123,7 +123,7 @@ class PropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
         ResourceTransformer $transformer,
         RelationshipField $field,
         $parentEntity,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     ) {
         $entities = $this->resolveProperty($transformer, $parentEntity, $field, $context);

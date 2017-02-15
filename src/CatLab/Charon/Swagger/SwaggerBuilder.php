@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Swagger;
 
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -78,6 +79,11 @@ class SwaggerBuilder implements DescriptionBuilder
     private $authentications;
 
     /**
+     * @var Route
+     */
+    private $routes;
+
+    /**
      * SwaggerBuilder constructor.
      * @param string $host
      * @param string $basePath
@@ -92,6 +98,8 @@ class SwaggerBuilder implements DescriptionBuilder
 
         $this->host = $host;
         $this->basePath = $basePath;
+
+        $this->routes = [];
     }
 
     /**
@@ -112,8 +120,9 @@ class SwaggerBuilder implements DescriptionBuilder
             throw new RouteAlreadyDefined('Route ' . $method . ' ' . $path . ' is already defined.');
         }
 
-        $this->paths[$path][$method] = $route->toSwagger($this);
+        $this->paths[$path][$method] = true;
 
+        $this->routes[] = $route;
         return $this;
     }
 
@@ -302,11 +311,17 @@ class SwaggerBuilder implements DescriptionBuilder
     }
 
     /**
-     *
+     * @param Context $context
+     * @return array
      */
-    public function build()
+    public function build(Context $context)
     {
         $out = [];
+
+        // Build routes
+        foreach ($this->routes as $route) {
+            $this->buildRoute($route, $context);
+        }
 
         $out['swagger'] = '2.0';
         $out['host'] = $this->host;
@@ -323,5 +338,17 @@ class SwaggerBuilder implements DescriptionBuilder
         }
 
         return $out;
+    }
+
+    /**
+     * @param Route $route
+     * @param Context $context
+     */
+    protected function buildRoute(Route $route, Context $context)
+    {
+        $path = str_replace('?', '', $route->getPath());
+        $method = $route->getHttpMethod();
+
+        $this->paths[$path][$method] = $route->toSwagger($this, $context);
     }
 }

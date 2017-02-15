@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Factories;
 
 use CatLab\Charon\Interfaces\Context;
+use CatLab\Charon\Models\Identifier;
 use Exception;
 
 /**
@@ -41,17 +42,19 @@ class EntityFactory implements \CatLab\Charon\Interfaces\EntityFactory
 
     /**
      * @param string $entityClassName
-     * @param array $identifiers
+     * @param Identifier $identifier
      * @param Context $context
      * @return mixed
      * @throws Exception
      */
-    public function resolveFromIdentifier(string $entityClassName, array $identifiers, Context $context)
+    public function resolveFromIdentifier(string $entityClassName, Identifier $identifier, Context $context)
     {
-        if (!isset($identifiers['id'])) {
+        $data = $identifier->toArray();
+
+        if (!isset($data['id'])) {
             throw new Exception('No ID identifier found for ' . $entityClassName);
         }
 
-        return $entityClassName::find($identifiers['id']);
+        return $entityClassName::find($data['id']);
     }
 }

@@ -1,0 +1,24 @@
+{
+  "name": "charon",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://travis-ci.org/CatLabInteractive/charon.svg?branch=master)](https://travis-ci.org/CatLabInteractive/charon)",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-md": "^0.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CatLabInteractive/charon.git"
+  },
+  "author": "CatLab Interactive <info@catlab.be>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CatLabInteractive/charon/issues"
+  },
+  "homepage": "https://github.com/CatLabInteractive/charon#readme"
+}

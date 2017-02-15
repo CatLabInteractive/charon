@@ -2,10 +2,15 @@
 
 namespace CatLab\Charon\Laravel\Controllers;
 
+use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Base\Models\Grammar\AndConjunction;
 use CatLab\Base\Models\Grammar\OrConjunction;
+use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Factories\EntityFactory;
+use CatLab\Charon\Laravel\InputParsers\JsonBodyInputParser;
+use CatLab\Charon\Laravel\InputParsers\PostInputParser;
 use CatLab\Laravel\Database\SelectQueryTransformer;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -15,9 +20,14 @@ use CatLab\Charon\Laravel\Resolvers\PropertyResolver;
 use CatLab\Charon\Laravel\Resolvers\PropertySetter;
 use CatLab\Charon\Laravel\Transformers\ResourceTransformer;
 use CatLab\Charon\Models\RESTResource;
+use CatLab\Requirements\Exceptions\ResourceValidationException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+
 use Request;
+use Response;
 
 /**
  * Class ResourceController
@@ -130,7 +140,7 @@ trait ResourceController
     /**
      * @param mixed $entity
      * @param Context $context
-     * @return RESTResource
+     * @return \CatLab\Charon\Interfaces\RESTResource
      */
     public function toResource($entity, Context $context, $resourceDefinition = null)
     {
@@ -145,7 +155,7 @@ trait ResourceController
      * @param mixed $entities
      * @param Context $context
      * @param null $resourceDefinition
-     * @return RESTResource
+     * @return ResourceCollection
      * @throws \CatLab\Charon\Exceptions\InvalidEntityException
      */
     public function toResources($entities, Context $context, $resourceDefinition = null)
@@ -165,48 +175,19 @@ trait ResourceController
      */
     public function bodyToResource(Context $context, $resourceDefinition = null)
     {
-        $content = Request::instance()->getContent();
-        switch ($this->getContentType()) {
-            case 'application/json':
-            case 'text/json':
-                $content = json_decode($content, true);
-
-                if (!$content) {
-                    throw new \InvalidArgumentException("Could not decode body.");
-                }
-
-                return $this->resourceTransformer->fromArray(
-                    $resourceDefinition ?? $this->resourceDefinition,
-                    $content,
-                    $context
-                );
-
-            case 'multipart/form-data':
-            case 'application/x-www-form-urlencoded':
-
-                $content = $_POST;
-
-                return $this->resourceTransformer->fromArray(
-                    $resourceDefinition ?? $this->resourceDefinition,
-                    $content,
-                    $context
-                );
-
-                break;
-
-            default:
-                throw new \InvalidArgumentException("Could not decode body.");
-        }
+        $resources = $this->bodyToResources($context, $resourceDefinition);
+        return $resources->first();
     }
 
     /**
-     * @return mixed|string
+     * @param Context $context
+     * @param null $resourceDefinition
+     * @return \CatLab\Charon\Collections\ResourceCollection
      */
-    private function getContentType()
+    public function bodyToResources(Context $context, $resourceDefinition = null)
     {
-        $contentType = mb_strtolower(Request::header('content-type'));
-        $parts = explode(';', $contentType);
-        return $parts[0];
+        $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
+        return $this->resourceTransformer->fromInput($resourceDefinition, $context);
     }
 
     /**
@@ -217,25 +198,159 @@ trait ResourceController
      */
     public function bodyIdentifiersToEntities(Context $context, $resourceDefinition = null)
     {
-        $content = Request::instance()->getContent();
-        switch (mb_strtolower(Request::header('content-type'))) {
-            case 'application/json':
-            case 'text/json':
-                $content = json_decode($content, true);
+        $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
 
-                if (!$content) {
-                    throw new \InvalidArgumentException("Could not decode body.");
-                }
+        $identifiers = $this->resourceTransformer->identifiersFromInput(
+            $resourceDefinition,
+            $context
+        );
 
-                return $this->resourceTransformer->entitiesFromIdentifiers(
-                    $resourceDefinition ?? $this->resourceDefinition,
-                    $content,
-                    new EntityFactory(),
-                    $context
-                );
+        return $this->resourceTransformer->entitiesFromIdentifiers(
+            $resourceDefinition,
+            $identifiers,
+            new EntityFactory(),
+            $context
+        );
+    }
 
-            default:
-                throw new \InvalidArgumentException("Could not decode body.");
+    /**
+     * @param string $action
+     * @param array $parameters
+     * @return Context|string
+     */
+    protected function getContext($action = Action::VIEW, $parameters = [])
+    {
+        $context = new \CatLab\Charon\Models\Context($action, $parameters);
+
+        if ($toShow = \Request::input(ResourceTransformer::FIELDS_PARAMETER)) {
+            $context->showFields(array_map('trim', explode(',', $toShow)));
         }
+
+        if ($toExpand = \Request::input(ResourceTransformer::EXPAND_PARAMETER)) {
+            $context->expandFields(array_map('trim', explode(',', $toExpand)));
+        }
+
+        $context->setUrl(\Request::url());
+
+        $context->addInputParser(JsonBodyInputParser::class);
+        $context->addInputParser(PostInputParser::class);
+
+        return $context;
+    }
+
+    /**
+     * @param int $id
+     * @param string $resource
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function notFound($id, $resource)
+    {
+        if ($resource) {
+            throw new ModelNotFoundException('Resource ' . $id . ' ' . $resource . ' not found.');
+        } else {
+            throw new ModelNotFoundException('Resource ' . $id . ' not found.');
+        }
+    }
+
+
+    /**
+     * Output a resource or a collection of resources
+     *
+     * @param $models
+     * @param array $parameters
+     * @param null $resourceDefinition
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function outputList($models, array $parameters = [], $resourceDefinition = null)
+    {
+        $resources = $this->filteredModelsToResources($models, $parameters, $resourceDefinition);
+        return $this->toResponse($resources);
+    }
+
+    /**
+     * @param $models
+     * @param array $parameters
+     * @param null $resourceDefinition
+     * @return array|\mixed[]
+     */
+    protected function filteredModelsToResources($models, array $parameters = [], $resourceDefinition = null)
+    {
+        $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
+
+        $context = $this->getContext(Action::INDEX, $parameters);
+
+        $records = Request::input('records', 10);
+        if (!is_numeric($records)) {
+            $records = 10;
+        }
+
+        $models = $this->filterAndGet(
+            $models,
+            $resourceDefinition,
+            $context,
+            $records
+        );
+
+        return $this->modelsToResources($models, $context, $resourceDefinition);
+    }
+
+
+    /**
+     * Output a resource or a collection of resources
+     *
+     * @param $models
+     * @param array $parameters
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function output($models, array $parameters = [])
+    {
+        if (ArrayHelper::isIterable($models)) {
+            $context = $this->getContext(Action::INDEX, $parameters);
+        } else {
+            $context = $this->getContext(Action::VIEW, $parameters);
+        }
+
+        $output = $this->modelsToResources($models, $context);
+        return $this->toResponse($output);
+    }
+
+    /**
+     * @param Model|Model[] $models
+     * @param Context $context
+     * @param null $resourceDefinition
+     * @return array|\mixed[]
+     */
+    protected function modelsToResources($models, Context $context, $resourceDefinition = null)
+    {
+        if (ArrayHelper::isIterable($models)) {
+            return $this->toResources($models, $context, $resourceDefinition)->toArray();
+        } elseif ($models instanceof Model) {
+            return $this->toResource($models, $context, $resourceDefinition)->toArray();
+        } else {
+            return $models;
+        }
+    }
+
+    /**
+     * @param ResourceValidationException $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function getValidationErrorResponse(ResourceValidationException $e)
+    {
+        return $this->toResponse([
+            'error' => [
+                'message' => 'Could not decode resource.',
+                'issues' => $e->getMessages()->toMap()
+            ]
+        ])->setStatusCode(400);
+    }
+
+    /**
+     * @param $data
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function toResponse($data)
+    {
+        return Response::json($data);
     }
 }

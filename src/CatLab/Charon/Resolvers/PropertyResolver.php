@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Resolvers;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 use CatLab\Charon\Interfaces\DynamicContext;
@@ -195,7 +195,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param ResourceTransformer $transformer
      * @param RelationshipField $field
      * @param mixed $parentEntity
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -203,7 +203,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         ResourceTransformer $transformer,
         RelationshipField $field,
         $parentEntity,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     ) {
         $entities = $this->resolveProperty($transformer, $parentEntity, $field, $context);

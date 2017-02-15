@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Resolvers;
 
-use CatLab\Charon\Collections\PropertyValues;
+use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -242,14 +242,14 @@ class ResolverBase
     /**
      * @param ResourceTransformer $transformer
      * @param $original
-     * @param PropertyValues $identifiers
+     * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return bool
      */
     protected function entityEquals(
         ResourceTransformer $transformer,
         $original,
-        PropertyValues $identifiers,
+        PropertyValueCollection $identifiers,
         Context $context
     ) {
         if (count($identifiers->getValues()) === 0) {
