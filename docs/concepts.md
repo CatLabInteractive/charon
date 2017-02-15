@@ -43,12 +43,6 @@ entity getters. Entities could, for example, return data based on the currently 
 user. This can be achieved by setting the user in the context and assigning the context.user 
 variable to the entity getter.
 
-Linking / Unlinking
--------------------
-Linking and unlinking are imaginary http requests to link or unlink resources with 
-eachother. A list of identifiers (most of the times this is the resource id) are sent 
-in a `post` or `delete` request to add or remove related items.
-
 Resolvers
 ---------
 A resolver is in charge of loading data from entities or setting data into entities. 
@@ -77,6 +71,12 @@ InputParser
 -----------
 The InputParsers take raw data from the http request and translate it to resources. 
 These resources can then be validated and transformed into new or existing entities.
+
+Linking / Unlinking
+-------------------
+Linking and unlinking are imaginary http requests to link or unlink resources with 
+eachother. A list of identifiers (most of the times this is the resource id) are sent 
+in a `post` or `delete` request to add or remove related items.
 
 Swagger
 -------
