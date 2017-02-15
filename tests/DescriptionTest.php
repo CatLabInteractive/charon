@@ -385,6 +385,11 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "allowMultiple":true
                            }
                         ],
+                        "consumes":[
+                           "application\/json",
+                           "multipart\/form-data",
+                           "application\/x-www-form-urlencoded"
+                        ],
                         "security":{
                            "oauth2":[
                               "full"
@@ -532,6 +537,11 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
             }
         
         ', true);
+
+        /*
+        echo json_encode($actual);
+        exit;
+        */
 
         $this->assertEquals($expected, $actual);
     }
