@@ -251,16 +251,21 @@ abstract class Parameter implements RouteMutator
             $out['description'] = $this->description;
         }
 
-        if (isset($this->values)) {
-            $out['enum'] = $this->values;
-        }
-
         if (isset($this->default)) {
             $out['default'] = $this->default;
         }
 
         if (isset($this->allowMultiple)) {
-            $out['allowMultiple'] = $this->allowMultiple;
+            //$out['allowMultiple'] = $this->allowMultiple;
+            $out['type'] = 'array';
+            $out['items'] = array(
+                'type' => $this->getType()
+            );
+        }
+
+        if (isset($this->values)) {
+            $out['enum'] = $this->values;
+
         }
 
         return $out;
