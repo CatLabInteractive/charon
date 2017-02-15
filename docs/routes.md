@@ -43,14 +43,12 @@ properties set in the group options array will be passed on the all routes in th
 
 ```php
 $routes->group(
-        $routes->group(
-            [
-                'tags' => 'books'
-            ],
-            function(RouteCollection $routes) {
-                $routes->get('books/{id}', 'BookController@show');
-            }
-        )
+    [
+        'tags' => 'books'
+    ],
+    function(RouteCollection $routes) {
+        $routes->get('books/{id}', 'BookController@show');
+    }
 );
 ```
 
