@@ -73,6 +73,11 @@ A processor is called at various times during the Charon execution. It allows se
 filters. An example is the included Pagination processor which adds cursor based pagination 
 the an API.
 
+InputParser
+-----------
+The InputParsers take raw data from the http request and translate it to resources. 
+These resources can then be validated and transformed into new or existing entities.
+
 Swagger
 -------
 Swagger is THE WORLD'S MOST POPULAR API FRAMEWORK. Not our words. 
