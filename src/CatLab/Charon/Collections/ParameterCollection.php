@@ -5,6 +5,7 @@ namespace CatLab\Charon\Collections;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\Context;
+use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -15,6 +16,7 @@ use CatLab\Charon\Models\Routing\Parameters\FileParameter;
 use CatLab\Charon\Models\Routing\Parameters\PathParameter;
 use CatLab\Charon\Models\Routing\Parameters\PostParameter;
 use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
+use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
 use CatLab\Charon\Models\Routing\Route;
 
 /**
@@ -58,15 +60,37 @@ class ParameterCollection
     }
 
     /**
+     * @deprecated Use resource() to define resource input.
      * @param string $name
      * @return BodyParameter
      */
     public function body($name)
     {
+        if ($name instanceof ResourceDefinition) {
+            $name = get_class($name);
+        }
+
         $parameter = new BodyParameter($name);
         $parameter->setRoute($this->route);
 
         $this->parameters[$name] = $parameter;
+
+        return $parameter;
+    }
+
+    /**
+     * Define the resource that can be sent with the request.
+     * Note that this method will not generate actual parameters, but instead
+     * will let the InputParsers know this resource can be expected.
+     * @param $resourceDefinition
+     * @return ResourceParameter
+     */
+    public function resource($resourceDefinition)
+    {
+        $parameter = new ResourceParameter($resourceDefinition);
+        $parameter->setRoute($this->route);
+
+        $this->parameters[$resourceDefinition] = $parameter;
 
         return $parameter;
     }
@@ -100,54 +124,6 @@ class ParameterCollection
     }
 
     /**
-     * Creates a set of post parameters from a given resource definition.
-     * @param $resourceDefinition
-     * @param Context $context
-     * @return RouteMutator
-     */
-    public function postParametersFromResourceDefinition($resourceDefinition, Context $context = null)
-    {
-        if (!$context) {
-            $context = new \CatLab\Charon\Models\Context(
-                Method::toAction($this->route->getMethod(), Cardinality::ONE)
-            );
-        }
-
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
-
-        foreach ($resourceDefinition->getFields() as $field) {
-
-            if ($field instanceof RelationshipField) {
-                continue;
-            }
-
-            /** @var Field $field */
-            if ($field->hasAction($context->getAction())) {
-                $this->postParameterFromField($field, $context);
-            }
-        }
-
-        return $this->route;
-    }
-
-    /**
-     * @param Field $field
-     * @param Context $context
-     * @return PostParameter
-     */
-    public function postParameterFromField(Field $field, Context $context)
-    {
-        $post = $this->post($field->getDisplayName());
-        $post->setType($field->getType());
-
-        foreach ($field->getRequirements() as $v) {
-            $post->setFromRequirement($v);
-        }
-
-        return $post;
-    }
-
-    /**
      * @param $name
      * @return FileParameter
      */
@@ -175,5 +151,14 @@ class ParameterCollection
     public function toArray()
     {
         return array_values($this->parameters);
+    }
+
+    /**
+     * @param ParameterCollection $collection
+     * @return array
+     */
+    public function merge(ParameterCollection $collection)
+    {
+        $this->parameters = array_merge($this->parameters, $collection->parameters);
     }
 }

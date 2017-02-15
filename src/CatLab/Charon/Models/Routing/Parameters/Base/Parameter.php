@@ -4,6 +4,7 @@ namespace CatLab\Charon\Models\Routing\Parameters\Base;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\ParameterCollection;
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\ReturnValue;
@@ -234,9 +235,10 @@ abstract class Parameter implements RouteMutator
 
     /**
      * @param DescriptionBuilder $builder
+     * @param Context $context
      * @return array
      */
-    public function toSwagger(DescriptionBuilder $builder)
+    public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
         $out = [];
 
@@ -298,5 +300,26 @@ abstract class Parameter implements RouteMutator
             case InArray::class:
                 $this->enum($requirement->getValues());
         }
+    }
+
+    /**
+     * Merge properties
+     * @param Parameter $parameter
+     * @return $this
+     */
+    public function merge(Parameter $parameter)
+    {
+        $this->required($parameter->isRequired());
+        $this->allowMultiple($parameter->allowMultiple);
+
+        if ($parameter->description) {
+            $this->describe($parameter->description);
+        }
+
+        if ($parameter->default) {
+            $this->default($parameter->default);
+        }
+
+        return $this;
     }
 }

@@ -2,3 +2,4 @@ vendor/
 .idea/
 composer.lock
 docs-html
+node_modules

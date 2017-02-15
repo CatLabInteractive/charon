@@ -2,9 +2,11 @@
 
 namespace CatLab\Charon\Models\Routing;
 
+use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RouteMutator;
@@ -98,9 +100,10 @@ class Route extends RouteProperties implements RouteMutator
 
     /**
      * @param DescriptionBuilder $builder
+     * @param Context $context
      * @return array
      */
-    public function toSwagger(DescriptionBuilder $builder)
+    public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
         $options = $this->getOptions();
 
@@ -133,7 +136,14 @@ class Route extends RouteProperties implements RouteMutator
         }
 
         foreach ($parameters as $parameter) {
-            $out['parameters'][] = $parameter->toSwagger($builder);
+            // Sometimes one parameter can result in multiple swagger parameters being added
+            $parameterSwaggerDescription = $parameter->toSwagger($builder, $context);
+            if (ArrayHelper::isAssociative($parameterSwaggerDescription)) {
+                $out['parameters'][] = $parameterSwaggerDescription;
+            } else {
+                $out['parameters'] = array_merge($out['parameters'], $parameterSwaggerDescription);
+            }
+
         }
 
         // Sort parameters: required first

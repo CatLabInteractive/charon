@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Routing\Parameters;
 
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
@@ -27,11 +28,12 @@ class FileParameter extends Parameter
 
     /**
      * @param DescriptionBuilder $builder
+     * @param Context $context
      * @return array
      */
-    public function toSwagger(DescriptionBuilder $builder)
+    public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
-        $out = parent::toSwagger($builder);
+        $out = parent::toSwagger($builder, $context);
         return $out;
     }
 }

@@ -3,12 +3,16 @@
 namespace CatLab\Charon\Laravel\InputParsers;
 
 use CatLab\Charon\Collections\IdentifierCollection;
+use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
+use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 
+use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
+use CatLab\Charon\Models\Routing\Route;
 use Request;
 
 /**
@@ -107,5 +111,30 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         }
 
         return false;
+    }
+
+
+    /**
+     * @param DescriptionBuilder $builder
+     * @param Route $route
+     * @param ResourceParameter $parameter
+     * @param ResourceDefinition $resourceDefinition
+     * @return ParameterCollection
+     */
+    public function getResourceRouteParameters(
+        DescriptionBuilder $builder,
+        Route $route,
+        ResourceParameter $parameter,
+        ResourceDefinition $resourceDefinition
+    ): ParameterCollection
+    {
+        $route->consumes('application/json');
+
+        $parameterCollection = new ParameterCollection($route);
+        $parameterCollection
+            ->body($resourceDefinition)
+            ->merge($parameter);
+
+        return $parameterCollection;
     }
 }

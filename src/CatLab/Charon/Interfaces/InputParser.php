@@ -3,8 +3,11 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\IdentifierCollection;
+use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
+use CatLab\Charon\Models\Routing\Route;
 
 /**
  * Interface InputParser
@@ -37,4 +40,18 @@ interface InputParser
         ResourceDefinition $resourceDefinition,
         Context $context
     );
+
+    /**
+     * @param DescriptionBuilder $builder
+     * @param Route $route
+     * @param ResourceParameter $parameter
+     * @param ResourceDefinition $resourceDefinition
+     * @return ParameterCollection
+     */
+    public function getResourceRouteParameters(
+        DescriptionBuilder $builder,
+        Route $route,
+        ResourceParameter $parameter,
+        ResourceDefinition $resourceDefinition
+    ) : ParameterCollection;
 }

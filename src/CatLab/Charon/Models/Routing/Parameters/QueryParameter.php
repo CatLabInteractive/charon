@@ -23,17 +23,4 @@ class QueryParameter extends Parameter
     {
         parent::__construct($name, self::IN_QUERY);
     }
-
-    /**
-     * @param DescriptionBuilder $builder
-     * @return array
-     */
-    public function toSwagger(DescriptionBuilder $builder)
-    {
-        $out = parent::toSwagger($builder);
-
-
-
-        return $out;
-    }
 }

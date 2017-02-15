@@ -2,6 +2,10 @@
 
 namespace CatLab\RESTResource\Tests;
 
+use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Laravel\InputParsers\JsonBodyInputParser;
+use CatLab\Charon\Laravel\InputParsers\PostInputParser;
+use CatLab\Charon\Models\Context;
 use CatLab\Charon\Swagger\Authentication\OAuth2Authentication;
 use CatLab\Charon\Swagger\SwaggerBuilder;
 use PHPUnit_Framework_TestCase;
@@ -40,7 +44,11 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
             $builder->addRoute($route);
         }
 
-        $actual = $builder->build();
+        $context = new Context(Action::INDEX);
+        $context->addInputParser(JsonBodyInputParser::class);
+        $context->addInputParser(PostInputParser::class);
+
+        $actual = $builder->build($context);
 
         $expected = json_decode('
             {
@@ -285,6 +293,103 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "full"
                            ]
                         }
+                     },
+                     "put":{
+                        "responses":{
+                           "200":{
+                              "schema":{
+                                 "$ref":"#\/definitions\/Pet_edit"
+                              },
+                              "headers":[
+            
+                              ]
+                           },
+                           "403":{
+                              "description":"Authentication error",
+                              "headers":[
+            
+                              ]
+                           },
+                           "404":{
+                              "description":"Entity not found",
+                              "headers":[
+            
+                              ]
+                           }
+                        },
+                        "summary":"Get a pet",
+                        "parameters":[
+                           {
+                              "name":"id",
+                              "type":"integer",
+                              "in":"path",
+                              "required":true
+                           },
+                           {
+                              "name":"name",
+                              "type":"string",
+                              "in":"formData",
+                              "required":true
+                           },
+                           {
+                              "name":"body",
+                              "in":"body",
+                              "required":false,
+                              "schema":{
+                                 "$ref":"#\/definitions\/Pet_edit"
+                              }
+                           },
+                           {
+                              "name":"pet-id",
+                              "type":"integer",
+                              "in":"formData",
+                              "required":false
+                           },
+                           {
+                              "name":"format",
+                              "type":"string",
+                              "in":"path",
+                              "required":false,
+                              "description":"Output format",
+                              "enum":[
+                                 "json"
+                              ],
+                              "default":"json"
+                           },
+                           {
+                              "name":"expand",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+                              "enum":[
+                                 "category",
+                                 "photos",
+                                 "tags"
+                              ],
+                              "allowMultiple":true
+                           },
+                           {
+                              "name":"fields",
+                              "type":"string",
+                              "in":"query",
+                              "required":false,
+                              "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "enum":[
+                                 "name",
+                                 "category",
+                                 "photos",
+                                 "tags",
+                                 "status"
+                              ],
+                              "allowMultiple":true
+                           }
+                        ],
+                        "security":{
+                           "oauth2":[
+                              "full"
+                           ]
+                        }
                      }
                   }
                },
@@ -349,6 +454,67 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                         },
                         "status":{
                            "type":"string"
+                        }
+                     }
+                  },
+                  "Pet_edit":{
+                     "type":"object",
+                     "properties":{
+                        "pet-id":{
+                           "type":"integer"
+                        },
+                        "name":{
+                           "type":"string"
+                        },
+                        "photos":{
+                           "type":"object",
+                           "schema":{
+                              "$ref":"#\/definitions\/Photo_create_items"
+                           }
+                        },
+                        "tags":{
+                           "type":"object",
+                           "schema":{
+                              "$ref":"#\/definitions\/Tag_identifier_items"
+                           }
+                        }
+                     }
+                  },
+                  "Photo_create":{
+                     "type":"object",
+                     "properties":{
+                        "url":{
+                           "type":"string"
+                        }
+                     }
+                  },
+                  "Photo_create_items":{
+                     "type":"object",
+                     "properties":{
+                        "items":{
+                           "type":"array",
+                           "items":{
+                              "$ref":"#\/definitions\/Photo_create"
+                           }
+                        }
+                     }
+                  },
+                  "Tag_identifier":{
+                     "type":"object",
+                     "properties":{
+                        "tag-id":{
+                           "type":"integer"
+                        }
+                     }
+                  },
+                  "Tag_identifier_items":{
+                     "type":"object",
+                     "properties":{
+                        "items":{
+                           "type":"array",
+                           "items":{
+                              "$ref":"#\/definitions\/Tag_identifier"
+                           }
                         }
                      }
                   }

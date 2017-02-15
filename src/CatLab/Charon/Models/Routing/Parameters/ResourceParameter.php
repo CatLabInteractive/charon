@@ -5,16 +5,14 @@ namespace CatLab\Charon\Models\Routing\Parameters;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Enums\Cardinality;
-use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
-use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 
 /**
- * Class BodyParameter
+ * Class ResourceParameter
  * @package App\CatLab\RESTResource\Models\Parameters\Base
  */
-class BodyParameter extends Parameter
+class ResourceParameter extends Parameter
 {
     /**
      * @var mixed
@@ -69,28 +67,22 @@ class BodyParameter extends Parameter
      */
     public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
-        $out = parent::toSwagger($builder, $context);
-        unset($out['type']);
+        $out = [];
 
         $resourceDefinition = ResourceDefinitionLibrary::make($this->resourceDefinition);
-        $context = Method::toAction($this->route->getMethod(), $this->cardinality);
 
-        $out['schema'] = [
-            '$ref' => $builder->addResourceDefinition($resourceDefinition, $context, $this->cardinality)
-        ];
+        $parameters = $context->getInputParser()->getResourceRouteParameters(
+            $builder,
+            $this->route,
+            $this,
+            $resourceDefinition
+        );
 
-        return $out;
-    }
-
-
-    public function merge(Parameter $parameter)
-    {
-        parent::merge($parameter);
-
-        if ($parameter instanceof ResourceParameter) {
-            $this->cardinality = $parameter->getCardinality();
+        /** @var Parameter $v */
+        foreach ($parameters->toArray() as $v) {
+            $out[] = $v->toSwagger($builder, $context);
         }
 
-        return $this;
+        return $out;
     }
 }

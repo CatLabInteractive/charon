@@ -351,7 +351,11 @@ class ResourceTransformer implements ResourceTransformerContract
             $identifier = Identifier::fromArray($resourceDefinition, $identifier);
         }
 
-        return $factory->resolveFromIdentifier($resourceDefinition->getEntityClassName(), $identifier, $context);
+        return $factory->resolveFromIdentifier(
+            $resourceDefinition->getEntityClassName(),
+            $identifier,
+            $context
+        );
     }
 
     /**

@@ -4,10 +4,13 @@ namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
 use CatLab\Charon\Interfaces\Context;
+use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Library\InputParserLibrary;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
+use CatLab\Charon\Models\Routing\Route;
 
 /**
  * Class InputParserCollection
@@ -31,6 +34,7 @@ class InputParserCollection extends Collection implements InputParser
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
             $content = $inputParser->getIdentifiers($resourceTransformer, $resourceDefinition, $context);
+
             if ($content) {
                 return $content;
             }
@@ -61,5 +65,31 @@ class InputParserCollection extends Collection implements InputParser
         }
 
         return null;
+    }
+
+    /**
+     * @param DescriptionBuilder $builder
+     * @param Route $route
+     * @param ResourceParameter $parameter
+     * @param ResourceDefinition $resourceDefinition
+     * @return ParameterCollection
+     */
+    public function getResourceRouteParameters(
+        DescriptionBuilder $builder,
+        Route $route,
+        ResourceParameter $parameter,
+        ResourceDefinition $resourceDefinition
+    ): ParameterCollection
+    {
+        $out = new ParameterCollection($route);
+
+        foreach ($this as $inputParser) {
+            $inputParser = InputParserLibrary::make($inputParser);
+
+            $parameters = $inputParser->getResourceRouteParameters($builder, $route, $parameter, $resourceDefinition);
+            $out->merge($parameters);
+        }
+
+        return $out;
     }
 }
