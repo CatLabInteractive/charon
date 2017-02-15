@@ -76,4 +76,5 @@ the an API.
 Swagger
 -------
 Swagger is THE WORLD'S MOST POPULAR API FRAMEWORK. Not our words. 
-[http://www.swagger.io](http://www.swagger.io)
+[http://www.swagger.io](http://www.swagger.io). Charon will take all defined routes, 
+resource definitions and input parameters and create swagger documentation on the fly.
