@@ -5,7 +5,7 @@
 
 What?
 =====
-Charon is a framework for building self documented RESTfull API's.
+Charon is a PHP framework for building self documented RESTfull API's.
 
 Getting started
 ===============
