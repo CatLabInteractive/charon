@@ -8,6 +8,20 @@
     <link rel="stylesheet" type="text/css" href="css/retro.css" />
 </head>
 <body>
-<div class="container content"><%= content %></div>
+    <div class="navigation">
+        <h1><%= title %></h1>
+        <h2>Navigation</h2>
+        <ul>
+            <% _.forEach(documents, function(document) { %>
+                <li>
+                    <a href="<%= document %>.html"><%= document %></a>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+
+    <div class="container content">
+        <%= content %>
+    </div>
 </body>
 </html>

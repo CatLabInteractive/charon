@@ -1,5 +1,12 @@
 module.exports = function (grunt) {
 
+    var documents = grunt.file.expand({filter: "isFile", cwd: "docs"}, ["*.md"]);
+    for (var i = 0; i < documents.length; i ++) {
+        documents[i] = documents[i].substr(0, documents[i].length -3);
+    }
+
+    console.log(documents);
+
     grunt.initConfig
     ({
 
@@ -13,9 +20,10 @@ module.exports = function (grunt) {
 
                     mm: {
                         context: {
-                            title: 'Charon REST Framework',
+                            title: 'Charon API',
                             description: 'Charon is a framework for building self documented RESTfull API\'s.',
-                            keywords: 'Charon rest api framework swagger'
+                            keywords: 'Charon rest api framework swagger',
+                            documents: documents
                         }
                     }
                 }
