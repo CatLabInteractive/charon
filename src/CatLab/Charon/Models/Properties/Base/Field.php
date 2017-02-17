@@ -6,6 +6,7 @@ use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
 use CatLab\Charon\Interfaces\Transformer;
 use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\CurrentPath;
+use CatLab\Charon\Transformers\DateTransformer;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Interfaces\Property;
 use CatLab\Charon\Enums\Action;
@@ -324,6 +325,16 @@ class Field implements Property, ResourceDefinitionManipulator
             return TransformerLibrary::make($this->transformer);
         }
         return null;
+    }
+
+    /**
+     * @return $this
+     */
+    public function datetime()
+    {
+        $this->setType(PropertyType::DATETIME);
+        $this->transformer(DateTransformer::class);
+        return $this;
     }
 
     /**

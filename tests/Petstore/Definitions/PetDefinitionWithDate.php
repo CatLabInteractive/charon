@@ -3,9 +3,6 @@
 namespace Tests\Petstore\Definitions;
 
 use CatLab\Charon\Transformers\DateTransformer;
-use Tests\Petstore\Models\Pet;
-use CatLab\Charon\Models\ResourceDefinition;
-use Tests\Petstore\Validators\PetValidator;
 
 /**
  * Class PetDefinitionWithDate
@@ -24,7 +21,6 @@ class PetDefinitionWithDate extends PetDefinition
             ->field('someDate')
                 ->datetime()
                 ->visible(true)
-                ->transformer(DateTransformer::class)
         ;
     }
 }
