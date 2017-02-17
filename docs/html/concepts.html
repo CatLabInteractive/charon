@@ -60,10 +60,6 @@ how data can be received etc), but it can also contain variables that are requir
 entity getters. Entities could, for example, return data based on the currently authenticated 
 user. This can be achieved by setting the user in the context and assigning the context.user 
 variable to the entity getter.</p>
-<h2 id="linking-unlinking">Linking / Unlinking</h2>
-<p>Linking and unlinking are imaginary http requests to link or unlink resources with 
-eachother. A list of identifiers (most of the times this is the resource id) are sent 
-in a <code>post</code> or <code>delete</code> request to add or remove related items.</p>
 <h2 id="resolvers">Resolvers</h2>
 <p>A resolver is in charge of loading data from entities or setting data into entities. 
 For example, the included Laravel resolvers will use the Laravel magic getters to<br>load data from entities.</p>
@@ -81,6 +77,10 @@ the an API.</p>
 <h2 id="inputparser">InputParser</h2>
 <p>The InputParsers take raw data from the http request and translate it to resources. 
 These resources can then be validated and transformed into new or existing entities.</p>
+<h2 id="linking-unlinking">Linking / Unlinking</h2>
+<p>Linking and unlinking are imaginary http requests to link or unlink resources with 
+eachother. A list of identifiers (most of the times this is the resource id) are sent 
+in a <code>post</code> or <code>delete</code> request to add or remove related items.</p>
 <h2 id="swagger">Swagger</h2>
 <p>Swagger is THE WORLD&#39;S MOST POPULAR API FRAMEWORK. Not our words. 
 <a href="http://www.swagger.io"><a href="http://www.swagger.io">http://www.swagger.io</a></a>. Charon will take all defined routes, 
