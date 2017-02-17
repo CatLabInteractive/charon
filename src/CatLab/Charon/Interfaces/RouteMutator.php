@@ -1,6 +1,7 @@
 <?php
 
 namespace CatLab\Charon\Interfaces;
+
 use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Models\Routing\ReturnValue;
