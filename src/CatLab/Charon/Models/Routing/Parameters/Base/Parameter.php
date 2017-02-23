@@ -299,7 +299,8 @@ abstract class Parameter implements RouteMutator
         $class = get_class($requirement);
         switch ($class) {
             case Exists::class:
-                $this->required();
+                //$this->required();
+                // This causes trouble when allowing multiple input methods.
                 return;
 
             case InArray::class:
