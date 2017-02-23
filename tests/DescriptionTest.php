@@ -336,12 +336,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "required":true
                            },
                            {
-                              "name":"name",
-                              "type":"string",
-                              "in":"formData",
-                              "required":true
-                           },
-                           {
                               "name":"body",
                               "in":"body",
                               "required":false,
@@ -352,6 +346,12 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                            {
                               "name":"pet-id",
                               "type":"integer",
+                              "in":"formData",
+                              "required":false
+                           },
+                           {
+                              "name":"name",
+                              "type":"string",
                               "in":"formData",
                               "required":false
                            },
