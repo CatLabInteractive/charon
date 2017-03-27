@@ -35,6 +35,11 @@ interface ResourceDefinition
     public function getValidators() : ValidatorCollection;
 
     /**
+     * @return string|null
+     */
+    public function getDefaultOrder();
+
+    /**
      * @param SwaggerBuilder $builder
      * @param string $action
      * @return mixed[]
