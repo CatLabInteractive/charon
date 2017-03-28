@@ -4,7 +4,7 @@
   "type": "library",
   "require": {
     "php": ">=7.0.0",
-    "catlabinteractive/requirements": ">=0.1.13"
+    "catlabinteractive/requirements": "~0.1.14"
   },
   "require-dev": {
     "phpunit/phpunit": "5.3.*",
