@@ -22,6 +22,10 @@ class DateTransformer implements Transformer
      */
     public function toResourceValue($value, Context $context)
     {
+        if ($value === null) {
+            return null;
+        }
+
         if (!$value instanceof \DateTime) {
             throw new InvalidPropertyException("Date value must implement \\DateTime");
         }
@@ -36,6 +40,10 @@ class DateTransformer implements Transformer
      */
     public function toEntityValue($value, Context $context)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return \DateTime::createFromFormat($this->format, $value);
     }
 }
