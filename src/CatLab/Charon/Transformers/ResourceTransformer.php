@@ -165,7 +165,7 @@ class ResourceTransformer implements ResourceTransformerContract
         }
 
         // Always start from a fresh context.
-        $context = clone $context;
+        $context = $context->fork();
 
         if ($resourceDefinition instanceof DynamicContext) {
             $resourceDefinition->transformContext($context, $entity);
