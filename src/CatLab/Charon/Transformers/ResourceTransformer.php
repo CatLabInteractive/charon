@@ -164,6 +164,9 @@ class ResourceTransformer implements ResourceTransformerContract
             throw InvalidContextAction::expectedReadable($context->getAction());
         }
 
+        // Always start from a fresh context.
+        $context = clone $context;
+
         if ($resourceDefinition instanceof DynamicContext) {
             $resourceDefinition->transformContext($context, $entity);
         }
