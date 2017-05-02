@@ -316,6 +316,13 @@ class Context implements ContextContract
                 return true;
             }
         } else {
+
+            // Finally, check for asterisk, which means we should keep the regular fields (and return NULL)
+            if (isset($fieldsToShow['*'])) {
+                return null;
+            }
+
+            // Nope, fail. Don't show.
             return false;
         }
     }

@@ -55,19 +55,19 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
     {
         return json_decode('
             {
-               "name":1,
+               "id":1,
                "children":{
                   "items":[
                      {
-                        "name":2,
+                        "id":2,
                         "children":{
                            "items":[
                               {
-                                 "name":5,
+                                 "id":5,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":8,
+                                          "id":8,
                                           "children":{
                                              "items":[
             
@@ -75,7 +75,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":9,
+                                          "id":9,
                                           "children":{
                                              "items":[
             
@@ -83,7 +83,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":10,
+                                          "id":10,
                                           "children":{
                                              "items":[
             
@@ -94,11 +94,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                  }
                               },
                               {
-                                 "name":6,
+                                 "id":6,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":11,
+                                          "id":11,
                                           "children":{
                                              "items":[
             
@@ -106,7 +106,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":12,
+                                          "id":12,
                                           "children":{
                                              "items":[
             
@@ -114,7 +114,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":13,
+                                          "id":13,
                                           "children":{
                                              "items":[
             
@@ -125,11 +125,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                  }
                               },
                               {
-                                 "name":7,
+                                 "id":7,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":14,
+                                          "id":14,
                                           "children":{
                                              "items":[
             
@@ -137,7 +137,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":15,
+                                          "id":15,
                                           "children":{
                                              "items":[
             
@@ -145,7 +145,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":16,
+                                          "id":16,
                                           "children":{
                                              "items":[
             
@@ -159,15 +159,15 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                         }
                      },
                      {
-                        "name":3,
+                        "id":3,
                         "children":{
                            "items":[
                               {
-                                 "name":17,
+                                 "id":17,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":20,
+                                          "id":20,
                                           "children":{
                                              "items":[
             
@@ -175,7 +175,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":21,
+                                          "id":21,
                                           "children":{
                                              "items":[
             
@@ -183,7 +183,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":22,
+                                          "id":22,
                                           "children":{
                                              "items":[
             
@@ -194,11 +194,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                  }
                               },
                               {
-                                 "name":18,
+                                 "id":18,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":23,
+                                          "id":23,
                                           "children":{
                                              "items":[
             
@@ -206,7 +206,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":24,
+                                          "id":24,
                                           "children":{
                                              "items":[
             
@@ -214,7 +214,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":25,
+                                          "id":25,
                                           "children":{
                                              "items":[
             
@@ -225,11 +225,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                  }
                               },
                               {
-                                 "name":19,
+                                 "id":19,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":26,
+                                          "id":26,
                                           "children":{
                                              "items":[
             
@@ -237,7 +237,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":27,
+                                          "id":27,
                                           "children":{
                                              "items":[
             
@@ -245,7 +245,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":28,
+                                          "id":28,
                                           "children":{
                                              "items":[
             
@@ -259,15 +259,15 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                         }
                      },
                      {
-                        "name":4,
+                        "id":4,
                         "children":{
                            "items":[
                               {
-                                 "name":29,
+                                 "id":29,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":32,
+                                          "id":32,
                                           "children":{
                                              "items":[
             
@@ -275,7 +275,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":33,
+                                          "id":33,
                                           "children":{
                                              "items":[
             
@@ -283,7 +283,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":34,
+                                          "id":34,
                                           "children":{
                                              "items":[
             
@@ -294,11 +294,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                  }
                               },
                               {
-                                 "name":30,
+                                 "id":30,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":35,
+                                          "id":35,
                                           "children":{
                                              "items":[
             
@@ -306,7 +306,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":36,
+                                          "id":36,
                                           "children":{
                                              "items":[
             
@@ -314,7 +314,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":37,
+                                          "id":37,
                                           "children":{
                                              "items":[
             
@@ -325,11 +325,11 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                  }
                               },
                               {
-                                 "name":31,
+                                 "id":31,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":38,
+                                          "id":38,
                                           "children":{
                                              "items":[
             
@@ -337,7 +337,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":39,
+                                          "id":39,
                                           "children":{
                                              "items":[
             
@@ -345,7 +345,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                                           }
                                        },
                                        {
-                                          "name":40,
+                                          "id":40,
                                           "children":{
                                              "items":[
             
@@ -371,57 +371,57 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
     {
         return json_decode('
             {
-               "name":1,
+               "id":1,
                "children":{
                   "items":[
                      {
-                        "name":2,
+                        "id":2,
                         "children":{
                            "items":[
                               {
-                                 "name":5,
+                                 "id":5,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":8
+                                          "id":8
                                        },
                                        {
-                                          "name":9
+                                          "id":9
                                        },
                                        {
-                                          "name":10
+                                          "id":10
                                        }
                                     ]
                                  }
                               },
                               {
-                                 "name":6,
+                                 "id":6,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":11
+                                          "id":11
                                        },
                                        {
-                                          "name":12
+                                          "id":12
                                        },
                                        {
-                                          "name":13
+                                          "id":13
                                        }
                                     ]
                                  }
                               },
                               {
-                                 "name":7,
+                                 "id":7,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":14
+                                          "id":14
                                        },
                                        {
-                                          "name":15
+                                          "id":15
                                        },
                                        {
-                                          "name":16
+                                          "id":16
                                        }
                                     ]
                                  }
@@ -430,53 +430,53 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                         }
                      },
                      {
-                        "name":3,
+                        "id":3,
                         "children":{
                            "items":[
                               {
-                                 "name":17,
+                                 "id":17,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":20
+                                          "id":20
                                        },
                                        {
-                                          "name":21
+                                          "id":21
                                        },
                                        {
-                                          "name":22
+                                          "id":22
                                        }
                                     ]
                                  }
                               },
                               {
-                                 "name":18,
+                                 "id":18,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":23
+                                          "id":23
                                        },
                                        {
-                                          "name":24
+                                          "id":24
                                        },
                                        {
-                                          "name":25
+                                          "id":25
                                        }
                                     ]
                                  }
                               },
                               {
-                                 "name":19,
+                                 "id":19,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":26
+                                          "id":26
                                        },
                                        {
-                                          "name":27
+                                          "id":27
                                        },
                                        {
-                                          "name":28
+                                          "id":28
                                        }
                                     ]
                                  }
@@ -485,53 +485,53 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
                         }
                      },
                      {
-                        "name":4,
+                        "id":4,
                         "children":{
                            "items":[
                               {
-                                 "name":29,
+                                 "id":29,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":32
+                                          "id":32
                                        },
                                        {
-                                          "name":33
+                                          "id":33
                                        },
                                        {
-                                          "name":34
+                                          "id":34
                                        }
                                     ]
                                  }
                               },
                               {
-                                 "name":30,
+                                 "id":30,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":35
+                                          "id":35
                                        },
                                        {
-                                          "name":36
+                                          "id":36
                                        },
                                        {
-                                          "name":37
+                                          "id":37
                                        }
                                     ]
                                  }
                               },
                               {
-                                 "name":31,
+                                 "id":31,
                                  "children":{
                                     "items":[
                                        {
-                                          "name":38
+                                          "id":38
                                        },
                                        {
-                                          "name":39
+                                          "id":39
                                        },
                                        {
-                                          "name":40
+                                          "id":40
                                        }
                                     ]
                                  }
@@ -552,53 +552,53 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
     {
         return json_decode('
             {
-               "name":1,
+               "id":1,
                "children":{
                   "items":[
                      {
-                        "name":2,
+                        "id":2,
                         "children":{
                            "items":[
                               {
-                                 "name":5
+                                 "id":5
                               },
                               {
-                                 "name":6
+                                 "id":6
                               },
                               {
-                                 "name":7
+                                 "id":7
                               }
                            ]
                         }
                      },
                      {
-                        "name":3,
+                        "id":3,
                         "children":{
                            "items":[
                               {
-                                 "name":17
+                                 "id":17
                               },
                               {
-                                 "name":18
+                                 "id":18
                               },
                               {
-                                 "name":19
+                                 "id":19
                               }
                            ]
                         }
                      },
                      {
-                        "name":4,
+                        "id":4,
                         "children":{
                            "items":[
                               {
-                                 "name":29
+                                 "id":29
                               },
                               {
-                                 "name":30
+                                 "id":30
                               },
                               {
-                                 "name":31
+                                 "id":31
                               }
                            ]
                         }
@@ -616,17 +616,17 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
     {
         return json_decode('
             {
-               "name":1,
+               "id":1,
                "children":{
                   "items":[
                      {
-                        "name":2
+                        "id":2
                      },
                      {
-                        "name":3
+                        "id":3
                      },
                      {
-                        "name":4
+                        "id":4
                      }
                   ]
                }
