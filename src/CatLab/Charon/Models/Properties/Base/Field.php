@@ -3,9 +3,10 @@
 namespace CatLab\Charon\Models\Properties\Base;
 
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
-use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Interfaces\Transformer;
+use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\CurrentPath;
-use CatLab\Charon\Models\Values\Base\RelationshipValue;
+use CatLab\Charon\Transformers\DateTransformer;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Interfaces\Property;
 use CatLab\Charon\Enums\Action;
@@ -16,7 +17,6 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Swagger\SwaggerBuilder;
-use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Interfaces\Validator;
 
 /**
@@ -31,33 +31,38 @@ class Field implements Property, ResourceDefinitionManipulator
      * Define in which contexts this attribute should be visible
      * @var string[]
      */
-    private $actions;
+    protected $actions;
 
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * Specify to give the field a different name
      * @var string
      */
-    private $displayName;
+    protected $displayName;
 
     /**
      * @var ResourceDefinition
      */
-    private $resourceDefinition;
+    protected $resourceDefinition;
 
     /**
      * @var bool
      */
-    private $visible;
+    protected $visible;
 
     /**
      * @var string
      */
-    private $path;
+    protected $path;
+
+    /**
+     * @var string
+     */
+    protected $transformer;
 
     /**
      * ResourceField constructor.
@@ -299,6 +304,37 @@ class Field implements Property, ResourceDefinitionManipulator
     public function isSearchable()
     {
         return false;
+    }
+
+    /**
+     * @param string $transformer
+     * @return $this
+     */
+    public function transformer(string $transformer)
+    {
+        $this->transformer = $transformer;
+        return $this;
+    }
+
+    /**
+     * @return Transformer|null
+     */
+    public function getTransformer()
+    {
+        if (isset($this->transformer)) {
+            return TransformerLibrary::make($this->transformer);
+        }
+        return null;
+    }
+
+    /**
+     * @return $this
+     */
+    public function datetime()
+    {
+        $this->setType(PropertyType::DATETIME);
+        $this->transformer(DateTransformer::class);
+        return $this;
     }
 
     /**

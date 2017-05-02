@@ -42,6 +42,11 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     private $validators;
 
     /**
+     * @var string
+     */
+    private $defaultOrder;
+
+    /**
      * ResourceDefinition constructor.
      * @param string $entityClassName
      */
@@ -95,7 +100,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     {
         $field = new RelationshipField($this, $name, $resourceDefinition);
         $this->fields->add($field);
-        
+
         return $field;
     }
 
@@ -169,5 +174,23 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function setUrl(string $url)
     {
         $this->url = $url;
+    }
+
+    /**
+     * @param string $order
+     * @return $this
+     */
+    public function defaultOrder(string $order)
+    {
+        $this->defaultOrder = $order;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultOrder()
+    {
+        return $this->defaultOrder;
     }
 }

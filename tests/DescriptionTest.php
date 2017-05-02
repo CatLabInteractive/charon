@@ -90,10 +90,10 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "in":"path",
                               "required":false,
                               "description":"Output format",
+                              "default":"json",
                               "enum":[
                                  "json"
-                              ],
-                              "default":"json"
+                              ]
                            }
                         ],
                         "tags":[
@@ -156,10 +156,10 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "in":"path",
                               "required":false,
                               "description":"Output format",
+                              "default":"json",
                               "enum":[
                                  "json"
-                              ],
-                              "default":"json"
+                              ]
                            },
                            {
                               "name":"pet-id",
@@ -170,43 +170,49 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                            },
                            {
                               "name":"sort",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Define the sort parameter. Separate multiple values with comma.",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "pet-id",
                                  "!pet-id"
-                              ],
-                              "allowMultiple":true
+                              ]
                            },
                            {
                               "name":"expand",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "category",
                                  "photos",
                                  "tags"
-                              ],
-                              "allowMultiple":true
+                              ]
                            },
                            {
                               "name":"fields",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "name",
                                  "category",
                                  "photos",
                                  "tags",
                                  "status"
-                              ],
-                              "allowMultiple":true
+                              ]
                            }
                         ],
                         "security":{
@@ -254,38 +260,42 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "in":"path",
                               "required":false,
                               "description":"Output format",
+                              "default":"json",
                               "enum":[
                                  "json"
-                              ],
-                              "default":"json"
+                              ]
                            },
                            {
                               "name":"expand",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "category",
                                  "photos",
                                  "tags"
-                              ],
-                              "allowMultiple":true
+                              ]
                            },
                            {
                               "name":"fields",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "name",
                                  "category",
                                  "photos",
                                  "tags",
                                  "status"
-                              ],
-                              "allowMultiple":true
+                              ]
                            }
                         ],
                         "security":{
@@ -326,12 +336,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "required":true
                            },
                            {
-                              "name":"name",
-                              "type":"string",
-                              "in":"formData",
-                              "required":true
-                           },
-                           {
                               "name":"body",
                               "in":"body",
                               "required":false,
@@ -346,43 +350,53 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "required":false
                            },
                            {
+                              "name":"name",
+                              "type":"string",
+                              "in":"formData",
+                              "required":false
+                           },
+                           {
                               "name":"format",
                               "type":"string",
                               "in":"path",
                               "required":false,
                               "description":"Output format",
+                              "default":"json",
                               "enum":[
                                  "json"
-                              ],
-                              "default":"json"
+                              ]
                            },
                            {
                               "name":"expand",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "category",
                                  "photos",
                                  "tags"
-                              ],
-                              "allowMultiple":true
+                              ]
                            },
                            {
                               "name":"fields",
-                              "type":"string",
+                              "type":"array",
                               "in":"query",
                               "required":false,
                               "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "items":{
+                                 "type":"string"
+                              },
                               "enum":[
                                  "name",
                                  "category",
                                  "photos",
                                  "tags",
                                  "status"
-                              ],
-                              "allowMultiple":true
+                              ]
                            }
                         ],
                         "consumes":[
@@ -537,11 +551,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
             }
         
         ', true);
-
-        /*
-        echo json_encode($actual);
-        exit;
-        */
 
         $this->assertEquals($expected, $actual);
     }

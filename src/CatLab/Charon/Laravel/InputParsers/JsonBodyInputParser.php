@@ -80,11 +80,11 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
             return null;
         }
 
-        $content = Request::instance()->getContent();
-        $content = json_decode($content, true);
+        $rawContent = Request::instance()->getContent();
+        $content = json_decode($rawContent, true);
 
         if (!$content) {
-            throw new \InvalidArgumentException("Could not decode body.");
+            throw new \InvalidArgumentException("Could not decode body: " . $rawContent);
         }
 
         $resource = $resourceTransformer->fromArray(

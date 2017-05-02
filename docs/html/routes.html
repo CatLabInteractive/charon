@@ -10,8 +10,13 @@
 <body>
     <div class="navigation">
         <h1>Charon API</h1>
+        <p><a href="https://github.com/CatLabInteractive/charon">https://github.com/CatLabInteractive/charon</a></p>
         <h2>Navigation</h2>
         <ul>
+            
+                <li>
+                    <a href="concepts.html">concepts</a>
+                </li>
             
                 <li>
                     <a href="index.html">index</a>
@@ -59,14 +64,12 @@ in BookResourceDefinition.</p>
 <p>Similar to Laravel routes, you can group routes by calling <code>group()</code>. All 
 properties set in the group options array will be passed on the all routes in the group.</p>
 <pre><code class="lang-php">$routes-&gt;group(
-        $routes-&gt;group(
-            [
-                &#39;tags&#39; =&gt; &#39;books&#39;
-            ],
-            function(RouteCollection $routes) {
-                $routes-&gt;get(&#39;books/{id}&#39;, &#39;BookController@show&#39;);
-            }
-        )
+    [
+        &#39;tags&#39; =&gt; &#39;books&#39;
+    ],
+    function(RouteCollection $routes) {
+        $routes-&gt;get(&#39;books/{id}&#39;, &#39;BookController@show&#39;);
+    }
 );</code></pre>
 <h2 id="parameters">Parameters</h2>
 <p>Each route can define a set of path, query, form or body parameters.

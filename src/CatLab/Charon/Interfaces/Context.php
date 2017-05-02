@@ -66,4 +66,10 @@ interface Context
      * @return InputParser
      */
     public function getInputParser() : InputParser;
+
+    /**
+     * Return a fork of the context.
+     * @return self
+     */
+    public function fork();
 }

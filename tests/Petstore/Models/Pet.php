@@ -43,6 +43,11 @@ class Pet
     private $status;
 
     /**
+     * @var \DateTime
+     */
+    private $someDate;
+
+    /**
      * @return int
      */
     public function getId()
@@ -147,6 +152,24 @@ class Pet
     public function setStatus($status)
     {
         $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getSomeDate(): \DateTime
+    {
+        return $this->someDate;
+    }
+
+    /**
+     * @param \DateTime $someDate
+     * @return Pet
+     */
+    public function setSomeDate(\DateTime $someDate)
+    {
+        $this->someDate = $someDate;
         return $this;
     }
 }

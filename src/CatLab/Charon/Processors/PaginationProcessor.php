@@ -171,6 +171,7 @@ class PaginationProcessor implements Processor
         $out = [];
 
         foreach ($sortOrder as $sort) {
+
             $value = $properties->getFromName($sort->getColumn());
             if ($value) {
                 $out[$value->getField()->getName()] = $value->getValue();
@@ -248,6 +249,8 @@ class PaginationProcessor implements Processor
          */
         $builder = new $cn();
 
+        $registeredFields = [];
+
         // Register attribute names
         foreach ($definition->getFields() as $field) {
             if (
@@ -258,6 +261,7 @@ class PaginationProcessor implements Processor
                 )
             ) {
                 $builder->registerPropertyName($field->getName(), $field->getDisplayName());
+                $registeredFields[$field->getName()] = $field;
             }
         }
 
@@ -280,7 +284,7 @@ class PaginationProcessor implements Processor
                     $direction = OrderParameter::ASC;
                 }
 
-                $field = $definition->getFields()->getFromDisplayName($sortField);
+                $field = $registeredFields[$sortField] ?? null;
 
                 if ($field) {
                     if ($field->isSortable()) {

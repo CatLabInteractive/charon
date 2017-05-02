@@ -251,16 +251,21 @@ abstract class Parameter implements RouteMutator
             $out['description'] = $this->description;
         }
 
-        if (isset($this->values)) {
-            $out['enum'] = $this->values;
-        }
-
         if (isset($this->default)) {
             $out['default'] = $this->default;
         }
 
         if (isset($this->allowMultiple)) {
-            $out['allowMultiple'] = $this->allowMultiple;
+            //$out['allowMultiple'] = $this->allowMultiple;
+            $out['type'] = 'array';
+            $out['items'] = array(
+                'type' => $this->getType()
+            );
+        }
+
+        if (isset($this->values)) {
+            $out['enum'] = $this->values;
+
         }
 
         return $out;
@@ -294,7 +299,8 @@ abstract class Parameter implements RouteMutator
         $class = get_class($requirement);
         switch ($class) {
             case Exists::class:
-                $this->required();
+                //$this->required();
+                // This causes trouble when allowing multiple input methods.
                 return;
 
             case InArray::class:

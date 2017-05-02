@@ -164,6 +164,9 @@ class ResourceTransformer implements ResourceTransformerContract
             throw InvalidContextAction::expectedReadable($context->getAction());
         }
 
+        // Always start from a fresh context.
+        $context = $context->fork();
+
         if ($resourceDefinition instanceof DynamicContext) {
             $resourceDefinition->transformContext($context, $entity);
         }
@@ -177,6 +180,7 @@ class ResourceTransformer implements ResourceTransformerContract
 
         $this->parents->push($entity);
 
+        /** @var Field $field */
         foreach ($fields as $field) {
             $this->currentPath->push($field);
             $visible = $this->shouldInclude($field, $context);
@@ -188,9 +192,15 @@ class ResourceTransformer implements ResourceTransformerContract
                         $this->linkRelationship($field, $entity, $resource, $context, $visible);
                     }
                 } else {
+                    $value = $this->propertyResolver->resolveProperty($this, $entity, $field, $context);
+
+                    if ($transformer = $field->getTransformer()) {
+                        $value = $transformer->toResourceValue($value, $context);
+                    }
+
                     $resource->setProperty(
                         $field,
-                        $this->propertyResolver->resolveProperty($this, $entity, $field, $context),
+                        $value,
                         $visible
                     );
                 }

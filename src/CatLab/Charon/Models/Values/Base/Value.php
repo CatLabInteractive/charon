@@ -92,11 +92,17 @@ abstract class Value
         Context $context
     ) {
         if ($this->field->canSetProperty()) {
+
+            $value = $this->value;
+            if ($transformer = $this->getField()->getTransformer()) {
+                $value = $transformer->toEntityValue($value, $context);
+            }
+
             $propertySetter->setEntityValue(
                 $resourceTransformer,
                 $entity,
                 $this->field,
-                $this->value,
+                $value,
                 $context
             );
         }

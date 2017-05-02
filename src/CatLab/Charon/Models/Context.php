@@ -334,4 +334,13 @@ class Context implements ContextContract
     {
         return $this->inputParsers;
     }
+
+    /**
+     * Return a fork of the context.
+     * @return self
+     */
+    public function fork()
+    {
+        return clone $this;
+    }
 }
