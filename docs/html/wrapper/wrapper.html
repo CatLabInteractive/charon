@@ -15,7 +15,7 @@
         <ul>
             <% _.forEach(documents, function(document) { %>
                 <li>
-                    <a href="<%= document %>.html"><%= document %></a>
+                    <a href="<%= document.url %>.html"><%= document.name %></a>
                 </li>
             <% }); %>
         </ul>
