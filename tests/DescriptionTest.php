@@ -443,36 +443,73 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                             },
                             "category": {
                                 "type": "object",
-                                "schema": {
-                                    "properties": {
-                                        "link": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
+                                "$ref": "#\/definitions\/Category_index"
                             },
                             "photos": {
                                 "type": "object",
-                                "schema": {
-                                    "properties": {
-                                        "link": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
+                                "$ref": "#\/definitions\/Photo_index_items"
                             },
                             "tags": {
                                 "type": "object",
-                                "schema": {
-                                    "properties": {
-                                        "link": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
+                                "$ref": "#\/definitions\/Tag_index_items"
                             },
                             "status": {
                                 "type": "string"
+                            }
+                        }
+                    },
+                    "Category_index": {
+                        "type": "object",
+                        "properties": {
+                            "category-id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "Photo_index": {
+                        "type": "object",
+                        "properties": {
+                            "photo-id": {
+                                "type": "string"
+                            },
+                            "url": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "Photo_index_items": {
+                        "type": "object",
+                        "properties": {
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#\/definitions\/Photo_index"
+                                }
+                            }
+                        }
+                    },
+                    "Tag_index": {
+                        "type": "object",
+                        "properties": {
+                            "tag-id": {
+                                "type": "integer"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "Tag_index_items": {
+                        "type": "object",
+                        "properties": {
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#\/definitions\/Tag_index"
+                                }
                             }
                         }
                     },
@@ -487,15 +524,11 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                             },
                             "photos": {
                                 "type": "object",
-                                "schema": {
-                                    "$ref": "#\/definitions\/Photo_create_items"
-                                }
+                                "$ref": "#\/definitions\/Photo_create_items"
                             },
                             "tags": {
                                 "type": "object",
-                                "schema": {
-                                    "$ref": "#\/definitions\/Tag_identifier_items"
-                                }
+                                "$ref": "#\/definitions\/Tag_identifier_items"
                             }
                         }
                     },

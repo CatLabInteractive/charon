@@ -332,33 +332,41 @@ class RelationshipField extends Field
      */
     public function toSwagger(SwaggerBuilder $builder, $action)
     {
-        if (Action::isReadContext($action) && $this->isExpanded()) {
+        if (Action::isReadContext($action) && $this->isExpandable()) {
+
+            $schema = $builder->getRelationshipSchema(
+                ResourceDefinitionLibrary::make($this->childResource),
+                $this->getExpandContext(),
+                $this->cardinality
+            );
+
             return [
                 'type' => 'object',
-                'schema' => $builder->getRelationshipSchema(
-                    ResourceDefinitionLibrary::make($this->childResource),
-                    $this->getExpandContext(),
-                    $this->cardinality
-                )
+                '$ref' => $schema['$ref']
             ];
         } elseif (Action::isWriteContext($action)) {
             if ($this->linkOnly) {
+
+                $schema = $builder->getRelationshipSchema(
+                    ResourceDefinitionLibrary::make($this->childResource),
+                    Action::IDENTIFIER,
+                    $this->cardinality
+                );
+
                 return [
                     'type' => 'object',
-                    'schema' => $builder->getRelationshipSchema(
-                        ResourceDefinitionLibrary::make($this->childResource),
-                        Action::IDENTIFIER,
-                        $this->cardinality
-                    )
+                    '$ref' => $schema['$ref']
                 ];
             } else {
+                $schema = $builder->getRelationshipSchema(
+                    ResourceDefinitionLibrary::make($this->childResource),
+                    Action::CREATE,
+                    $this->cardinality
+                );
+
                 return [
                     'type' => 'object',
-                    'schema' => $builder->getRelationshipSchema(
-                        ResourceDefinitionLibrary::make($this->childResource),
-                        Action::CREATE,
-                        $this->cardinality
-                    )
+                    '$ref' => $schema['$ref']
                 ];
             }
         } else {
