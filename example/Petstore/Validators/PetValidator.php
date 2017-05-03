@@ -19,8 +19,8 @@ class PetValidator implements Validator
     public function validate($value)
     {
         /** @var RESTResource $value */
-        // A pet must have at least one picture.
 
+        // A pet must have at least one picture.
         $photos = $value->getProperties()->getFromName('photos')->getValue();
 
         if ($photos === null || count($photos) < 2) {
@@ -34,6 +34,6 @@ class PetValidator implements Validator
      */
     public function getErrorMessage(ValidatorValidationException $exception) : Message
     {
-        return new Message('Pets must have at least photos.');
+        return new Message('Pets must have at least one photo.');
     }
 }

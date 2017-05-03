@@ -8,6 +8,7 @@ use CatLab\Charon\Laravel\InputParsers\PostInputParser;
 use CatLab\Charon\Models\Context;
 use CatLab\Charon\Swagger\Authentication\OAuth2Authentication;
 use CatLab\Charon\Swagger\SwaggerBuilder;
+
 use PHPUnit_Framework_TestCase;
 
 /**

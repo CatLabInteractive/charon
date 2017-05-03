@@ -24,6 +24,16 @@ class Category
     private $description;
 
     /**
+     * @var Category
+     */
+    private $parent;
+
+    /**
+     * @var Category[]
+     */
+    private $children = [];
+
+    /**
      * @return string
      */
     public function getId()
@@ -75,5 +85,42 @@ class Category
     {
         $this->description = $description;
         return $this;
+    }
+
+    /**
+     * @return Category
+     */
+    public function getParent(): Category
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param Category $parent
+     * @return Category
+     */
+    public function setParent(Category $parent): Category
+    {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    /**
+     * @param Category $child
+     * @return $this
+     */
+    public function addChild(Category $child)
+    {
+        $child->setParent($this);
+        $this->children[] = $child;
+        return $this;
+    }
+
+    /**
+     * @return Category[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 }

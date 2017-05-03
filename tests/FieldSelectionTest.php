@@ -5,6 +5,7 @@ namespace CatLab\RESTResource\Tests;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
 use CatLab\Charon\Transformers\ResourceTransformer;
+
 use MockEntityModel;
 use MockResourceDefinitionExtraAttributes;
 use PHPUnit_Framework_TestCase;

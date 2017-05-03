@@ -20,7 +20,6 @@ class CategoryDefinition extends ResourceDefinition
 
         $this
             ->identifier('id')
-                ->display('category-id')
                 ->int()
 
             ->field('name')
@@ -29,8 +28,12 @@ class CategoryDefinition extends ResourceDefinition
                 ->visible(true, true)
 
             ->field('description')
-                ->display('category-description')
                 ->visible()
+
+            ->relationship('parent', CategoryDefinition::class)
+                ->visible(true)
+                ->url('categories/{model.id}/parent')
+                ->expandable()
         ;
     }
 }

@@ -22,33 +22,35 @@ class PetDefinition extends ResourceDefinition
         $this
             ->identifier('id')
                 ->int()
-                ->display('pet-id')
             
             ->field('name')
                 ->writeable()
                 ->required()
-                ->visible()
+                ->visible(true)
             
             ->relationship('category', CategoryDefinition::class)
                 ->one()
-                ->visible()
-                ->expandable()
+                ->visible(true)
+                ->expanded()
+                ->url('/api/v1/pets/{model.id}/categories')
             
             ->relationship('photos', PhotoDefinition::class)
                 ->many()
                 ->visible()
                 ->expandable()
                 ->writeable()
+                ->url('/api/v1/pets/{model.id}/photos')
             
             ->relationship('tags', TagDefinition::class)
                 ->many()
                 ->linkable()
                 ->expandable()
                 ->visible()
+                ->url('/api/v1/pets/{model.id}/tags')
 
             ->field('status')
                 ->enum([ Pet::STATUS_AVAILABLE, Pet::STATUS_ENDING, Pet::STATUS_SOLD ])
-                ->visible()
+                ->visible(true)
 
             ->validator(new PetValidator())
         ;

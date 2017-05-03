@@ -5,6 +5,9 @@
  * We only want to show the translation from entity to resources.
  * Charon works perfectly with Laravel of Symfony, but for this
  * example we just use a static model factory.
+ *
+ * For an example of Charon used in combination with laravel, check:
+ * https://github.com/CatLabInteractive/laravel-petstore
  */
 
 require '../vendor/autoload.php';
@@ -13,7 +16,7 @@ require '../vendor/autoload.php';
 $routes = include 'Petstore/routes.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-$path = $_SERVER['REQUEST_URI'];
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Find controller from
 $route = $routes->findFromPath($path, $method);
