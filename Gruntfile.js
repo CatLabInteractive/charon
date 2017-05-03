@@ -2,7 +2,12 @@ module.exports = function (grunt) {
 
     var documents = grunt.file.expand({filter: "isFile", cwd: "docs"}, ["*.md"]);
     for (var i = 0; i < documents.length; i ++) {
-        documents[i] = documents[i].substr(0, documents[i].length -3);
+        var name = documents[i].substr(0, documents[i].length -3);
+        documents[i] = {
+            name: name,
+            url: name
+        };
+        documents[i].name = documents[i].name.replace(/_/g, ' ');
     }
 
     console.log(documents);

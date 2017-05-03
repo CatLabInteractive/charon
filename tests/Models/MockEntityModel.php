@@ -69,6 +69,38 @@ class MockEntityModel
     }
 
     /**
+     * @return string
+     */
+    public function getAlwaysVisibleField()
+    {
+        return 'wololo';
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewVisibleField()
+    {
+        return 'everything is awesome';
+    }
+
+    /**
+     * @return MockEntityModel[]
+     */
+    public function getViewVisibleRelationship()
+    {
+        return $this->getChildren();
+    }
+
+    /**
+     * @return MockEntityModel[]
+     */
+    public function getAlwaysVisibleRelationship()
+    {
+        return $this->getChildren();
+    }
+
+    /**
      * @return MockEntityModel[]
      */
     public function getChildren()

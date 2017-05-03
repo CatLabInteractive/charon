@@ -8,6 +8,7 @@ use CatLab\Charon\Laravel\InputParsers\PostInputParser;
 use CatLab\Charon\Models\Context;
 use CatLab\Charon\Swagger\Authentication\OAuth2Authentication;
 use CatLab\Charon\Swagger\SwaggerBuilder;
+
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -93,6 +94,19 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "default":"json",
                               "enum":[
                                  "json"
+                              ]
+                           },
+                           {
+                              "name":"fields",
+                              "type":"array",
+                              "in":"query",
+                              "required":false,
+                              "description":"Define fields to return. Separate multiple values with comma. Values: *",
+                              "items":{
+                                 "type":"string"
+                              },
+                              "enum":[
+                                 "*"
                               ]
                            }
                         ],
@@ -202,15 +216,23 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "type":"array",
                               "in":"query",
                               "required":false,
-                              "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "description":"Define fields to return. Separate multiple values with comma. Values: *, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
                               "items":{
                                  "type":"string"
                               },
                               "enum":[
+                                 "*",
                                  "name",
                                  "category",
+                                 "category.*",
+                                 "category.name",
+                                 "category.category-description",
                                  "photos",
+                                 "photos.*",
+                                 "photos.url",
                                  "tags",
+                                 "tags.*",
+                                 "tags.name",
                                  "status"
                               ]
                            }
@@ -285,15 +307,23 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "type":"array",
                               "in":"query",
                               "required":false,
-                              "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "description":"Define fields to return. Separate multiple values with comma. Values: *, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
                               "items":{
                                  "type":"string"
                               },
                               "enum":[
+                                 "*",
                                  "name",
                                  "category",
+                                 "category.*",
+                                 "category.name",
+                                 "category.category-description",
                                  "photos",
+                                 "photos.*",
+                                 "photos.url",
                                  "tags",
+                                 "tags.*",
+                                 "tags.name",
                                  "status"
                               ]
                            }
@@ -386,15 +416,23 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "type":"array",
                               "in":"query",
                               "required":false,
-                              "description":"Define fields to return. Separate multiple values with comma. Values: name, category, photos, tags, status",
+                              "description":"Define fields to return. Separate multiple values with comma. Values: *, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
                               "items":{
                                  "type":"string"
                               },
                               "enum":[
+                                 "*",
                                  "name",
                                  "category",
+                                 "category.*",
+                                 "category.name",
+                                 "category.category-description",
                                  "photos",
+                                 "photos.*",
+                                 "photos.url",
                                  "tags",
+                                 "tags.*",
+                                 "tags.name",
                                  "status"
                               ]
                            }

@@ -7,10 +7,7 @@ class MockResourceDefinitionDepthTwo extends \CatLab\Charon\Models\ResourceDefin
         parent::__construct(MockEntityModel::class);
 
         $this
-            ->field('id')
-                ->display('name')
-                ->visible(true)
-                ->writeable()
+            ->identifier('id')
 
             ->relationship('children', MockResourceDefinitionDepthTwo::class)
                 ->expanded()

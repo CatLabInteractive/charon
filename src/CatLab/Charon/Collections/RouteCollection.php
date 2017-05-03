@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Models\Routing\MatchedRoute;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Models\Routing\RouteProperties;
 
@@ -159,6 +160,22 @@ class RouteCollection extends RouteProperties
         }
 
         return $out;
+    }
+
+    /**
+     * Find a route based on method and path.
+     * @param $path
+     * @param $method
+     * @return MatchedRoute|null
+     */
+    public function findFromPath($path, $method = null)
+    {
+        foreach ($this->getRoutes() as $route) {
+            if ($matchedRoute = $route->matches($path, $method)) {
+                return $matchedRoute;
+            }
+        }
+        return null;
     }
 
     /**

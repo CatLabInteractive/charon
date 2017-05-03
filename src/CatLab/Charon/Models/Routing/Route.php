@@ -6,6 +6,7 @@ use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -172,6 +173,46 @@ class Route extends RouteProperties implements RouteMutator
     }
 
     /**
+     * @param $method
+     * @param $requestPath
+     * @return MatchedRoute|boolean
+     */
+    public function matches($requestPath, $method)
+    {
+        if ($method) {
+            if (strtolower($method) != $this->getMethod()) {
+                return false;
+            }
+        }
+
+        $path = $this->getPath();
+
+        $path = preg_replace ('/.{\w+\\?}/', '(\.\w+)?', $path);
+        $path = preg_replace ('/\/\{\w+\\?}/', '(/\w+)?', $path);
+        $path = preg_replace ('/\/\{\w+\}/', '(/\w+)', $path);
+
+        if (preg_match_all('#^' . $path . '$#', $requestPath, $matches, PREG_OFFSET_CAPTURE)) {
+
+            // Rework matches to only contain the matches, not the orig string
+            $matches = array_slice($matches, 1);
+            // Extract the matched URL parameters (and only the parameters)
+            $params = array_map(function($match, $index) use ($matches) {
+                // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
+                if (isset($matches[$index+1]) && isset($matches[$index+1][0]) && is_array($matches[$index+1][0])) {
+                    return trim(substr($match[0][0], 0, $matches[$index+1][0][1] - $match[0][1]), '/');
+                }
+                // We have no following paramete: return the whole lot
+                else {
+                    return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
+                }
+            }, $matches, array_keys($matches));
+
+            return new MatchedRoute($this, $params);
+        }
+        return false;
+    }
+
+    /**
      * @param bool TRUE if at least one return value consists of multiple models.
      * @return Parameter[]
      */
@@ -182,7 +223,9 @@ class Route extends RouteProperties implements RouteMutator
         $sortValues = [];
         $expandValues = [];
         $selectValues = [];
-        $visibleValues = [];
+        $visibleValues = [
+            '*'
+        ];
 
         $parameters = [];
 
@@ -200,10 +243,30 @@ class Route extends RouteProperties implements RouteMutator
                         $sortValues[] = '!' . $field->getDisplayName();
                     }
 
+                    // Visible
+                    if ($field->isVisible()) {
+                        $visibleValues[] = $field->getDisplayName();
+                    }
+
                     // Expandable field
                     if ($field instanceof RelationshipField) {
                         if ($field->isExpandable()) {
                             $expandValues[] = $field->getDisplayName();
+                            $visibleValues[] = $field->getDisplayName() . '.*';
+
+                            // Also do sectond level expandable and filterable, but no further!
+                            $related = $field->getChildResource();
+                            foreach ($related->getFields() as $relatedField) {
+                                if ($relatedField->isVisible()) {
+                                    $visibleValues[] = $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+                                }
+
+                                if ($relatedField instanceof RelationshipField) {
+                                    if ($relatedField->isExpandable()) {
+                                        $expandValues[] = $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -215,11 +278,6 @@ class Route extends RouteProperties implements RouteMutator
                     // Searchable fields
                     if ($field->isSearchable() && $hasCardinalityMany) {
                         $parameters[] = $this->getSearchField($field);
-                    }
-
-                    // Visible
-                    if ($field->isVisible()) {
-                        $visibleValues[] = $field->getDisplayName();
                     }
 
                     $selectValues[] = $field->getDisplayName();
