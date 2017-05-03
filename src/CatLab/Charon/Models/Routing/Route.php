@@ -223,9 +223,7 @@ class Route extends RouteProperties implements RouteMutator
         $sortValues = [];
         $expandValues = [];
         $selectValues = [];
-        $visibleValues = [
-            '*'
-        ];
+        $visibleValues = [];
 
         $parameters = [];
 
@@ -305,6 +303,10 @@ class Route extends RouteProperties implements RouteMutator
         }
 
         if (count($visibleValues) > 0) {
+
+            // Add asterisk
+            array_unshift($visibleValues, '*');
+
             $parameters[] = (new QueryParameter(ResourceTransformer::FIELDS_PARAMETER))
                 ->setType('string')
                 ->enum($visibleValues)
