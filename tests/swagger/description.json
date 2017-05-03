@@ -288,18 +288,6 @@
             }
           },
           {
-            "name": "pet-id",
-            "type": "integer",
-            "in": "formData",
-            "required": false
-          },
-          {
-            "name": "name",
-            "type": "string",
-            "in": "formData",
-            "required": false
-          },
-          {
             "name": "expand",
             "type": "array",
             "in": "query",
@@ -341,9 +329,7 @@
           }
         ],
         "consumes": [
-          "application\/json",
-          "multipart\/form-data",
-          "application\/x-www-form-urlencoded"
+          "application\/json"
         ],
         "security": {
           "oauth2": [
