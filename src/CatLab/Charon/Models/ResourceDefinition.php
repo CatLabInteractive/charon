@@ -156,7 +156,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
         }
 
         if (count($out['properties']) === 0) {
-            unset($out['properties']);
+            $out['properties'] = (object) [];
         }
 
         return $out;
