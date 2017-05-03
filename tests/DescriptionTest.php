@@ -47,7 +47,9 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
 
         $context = new Context(Action::INDEX);
         $context->addInputParser(JsonBodyInputParser::class);
-        $context->addInputParser(PostInputParser::class);
+
+        // For description we only want one input parser!
+        // $context->addInputParser(PostInputParser::class);
 
         $actual = $builder->build($context);
 
