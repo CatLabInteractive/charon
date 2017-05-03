@@ -245,11 +245,9 @@ class ReturnValue implements RouteMutator
 
         // Is this a native type?
         if (PropertyType::isNative($this->getType())) {
-            /*
             $response = [
                 'type' => $this->getType()
             ];
-            */
         }
 
         // Is this a resource definition?
@@ -269,7 +267,7 @@ class ReturnValue implements RouteMutator
             $response['description'] = $this->description;
         }
 
-        if ($this->headers) {
+        if ($this->headers->count() > 0) {
             $response['headers'] = $this->headers->toSwagger($builder);
         }
 

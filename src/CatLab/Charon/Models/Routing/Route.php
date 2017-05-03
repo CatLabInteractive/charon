@@ -106,10 +106,9 @@ class Route extends RouteProperties implements RouteMutator
      */
     public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
-        $options = $this->getOptions();
-
         $out = [];
 
+        $options = $this->getOptions();
         $parameters = $this->getParameters();
 
         // Check return

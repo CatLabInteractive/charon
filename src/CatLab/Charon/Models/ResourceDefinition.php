@@ -146,15 +146,19 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function toSwagger(SwaggerBuilder $builder, $action)
     {
         $out = [
-            'type' => 'object',
-            'properties' => []
+            'type' => 'object'
         ];
 
+        $out['properties'] = [];
         foreach ($this->getFields() as $field) {
             /** @var ResourceField $field */
             if ($field->hasAction($action)) {
                 $out['properties'][$field->getDisplayName()] = $field->toSwagger($builder, $action);
             }
+        }
+
+        if (count($out['properties']) === 0) {
+            unset($out['properties']);
         }
 
         return $out;
