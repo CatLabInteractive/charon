@@ -223,7 +223,9 @@ class Route extends RouteProperties implements RouteMutator
         $sortValues = [];
         $expandValues = [];
         $selectValues = [];
-        $visibleValues = [];
+        $visibleValues = [
+            '*'
+        ];
 
         $parameters = [];
 
@@ -241,10 +243,30 @@ class Route extends RouteProperties implements RouteMutator
                         $sortValues[] = '!' . $field->getDisplayName();
                     }
 
+                    // Visible
+                    if ($field->isVisible()) {
+                        $visibleValues[] = $field->getDisplayName();
+                    }
+
                     // Expandable field
                     if ($field instanceof RelationshipField) {
                         if ($field->isExpandable()) {
                             $expandValues[] = $field->getDisplayName();
+                            $visibleValues[] = $field->getDisplayName() . '.*';
+
+                            // Also do sectond level expandable and filterable, but no further!
+                            $related = $field->getChildResource();
+                            foreach ($related->getFields() as $relatedField) {
+                                if ($relatedField->isVisible()) {
+                                    $visibleValues[] = $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+                                }
+
+                                if ($relatedField instanceof RelationshipField) {
+                                    if ($relatedField->isExpandable()) {
+                                        $expandValues[] = $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -256,11 +278,6 @@ class Route extends RouteProperties implements RouteMutator
                     // Searchable fields
                     if ($field->isSearchable() && $hasCardinalityMany) {
                         $parameters[] = $this->getSearchField($field);
-                    }
-
-                    // Visible
-                    if ($field->isVisible()) {
-                        $visibleValues[] = $field->getDisplayName();
                     }
 
                     $selectValues[] = $field->getDisplayName();

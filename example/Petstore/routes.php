@@ -2,8 +2,8 @@
 
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Action;
-use Tests\Petstore\Definitions\PetDefinition;
-use Tests\Petstore\Models\Pet;
+use App\Petstore\Definitions\PetDefinition;
+use App\Petstore\Models\Pet;
 
 $routes = new RouteCollection();
 
