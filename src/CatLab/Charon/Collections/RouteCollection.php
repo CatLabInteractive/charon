@@ -185,7 +185,7 @@ class RouteCollection extends RouteProperties
     {
         $out = "";
         foreach ($this->getRoutes() as $route) {
-            $out .= str_pad(strtoupper($route->getMethod()), 6, ' ');
+            $out .= str_pad(strtoupper($route->getMethod()), 8, ' ');
             $out .= str_pad($route->getPath(), 70, ' ');
             $out .= $route->getAction();
 
