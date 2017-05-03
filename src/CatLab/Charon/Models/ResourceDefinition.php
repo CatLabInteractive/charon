@@ -145,9 +145,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      */
     public function toSwagger(SwaggerBuilder $builder, $action)
     {
-        $out = [
-            'type' => 'object'
-        ];
+        $out = [];
 
         $out['properties'] = [];
         foreach ($this->getFields() as $field) {
@@ -158,7 +156,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
         }
 
         if (count($out['properties']) === 0) {
-            unset($out['properties']);
+            $out['properties'] = (object) [];
         }
 
         return $out;

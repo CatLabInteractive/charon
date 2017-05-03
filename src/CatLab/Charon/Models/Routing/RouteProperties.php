@@ -100,7 +100,7 @@ abstract class RouteProperties implements RouteMutator
         $out = $this->parameters->toMap();
 
         if ($this->parent) {
-            $out = array_merge($out, $this->parent->parameters->toMap());
+            $out = array_merge($out, $this->parent->getParameters());
         }
         
         return array_values($out);
@@ -216,7 +216,11 @@ abstract class RouteProperties implements RouteMutator
      */
     public function getSummary()
     {
-        return $this->summary;
+        if ($this->summary) {
+            return $this->summary;
+        } else {
+            return 'No route summary set.';
+        }
     }
 
     /**

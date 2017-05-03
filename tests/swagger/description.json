@@ -1,0 +1,455 @@
+{
+  "swagger": "2.0",
+  "host": "localhost",
+  "basePath": "\/",
+  "info": {
+    "title": "Pet store API",
+    "description": "This pet store api allows you to buy pets",
+    "contact": {
+      "name": "CatLab Interactive",
+      "url": "https:\/\/www.catlab.eu\/",
+      "email": "info@catlab.eu"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "api\/v1\/description.{format}": {
+      "get": {
+        "responses": {
+          "403": {
+            "description": "Authentication error"
+          },
+          "404": {
+            "description": "Entity not found"
+          }
+        },
+        "summary": "Get swagger API description",
+        "parameters": [
+          {
+            "name": "format",
+            "type": "string",
+            "in": "path",
+            "required": true,
+            "description": "Output format",
+            "default": "json",
+            "enum": [
+              "json"
+            ]
+          }
+        ],
+        "tags": [
+          "swagger"
+        ],
+        "security": {
+          "oauth2": [
+            "full"
+          ]
+        }
+      }
+    },
+    "api\/v1\/pets.{format}": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#\/definitions\/Pet_index_items"
+            },
+            "description": "Returns many Tests\\Petstore\\Models\\Pet"
+          },
+          "403": {
+            "description": "Authentication error"
+          },
+          "404": {
+            "description": "Entity not found"
+          }
+        },
+        "summary": "Get all pet",
+        "parameters": [
+          {
+            "name": "format",
+            "type": "string",
+            "in": "path",
+            "required": true,
+            "description": "Output format",
+            "default": "json",
+            "enum": [
+              "json"
+            ]
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "in": "query",
+            "required": false,
+            "description": "Find pets on name"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "in": "query",
+            "required": false,
+            "enum": [
+              "available",
+              "ending",
+              "sold"
+            ]
+          },
+          {
+            "name": "pet-id",
+            "type": "integer",
+            "in": "query",
+            "required": false,
+            "description": "Filter results on pet-id"
+          },
+          {
+            "name": "sort",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Define the sort parameter. Separate multiple values with comma.",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "pet-id",
+              "!pet-id"
+            ]
+          },
+          {
+            "name": "expand",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "category",
+              "photos",
+              "tags"
+            ]
+          },
+          {
+            "name": "fields",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Define fields to return. Separate multiple values with comma. Values: *, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "*",
+              "name",
+              "category",
+              "category.*",
+              "category.name",
+              "category.category-description",
+              "photos",
+              "photos.*",
+              "photos.url",
+              "tags",
+              "tags.*",
+              "tags.name",
+              "status"
+            ]
+          }
+        ],
+        "security": {
+          "oauth2": [
+            "full"
+          ]
+        }
+      }
+    },
+    "api\/v1\/pets\/{id}.{format}": {
+      "get": {
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#\/definitions\/Pet_view"
+            },
+            "description": "Returns one Tests\\Petstore\\Models\\Pet"
+          },
+          "403": {
+            "description": "Authentication error"
+          },
+          "404": {
+            "description": "Entity not found"
+          }
+        },
+        "summary": "Get a pet",
+        "parameters": [
+          {
+            "name": "id",
+            "type": "integer",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "format",
+            "type": "string",
+            "in": "path",
+            "required": true,
+            "description": "Output format",
+            "default": "json",
+            "enum": [
+              "json"
+            ]
+          },
+          {
+            "name": "expand",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "category",
+              "photos",
+              "tags"
+            ]
+          },
+          {
+            "name": "fields",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Define fields to return. Separate multiple values with comma. Values: *, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "*",
+              "name",
+              "category",
+              "category.*",
+              "category.name",
+              "category.category-description",
+              "photos",
+              "photos.*",
+              "photos.url",
+              "tags",
+              "tags.*",
+              "tags.name",
+              "status"
+            ]
+          }
+        ],
+        "security": {
+          "oauth2": [
+            "full"
+          ]
+        }
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#\/definitions\/Pet_edit"
+            },
+            "description": "Returns one Tests\\Petstore\\Models\\Pet"
+          },
+          "403": {
+            "description": "Authentication error"
+          },
+          "404": {
+            "description": "Entity not found"
+          }
+        },
+        "summary": "Get a pet",
+        "parameters": [
+          {
+            "name": "id",
+            "type": "integer",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "format",
+            "type": "string",
+            "in": "path",
+            "required": true,
+            "description": "Output format",
+            "default": "json",
+            "enum": [
+              "json"
+            ]
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#\/definitions\/Pet_edit"
+            }
+          },
+          {
+            "name": "expand",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Expand relationships. Separate multiple values with comma. Values: category, photos, tags",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "category",
+              "photos",
+              "tags"
+            ]
+          },
+          {
+            "name": "fields",
+            "type": "array",
+            "in": "query",
+            "required": false,
+            "description": "Define fields to return. Separate multiple values with comma. Values: *, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
+            "items": {
+              "type": "string"
+            },
+            "enum": [
+              "*",
+              "name",
+              "category",
+              "category.*",
+              "category.name",
+              "category.category-description",
+              "photos",
+              "photos.*",
+              "photos.url",
+              "tags",
+              "tags.*",
+              "tags.name",
+              "status"
+            ]
+          }
+        ],
+        "consumes": [
+          "application\/json"
+        ],
+        "security": {
+          "oauth2": [
+            "full"
+          ]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Pet_index": {
+      "properties": {
+        "pet-id": {
+          "type": "integer"
+        }
+      }
+    },
+    "Pet_index_items": {
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Pet_index"
+          }
+        }
+      }
+    },
+    "Pet_view": {
+      "properties": {
+        "pet-id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "properties": {
+            "link": {
+              "type": "string"
+            }
+          }
+        },
+        "photos": {
+          "properties": {
+            "link": {
+              "type": "string"
+            }
+          }
+        },
+        "tags": {
+          "properties": {
+            "link": {
+              "type": "string"
+            }
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "Pet_edit": {
+      "properties": {
+        "pet-id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "photos": {
+          "$ref": "#\/definitions\/Photo_create_items"
+        },
+        "tags": {
+          "$ref": "#\/definitions\/Tag_identifier_items"
+        }
+      }
+    },
+    "Photo_create": {
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "Photo_create_items": {
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Photo_create"
+          }
+        }
+      }
+    },
+    "Tag_identifier": {
+      "properties": {
+        "tag-id": {
+          "type": "integer"
+        }
+      }
+    },
+    "Tag_identifier_items": {
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Tag_identifier"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "authorizationUrl": "oauth\/authorize",
+      "flow": "implicit",
+      "scopes": {
+        "full": "Full access"
+      }
+    }
+  }
+}

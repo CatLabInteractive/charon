@@ -245,13 +245,8 @@ class ReturnValue implements RouteMutator
 
         // Is this a native type?
         if (PropertyType::isNative($this->getType())) {
-            $response = [
-                'type' => $this->getType()
-            ];
-        }
-
-        // Is this a resource definition?
-        else {
+            // Do nothing.
+        } else {
             $schema = $builder->getRelationshipSchema(
                 ResourceDefinitionLibrary::make($this->getType()),
                 $this->getContext(),
@@ -265,6 +260,8 @@ class ReturnValue implements RouteMutator
 
         if (isset($this->description)) {
             $response['description'] = $this->description;
+        } else {
+            $response['description'] = $this->getDescriptionFromType();
         }
 
         if ($this->headers->count() > 0) {
@@ -272,6 +269,23 @@ class ReturnValue implements RouteMutator
         }
 
         return $response;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDescriptionFromType()
+    {
+        if (!$this->getType()) {
+            return 'No description set.';
+        }
+
+        if (PropertyType::isNative($this->getType())) {
+            return 'Returns ' . $this->getType();
+        } else {
+            $type = ResourceDefinitionLibrary::make($this->getType());
+            return 'Returns ' . $this->getCardinality() . ' ' . $type->getEntityClassName();
+        }
     }
 
     /**

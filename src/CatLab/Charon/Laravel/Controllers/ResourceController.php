@@ -232,10 +232,19 @@ trait ResourceController
 
         $context->setUrl(\Request::url());
 
-        $context->addInputParser(JsonBodyInputParser::class);
-        $context->addInputParser(PostInputParser::class);
+
 
         return $context;
+    }
+
+    /**
+     * Set the input parsers that will be used to turn requests into resources.
+     * @param \CatLab\Charon\Models\Context $context
+     */
+    protected function setInputParsers(\CatLab\Charon\Models\Context $context)
+    {
+        $context->addInputParser(JsonBodyInputParser::class);
+        // $context->addInputParser(PostInputParser::class);
     }
 
     /**
