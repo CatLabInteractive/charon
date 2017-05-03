@@ -332,7 +332,7 @@ class RelationshipField extends Field
      */
     public function toSwagger(SwaggerBuilder $builder, $action)
     {
-        if (Action::isReadContext($action) && $this->isExpandable()) {
+        if (Action::isReadContext($action) && $this->isExpanded()) {
 
             $schema = $builder->getRelationshipSchema(
                 ResourceDefinitionLibrary::make($this->childResource),
@@ -341,7 +341,6 @@ class RelationshipField extends Field
             );
 
             return [
-                'type' => 'object',
                 '$ref' => $schema['$ref']
             ];
         } elseif (Action::isWriteContext($action)) {
@@ -354,7 +353,6 @@ class RelationshipField extends Field
                 );
 
                 return [
-                    'type' => 'object',
                     '$ref' => $schema['$ref']
                 ];
             } else {
@@ -365,18 +363,14 @@ class RelationshipField extends Field
                 );
 
                 return [
-                    'type' => 'object',
                     '$ref' => $schema['$ref']
                 ];
             }
         } else {
             return [
-                'type' => 'object',
-                'schema' => [
-                    'properties' => [
-                        ResourceTransformer::RELATIONSHIP_LINK => [
-                            'type' => 'string'
-                        ]
+                'properties' => [
+                    ResourceTransformer::RELATIONSHIP_LINK => [
+                        'type' => 'string'
                     ]
                 ]
             ];

@@ -286,7 +286,6 @@ class SwaggerBuilder implements DescriptionBuilder
         $name = $name . '_' . $action . '_items';
         if (!array_key_exists($name, $this->schemas)) {
             $this->schemas[$name] = [
-                'type' => 'object',
                 'properties' => [
                     ResourceTransformer::RELATIONSHIP_ITEMS => [
                         'type' => 'array',

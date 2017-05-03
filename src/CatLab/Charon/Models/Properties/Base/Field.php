@@ -243,9 +243,20 @@ class Field implements Property, ResourceDefinitionManipulator
      */
     public function toSwagger(SwaggerBuilder $builder, $action)
     {
-        return [
-            'type' => $this->type
-        ];
+        $out = [];
+
+        $type = $this->type;
+        switch ($type) {
+            case PropertyType::DATETIME:
+                $out['type'] = 'string';
+                $out['format'] = 'date-time';
+                break;
+
+            default:
+                $out['type'] = $type;
+        }
+
+        return $out;
     }
 
     /**
