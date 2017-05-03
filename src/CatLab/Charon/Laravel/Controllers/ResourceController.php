@@ -231,8 +231,7 @@ trait ResourceController
         }
 
         $context->setUrl(\Request::url());
-
-
+        $this->setInputParsers($context);
 
         return $context;
     }
