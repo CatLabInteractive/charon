@@ -95,10 +95,6 @@ class InputParserCollection extends Collection implements InputParser
 
             $parameters = $inputParser->getResourceRouteParameters($builder, $route, $parameter, $resourceDefinition);
             $out->merge($parameters);
-
-            // In order to provide valid swagger documentation, we can only provide fields
-            // for the first InputParser in this collection.
-            break;
         }
 
         return $out;
