@@ -49,7 +49,7 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
         $context->addInputParser(JsonBodyInputParser::class);
 
         // For description we only want one input parser!
-        // $context->addInputParser(PostInputParser::class);
+        //$context->addInputParser(PostInputParser::class);
 
         $actual = $builder->build($context);
 

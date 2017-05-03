@@ -2,6 +2,8 @@
 
 namespace CatLab\Charon\Models\Routing\Parameters;
 
+use CatLab\Base\Collections\Collection;
+use CatLab\Charon\Exceptions\SwaggerMultipleInputParsers;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Enums\Cardinality;
@@ -64,12 +66,18 @@ class ResourceParameter extends Parameter
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
+     * @throws SwaggerMultipleInputParsers
      */
     public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
         $out = [];
 
         $resourceDefinition = ResourceDefinitionLibrary::make($this->resourceDefinition);
+
+        $inputParser = $context->getInputParser();
+        if ($inputParser instanceof Collection && $inputParser->count() > 1) {
+            throw SwaggerMultipleInputParsers::make();
+        }
 
         $parameters = $context->getInputParser()->getResourceRouteParameters(
             $builder,
