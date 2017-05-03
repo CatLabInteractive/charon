@@ -95,19 +95,6 @@ class DescriptionTest extends PHPUnit_Framework_TestCase
                               "enum":[
                                  "json"
                               ]
-                           },
-                           {
-                              "name":"fields",
-                              "type":"array",
-                              "in":"query",
-                              "required":false,
-                              "description":"Define fields to return. Separate multiple values with comma. Values: *",
-                              "items":{
-                                 "type":"string"
-                              },
-                              "enum":[
-                                 "*"
-                              ]
                            }
                         ],
                         "tags":[
