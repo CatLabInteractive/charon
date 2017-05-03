@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
+use CatLab\Charon\Exceptions\NoInputParsersSet;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
@@ -30,6 +31,8 @@ class InputParserCollection extends Collection implements InputParser
         ResourceDefinition $resourceDefinition,
         Context $context
     ) {
+        $this->checkExists();
+
         /** @var InputParser $inputParser */
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
@@ -55,6 +58,8 @@ class InputParserCollection extends Collection implements InputParser
         ResourceDefinition $resourceDefinition,
         Context $context
     ) {
+        $this->checkExists();
+
         /** @var InputParser $inputParser */
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
@@ -81,6 +86,8 @@ class InputParserCollection extends Collection implements InputParser
         ResourceDefinition $resourceDefinition
     ): ParameterCollection
     {
+        $this->checkExists();
+
         $out = new ParameterCollection($route);
 
         foreach ($this as $inputParser) {
@@ -91,5 +98,15 @@ class InputParserCollection extends Collection implements InputParser
         }
 
         return $out;
+    }
+
+    /**
+     * @throws NoInputParsersSet
+     */
+    protected function checkExists()
+    {
+        if ($this->count() === 0) {
+            throw NoInputParsersSet::make();
+        }
     }
 }
