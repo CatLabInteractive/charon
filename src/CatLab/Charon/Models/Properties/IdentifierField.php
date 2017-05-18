@@ -61,4 +61,14 @@ class IdentifierField extends ResourceField
     {
         return false;
     }
+
+    /**
+     * Can this field be viewed?
+     * @param null $action
+     * @return bool
+     */
+    public function isViewable($action = null)
+    {
+        return true;
+    }
 }

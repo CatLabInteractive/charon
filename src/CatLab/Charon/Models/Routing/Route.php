@@ -234,6 +234,8 @@ class Route extends RouteProperties implements RouteMutator
 
                 foreach ($resourceDefinition->getFields() as $field) {
 
+                    /** @var Field $field */
+
                     // Sortable field
                     if ($field->isSortable() && $hasCardinalityMany) {
                         $sortValues[] = $field->getDisplayName();
@@ -241,13 +243,13 @@ class Route extends RouteProperties implements RouteMutator
                     }
 
                     // Visible
-                    if ($field->isVisible()) {
+                    if ($field->isViewable($returnValue->getContext())) {
                         $visibleValues[] = $field->getDisplayName();
                     }
 
                     // Expandable field
                     if ($field instanceof RelationshipField) {
-                        if ($field->isExpandable()) {
+                        if ($field->isViewable($returnValue->getContext()) && $field->isExpandable()) {
                             $expandValues[] = $field->getDisplayName();
                             $visibleValues[] = $field->getDisplayName() . '.*';
 

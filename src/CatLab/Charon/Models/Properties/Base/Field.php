@@ -164,6 +164,20 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
+     * Can this field be viewed?
+     * @param null $action
+     * @return bool
+     */
+    public function isViewable($action = null)
+    {
+        if ($action === Action::IDENTIFIER) {
+            return false;
+        }
+
+        return $this->isVisible($action);
+    }
+
+    /**
      * @param string $context
      * @return bool
      */

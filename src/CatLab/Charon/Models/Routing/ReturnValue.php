@@ -140,12 +140,12 @@ class ReturnValue implements RouteMutator
      */
     public function getContext() : string
     {
-        if (isset($this->context)) {
-            return $this->context;
-        }
-
         if (!isset($this->cardinality)) {
             $this->cardinality = Cardinality::ONE;
+        }
+
+        if (isset($this->context)) {
+            return $this->context;
         }
 
         return Method::toAction($this->parent->getMethod(), $this->cardinality);
