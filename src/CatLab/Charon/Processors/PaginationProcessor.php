@@ -289,7 +289,13 @@ class PaginationProcessor implements Processor
                 if ($field) {
                     if ($field->isSortable()) {
                         $sortedOn[$field->getName()] = true;
-                        $builder->orderBy(new OrderParameter($transformer->getQualifiedName($field), $direction));
+                        $builder->orderBy(
+                            new OrderParameter(
+                                $transformer->getQualifiedName($field),
+                                $direction,
+                                $definition->getEntityClassName()
+                            )
+                        );
                     }
                 } else {
                     // Check sortable
@@ -298,6 +304,7 @@ class PaginationProcessor implements Processor
                         case self::RANDOM:
                             $this->handleRandomOrder(
                                 $builder,
+                                $definition,
                                 $direction,
                                 $request
                             );
@@ -312,7 +319,13 @@ class PaginationProcessor implements Processor
         // Add all
         foreach ($definition->getFields() as $field) {
             if ($field instanceof IdentifierField && !isset($sortedOn[$field->getName()])) {
-                $builder->orderBy(new OrderParameter($field->getName(), OrderParameter::ASC));
+                $builder->orderBy(
+                    new OrderParameter(
+                        $field->getName(),
+                        OrderParameter::ASC,
+                        $definition->getEntityClassName()
+                    )
+                );
             }
         }
 
@@ -326,10 +339,11 @@ class PaginationProcessor implements Processor
 
     /**
      * @param PaginationBuilder $builder
+     * @param ResourceDefinition $definition
      * @param $direction
      * @param $request
      */
-    private function handleRandomOrder(PaginationBuilder $builder, $direction, &$request)
+    private function handleRandomOrder(PaginationBuilder $builder, ResourceDefinition $definition, $direction, &$request)
     {
         if (isset($request) && isset($request[self::RANDOM_SEED_QUERY])) {
             $random = intval($request[self::RANDOM_SEED_QUERY]);
@@ -338,9 +352,12 @@ class PaginationProcessor implements Processor
         }
 
 
-        $builder->orderBy(new OrderParameter(
+        $builder->orderBy(
+            new OrderParameter(
                 DB::raw('RAND(' . $random . ')'),
-                $direction)
+                $direction,
+                $definition
+            )
         );
 
         $request[self::RANDOM_SEED_QUERY] = $random;
