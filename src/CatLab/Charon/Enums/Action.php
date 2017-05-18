@@ -35,7 +35,7 @@ class Action
      */
     public static function isWriteContext($action)
     {
-        return in_array($action, [ Action::CREATE, Action::EDIT ]);
+        return in_array($action, [ Action::CREATE, Action::EDIT, Action::IDENTIFIER ]);
     }
 
     /**
