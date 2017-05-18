@@ -52,8 +52,12 @@ trait ResourceController
      * @param int $records
      * @return mixed
      */
-    public function filterAndGet($model, $resourceDefinition, Context $context, $records = 10)
+    public function filterAndGet($model, $resourceDefinition, Context $context, $records = null)
     {
+        if (!isset($records)) {
+            $records = $this->getRecordLimit();
+        }
+
         $filter = $this->resourceTransformer->getFilters(
             Request::query(),
             $resourceDefinition,
