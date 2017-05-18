@@ -62,7 +62,8 @@ trait ResourceController
         );
 
         // Translate parameters to larevel query
-        SelectQueryTransformer::toLaravel($model, $filter);
+        $selectQueryTransformer = new SelectQueryTransformer();
+        $selectQueryTransformer->toLaravel($model, $filter);
 
         // Process eager loading
         $this->resourceTransformer->processEagerLoading($model, $resourceDefinition, $context);

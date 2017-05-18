@@ -393,12 +393,24 @@ class ResourceTransformer implements ResourceTransformerContract
                 if ($field->isFilterable()) {
                     $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
                     if ($parameter) {
-                        $queryBuilder->where(new WhereParameter($field->getName(), Operator::EQ, $parameter));
+                        $queryBuilder->where(
+                            new WhereParameter(
+                                $field->getName(),
+                                Operator::EQ,
+                                $parameter,
+                                $definition->getEntityClassName())
+                        );
                     }
                 } elseif ($field->isSearchable()) {
                     $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
                     if ($parameter) {
-                        $queryBuilder->where(new WhereParameter($field->getName(), Operator::SEARCH, $parameter));
+                        $queryBuilder->where(
+                            new WhereParameter(
+                                $field->getName(),
+                                Operator::SEARCH,
+                                $parameter,
+                                $definition->getEntityClassName())
+                        );
                     }
                 }
 
