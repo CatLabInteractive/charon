@@ -288,21 +288,29 @@ trait ResourceController
 
         $context = $this->getContext(Action::INDEX, $parameters);
 
-        $records = Request::input('records', 10);
-        if (!is_numeric($records)) {
-            $records = 10;
-        }
+
 
         $models = $this->filterAndGet(
             $models,
             $resourceDefinition,
             $context,
-            $records
+            $this->getRecordLimit()
         );
 
         return $this->modelsToResources($models, $context, $resourceDefinition);
     }
 
+    /**
+     * @return int
+     */
+    protected function getRecordLimit()
+    {
+        $records = Request::input('records', 10);
+        if (!is_numeric($records)) {
+            $records = 10;
+        }
+        return $records;
+    }
 
     /**
      * Output a resource or a collection of resources
