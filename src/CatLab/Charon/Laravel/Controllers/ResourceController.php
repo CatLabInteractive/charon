@@ -265,7 +265,6 @@ trait ResourceController
         }
     }
 
-
     /**
      * Output a resource or a collection of resources
      *
@@ -289,10 +288,7 @@ trait ResourceController
     protected function filteredModelsToResources($models, array $parameters = [], $resourceDefinition = null)
     {
         $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
-
         $context = $this->getContext(Action::INDEX, $parameters);
-
-
 
         $models = $this->filterAndGet(
             $models,
@@ -336,17 +332,20 @@ trait ResourceController
     }
 
     /**
+     * Take one or multiple models and transform them into one or multiple resources.
+     * Notice: When non-model content is found, it is returned "as-is".
+     * @deprecated Use toResources() or toResource().
      * @param Model|Model[] $models
      * @param Context $context
      * @param null $resourceDefinition
-     * @return array|\mixed[]
+     * @return RESTResource|RESTResource[]|mixed
      */
     protected function modelsToResources($models, Context $context, $resourceDefinition = null)
     {
         if (ArrayHelper::isIterable($models)) {
-            return $this->toResources($models, $context, $resourceDefinition)->toArray();
+            return $this->toResources($models, $context, $resourceDefinition);
         } elseif ($models instanceof Model) {
-            return $this->toResource($models, $context, $resourceDefinition)->toArray();
+            return $this->toResource($models, $context, $resourceDefinition);
         } else {
             return $models;
         }
@@ -372,6 +371,29 @@ trait ResourceController
      */
     protected function toResponse($data)
     {
+        // First make sure all collections and resources are transformed to arrays.
+        $data = $this->resourceToArray($data);
         return Response::json($data);
+    }
+
+    /**
+     * Convert collections or resources to arrays.
+     * @param $data
+     * @return array|mixed
+     */
+    protected function resourceToArray($data)
+    {
+        if ($data instanceof Collection) {
+            return $data->toArray();
+        } else if ($data instanceof RESTResource) {
+            return $data->toArray();
+        } else if (ArrayHelper::isIterable($data)) {
+            foreach ($data as $k => $v) {
+                $data[$k] = $this->resourceToArray($v);
+            }
+            return $data;
+        }
+
+        return $data;
     }
 }
