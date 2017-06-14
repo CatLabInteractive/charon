@@ -31,10 +31,10 @@ interface RouteMutator
     public function parameters() : ParameterCollection;
 
     /**
-     * @param string $summary
+     * @param string|callable $summary
      * @return RouteMutator
      */
-    public function summary(string $summary) : RouteMutator;
+    public function summary($summary) : RouteMutator;
 
     /**
      * @param string $mimetype

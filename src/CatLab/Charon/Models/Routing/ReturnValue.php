@@ -182,7 +182,7 @@ class ReturnValue implements RouteMutator
      * @param string $summary
      * @return RouteMutator
      */
-    public function summary(string $summary) : RouteMutator
+    public function summary($summary) : RouteMutator
     {
         return $this->parent->summary($summary);
     }

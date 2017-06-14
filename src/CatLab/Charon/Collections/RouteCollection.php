@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Routing\MatchedRoute;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Models\Routing\RouteProperties;
@@ -140,6 +141,55 @@ class RouteCollection extends RouteProperties
         $this->routes[] = $route;
 
         return $route;
+    }
+
+    /**
+     * Set all crud actions, including documentation
+     * Really only usable for the default case
+     * @param $resourceDefinition
+     * @param string $path
+     * @param string $controller
+     * @return RouteCollection
+     */
+    public function resource($resourceDefinition, $path, $controller)
+    {
+        $group = $this->group([]);
+
+        $group->get($path, $controller . '@index')
+            ->summary(function() use ($resourceDefinition) {
+                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
+                return 'Returns all ' . $entityName;
+            })
+            ->returns()->statusCode(200)->many($resourceDefinition);
+
+        $group->get($path . '/{id}', $controller . '@show')
+            ->summary(function() use ($resourceDefinition) {
+                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
+                return 'View a single ' . $entityName;
+            })
+            ->returns()->statusCode(200)->one($resourceDefinition);
+
+        $group->post($path, $controller . '@store')
+            ->summary(function() use ($resourceDefinition) {
+                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
+                return 'Create a new ' . $entityName;
+            })
+            ->returns()->statusCode(200)->one($resourceDefinition);
+
+        $group->put($path . '/{id}', $controller . '@edit')
+            ->summary(function() use ($resourceDefinition) {
+                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
+                return 'Update an existing ' . $entityName;
+            })
+            ->returns()->statusCode(200)->one($resourceDefinition);
+
+        $group->delete($path . '/{id}', $controller . '@destroy')
+            ->summary(function() use ($resourceDefinition) {
+                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
+                return 'Delete a ' . $entityName;
+            });
+
+        return $group;
     }
 
     /**

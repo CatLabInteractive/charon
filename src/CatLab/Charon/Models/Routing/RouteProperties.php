@@ -7,6 +7,7 @@ use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
+use Closure;
 
 /**
  * Class RouteProperties
@@ -40,7 +41,7 @@ abstract class RouteProperties implements RouteMutator
     private $returnValues;
 
     /**
-     * @var string
+     * @var string|Closure
      */
     private $summary;
 
@@ -102,7 +103,7 @@ abstract class RouteProperties implements RouteMutator
         if ($this->parent) {
             $out = array_merge($out, $this->parent->getParameters());
         }
-        
+
         return array_values($out);
     }
 
@@ -202,10 +203,10 @@ abstract class RouteProperties implements RouteMutator
 
 
     /**
-     * @param string $summary
+     * @param string|Closure $summary
      * @return RouteMutator
      */
-    public function summary(string $summary) : RouteMutator
+    public function summary($summary) : RouteMutator
     {
         $this->summary = $summary;
         return $this;
@@ -217,7 +218,11 @@ abstract class RouteProperties implements RouteMutator
     public function getSummary()
     {
         if ($this->summary) {
-            return $this->summary;
+            if ($this->summary instanceof Closure) {
+                return call_user_func($this->summary);
+            } else {
+                return $this->summary;
+            }
         } else {
             return 'No route summary set.';
         }

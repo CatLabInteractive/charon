@@ -20,6 +20,13 @@ interface ResourceDefinition
     public function getEntityClassName();
 
     /**
+     * Return the entity name in human readable form
+     * @param bool|int $plural True for plural, or number for amount expected.
+     * @return string
+     */
+    public function getEntityName($plural = false);
+
+    /**
      * @return ResourceFieldCollection
      */
     public function getFields();

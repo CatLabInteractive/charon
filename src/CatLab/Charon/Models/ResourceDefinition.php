@@ -2,6 +2,8 @@
 
 namespace CatLab\Charon\Models;
 
+use CatLab\Base\Helpers\ObjectHelper;
+use CatLab\Base\Helpers\StringHelper;
 use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
@@ -110,6 +112,23 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function getEntityClassName()
     {
         return $this->entityClassName;
+    }
+
+    /**
+     * Similar to getEntityClassName, but instead returns a human readable name.
+     * @param bool $plural
+     * @return string
+     */
+    public function getEntityName($plural = false)
+    {
+        $entityClassName = $this->getEntityClassName();
+        $entityName = ObjectHelper::class_basename($entityClassName);
+
+        if ($plural) {
+            return StringHelper::plural($entityName, is_numeric($plural) ? $plural : 2);
+        } else {
+            return $entityName;
+        }
     }
 
     /**

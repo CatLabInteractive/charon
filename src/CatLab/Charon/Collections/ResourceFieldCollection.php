@@ -76,6 +76,23 @@ class ResourceFieldCollection extends Collection
     }
 
     /**
+     * @param $action
+     * @return array|ResourceFieldCollection
+     */
+    public function getWithAction($action)
+    {
+        $out = new self();
+        foreach ($this as $v) {
+            /** @var $v Field */
+            if ($v->hasAction($action)) {
+                $out[] = $v;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Get all resource fields that should be included in a given context
      * @param Context $context
      * @param CurrentPath|null $path

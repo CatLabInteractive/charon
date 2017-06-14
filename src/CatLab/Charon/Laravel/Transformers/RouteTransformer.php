@@ -26,10 +26,12 @@ class RouteTransformer
     {
         foreach ($routes->getRoutes() as $route) {
             $options = $route->getOptions();
-            $route = Route::match([ $route->getHttpMethod() ], $route->getPath(), $route->getAction());
+            $action = $route->getAction();
+
+            $laravelRoute = Route::match([ $route->getHttpMethod() ], $route->getPath(), $action);
 
             if (isset($options['middleware'])) {
-                $route->middleware($options['middleware']);
+                $laravelRoute->middleware($options['middleware']);
             }
         }
     }
