@@ -183,9 +183,10 @@ trait ResourceController
     /**
      * @param mixed $entity
      * @param Context $context
-     * @return \CatLab\Charon\Interfaces\RESTResource
+     * @param null $resourceDefinition
+     * @return \CatLab\Charon\Interfaces\RESTResource|RESTResource
      */
-    public function toResource($entity, Context $context, $resourceDefinition = null)
+    public function toResource($entity, Context $context, $resourceDefinition = null) : RESTResource
     {
         return $this->resourceTransformer->toResource(
             $resourceDefinition ?? $this->resourceDefinition,
@@ -201,7 +202,7 @@ trait ResourceController
      * @return ResourceCollection
      * @throws \CatLab\Charon\Exceptions\InvalidEntityException
      */
-    public function toResources($entities, Context $context, $resourceDefinition = null)
+    public function toResources($entities, Context $context, $resourceDefinition = null) : ResourceCollection
     {
         return $this->resourceTransformer->toResources(
             $resourceDefinition ?? $this->resourceDefinition,
@@ -217,6 +218,7 @@ trait ResourceController
      * @param null $existingEntity
      * @param null $resourceDefinition
      * @param null $entityFactory
+     * @return mixed
      */
     public function toEntity(
         RESTResource $resource,

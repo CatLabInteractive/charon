@@ -3,9 +3,11 @@
 namespace CatLab\Charon\Laravel\Controllers;
 
 
+use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Exceptions\ResourceException;
 use CatLab\Charon\Interfaces\Context;
+use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Models\ResourceResponse;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
@@ -28,11 +30,19 @@ trait CrudController
      * Required methods
      */
     abstract function getContext($action = Action::VIEW, $parameters = []) : \CatLab\Charon\Interfaces\Context;
-    abstract function getModels($queryBuilder, Context $context, $resourceDefinition = null, $records = null);
-    abstract function toResources($entities, Context $context, $resourceDefinition = null);
-    abstract function notFound($id, $resource);
-    abstract function bodyToResource(Context $context, $resourceDefinition = null) : RESTResource;
+    abstract function getResourceDefinition(): ResourceDefinition;
 
+    abstract function getModels($queryBuilder, Context $context, $resourceDefinition = null, $records = null);
+
+    abstract function bodyToResource(Context $context, $resourceDefinition = null) : RESTResource;
+    abstract function bodyToResources(Context $context, $resourceDefinition = null) : ResourceCollection;
+
+    abstract function getValidationErrorResponse(ResourceValidationException $e);
+    abstract function notFound($id, $resource);
+    abstract function toEntity(RESTResource $resource, Context $context, $existingEntity = null, $resourceDefinition = null, $entityFactory = null);
+
+    abstract function toResources($entities, Context $context, $resourceDefinition = null) : ResourceCollection;
+    abstract function toResource($entity, Context $context, $resourceDefinition = null) : RESTResource;
 
     use AuthorizesRequests {
         authorize as laravelAuthorize;
@@ -51,11 +61,12 @@ trait CrudController
     }
 
     /**
+     * @param Request $request
      * @return Response
      */
     public function index(Request $request)
     {
-        $this->authorize('index', $this->getEntityClassName());
+        $this->authorize(Action::INDEX, $this->getEntityClassName());
         $context = $this->getContext(Action::INDEX);
 
         $models = $this->getModels($this->callEntityMethod('query'), $context);
@@ -67,17 +78,12 @@ trait CrudController
     /**
      * View an entity
      * @param Request $request
-     * @param $id
      * @return Response
      */
-    public function show(Request $request, $id)
+    public function view(Request $request)
     {
-        $entity = $this->callEntityMethod('find', $id);
-        $this->authorize('show', $entity);
-
-        if (!$entity) {
-            return $this->notFound($id, $this->getEntityClassName());
-        }
+        $entity = $this->findEntity($request);
+        $this->authorize(Action::VIEW, $entity);
 
         return $this->createViewEntityResponse($entity);
     }
@@ -86,12 +92,11 @@ trait CrudController
      * Create a new entity
      * @return Response
      */
-    public function create()
+    public function store(Request $request)
     {
-        $this->authorize('create', $this->getEntityClassName());
+        $this->authorize(Action::CREATE, $this->getEntityClassName());
 
         $writeContext = $this->getContext(Action::CREATE);
-
         $inputResource = $this->bodyToResource($writeContext);
 
         try {
@@ -107,6 +112,50 @@ trait CrudController
 
         // Turn back into a resource
         return $this->createViewEntityResponse($entity);
+    }
+
+    /**
+     * @param Request $request
+     * @return ResourceResponse
+     */
+    public function edit(Request $request)
+    {
+        $entity = $this->findEntity($request);
+        $this->authorize(Action::EDIT, $entity);
+
+        $writeContext = $this->getContext(Action::EDIT);
+        $inputResource = $this->bodyToResource($writeContext);
+
+        try {
+            $inputResource->validate();
+        } catch (ResourceValidationException $e) {
+            return $this->getValidationErrorResponse($e);
+        }
+
+        $entity = $this->toEntity($inputResource, $writeContext, $entity);
+
+        // Save the entity
+        $entity->save();
+
+        // Turn back into a resource
+        return $this->createViewEntityResponse($entity);
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function destroy(Request $request)
+    {
+        $entity = $this->findEntity($request);
+        $this->authorize('destroy', $entity);
+
+        $entity->delete();
+
+        return \Illuminate\Http\Response::json([
+            'success' => true,
+            'message' => 'Successfully deleted entity.'
+        ]);
     }
 
     /**
@@ -142,5 +191,30 @@ trait CrudController
         array_shift($args);
 
         return call_user_func_array([ $this->getEntityClassName(), $method ], $args);
+    }
+
+    protected function findEntity(Request $request)
+    {
+        $id = $request->route()->parameter($this->getIdParameter());
+
+        $entity = $this->callEntityMethod('find', $id);
+
+        if (!$entity) {
+            $this->notFound($id, $this->getEntityClassName());
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getIdParameter()
+    {
+        if (defined('static::RESOURCE_ID')) {
+            return static::RESOURCE_ID;
+        } else {
+            return 'id';
+        }
     }
 }

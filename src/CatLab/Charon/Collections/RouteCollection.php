@@ -149,45 +149,73 @@ class RouteCollection extends RouteProperties
      * @param $resourceDefinition
      * @param string $path
      * @param string $controller
+     * @param $options
      * @return RouteCollection
      */
-    public function resource($resourceDefinition, $path, $controller)
+    public function resource($resourceDefinition, $path, $controller, $options)
     {
+        $id = $options['id'] ?? 'id';
+        $only = $options['only'] ?? [ 'index', 'view', 'store', 'edit', 'destroy' ];
+
         $group = $this->group([]);
 
-        $group->get($path, $controller . '@index')
-            ->summary(function() use ($resourceDefinition) {
-                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
-                return 'Returns all ' . $entityName;
-            })
-            ->returns()->statusCode(200)->many($resourceDefinition);
+        if (in_array('index', $only)) {
+            $group->get($path, $controller . '@index')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
+                    return 'Returns all ' . $entityName;
+                })
+                ->returns()->statusCode(200)->many($resourceDefinition);
+        }
 
-        $group->get($path . '/{id}', $controller . '@show')
-            ->summary(function() use ($resourceDefinition) {
-                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
-                return 'View a single ' . $entityName;
-            })
-            ->returns()->statusCode(200)->one($resourceDefinition);
+        if (in_array('view', $only)) {
+            $group->get($path . '/{' . $id . '}', $controller . '@view')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
 
-        $group->post($path, $controller . '@store')
-            ->summary(function() use ($resourceDefinition) {
-                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
-                return 'Create a new ' . $entityName;
-            })
-            ->returns()->statusCode(200)->one($resourceDefinition);
+                    return 'View a single ' . $entityName;
+                })
+                ->parameters()->path($id)->int()->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
 
-        $group->put($path . '/{id}', $controller . '@edit')
-            ->summary(function() use ($resourceDefinition) {
-                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
-                return 'Update an existing ' . $entityName;
-            })
-            ->returns()->statusCode(200)->one($resourceDefinition);
+        if (in_array('store', $only)) {
+            $group->post($path, $controller . '@store')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
 
-        $group->delete($path . '/{id}', $controller . '@destroy')
-            ->summary(function() use ($resourceDefinition) {
-                $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(false);
-                return 'Delete a ' . $entityName;
-            });
+                    return 'Create a new ' . $entityName;
+                })
+                ->parameters()->resource($resourceDefinition)->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
+
+        if (in_array('edit', $only)) {
+            $group->put($path . '/{' . $id . '}', $controller . '@edit')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'Update an existing ' . $entityName;
+                })
+                ->parameters()->path($id)->int()->required()
+                ->parameters()->resource($resourceDefinition)->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
+
+        if (in_array('destroy', $only)) {
+            $group->delete($path . '/{' . $id . '}', $controller . '@destroy')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'Delete a ' . $entityName;
+                })
+                ->parameters()->path($id)->int()->required()
+            ;
+        }
 
         return $group;
     }

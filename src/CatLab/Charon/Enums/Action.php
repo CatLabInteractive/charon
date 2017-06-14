@@ -20,6 +20,9 @@ class Action
     const CREATE = 'create';
     const EDIT = 'edit';
 
+    // Destroy
+    const DESTROY = 'destroy';
+
     /**
      * @param string $action
      * @return bool
