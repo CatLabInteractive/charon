@@ -11,6 +11,7 @@ use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Factories\EntityFactory;
 use CatLab\Charon\Laravel\InputParsers\JsonBodyInputParser;
 use CatLab\Charon\Laravel\InputParsers\PostInputParser;
+use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Laravel\Database\SelectQueryTransformer;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -46,6 +47,25 @@ trait ResourceController
     protected $resourceTransformer;
 
     /**
+     * From a query builder, filter models based on input and processor and return the resulting
+     * models.
+     * Since order is important, the returned Collection will be a plain laravel collection!
+     * @param $queryBuilder
+     * @param Context $context
+     * @param ResourceDefinition|string|null $resourceDefinition
+     * @param int|null $records
+     * @return Model[]
+     */
+    public function getModels($queryBuilder, Context $context, $resourceDefinition = null, $records = null)
+    {
+        $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
+        $records = $records ?? $this->getRecordLimit();
+
+        return $this->filterAndGet($queryBuilder, $resourceDefinition, $context, $records);
+    }
+
+    /**
+     * @deprecated Use getModels()
      * @param $model
      * @param $resourceDefinition
      * @param Context $context
@@ -314,6 +334,7 @@ trait ResourceController
 
     /**
      * Output a resource or a collection of resources
+     * @deprecated Use getModels(), toResource() and toResources()
      *
      * @param $models
      * @param array $parameters
