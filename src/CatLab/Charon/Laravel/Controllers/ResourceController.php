@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
+use Illuminate\Http\JsonResponse;
 use Request;
 use Response;
 
@@ -444,7 +445,7 @@ trait ResourceController
         if ($data instanceof SerializableResource) {
             return new ResourceResponse($data, $context);
         } else {
-            return \Illuminate\Http\Response::json($this->resourceToArray($data));
+            return JsonResponse::create($this->resourceToArray($data));
         }
     }
 
