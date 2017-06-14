@@ -217,6 +217,7 @@ trait ResourceController
      * @param null $existingEntity
      * @param null $resourceDefinition
      * @param null $entityFactory
+     * @return mixed
      */
     public function toEntity(
         RESTResource $resource,
@@ -228,7 +229,7 @@ trait ResourceController
         $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
         $entityFactory = $entityFactory ?? new EntityFactory();
 
-        $this->resourceTransformer->toEntity(
+        return $this->resourceTransformer->toEntity(
             $resource,
             $resourceDefinition,
             $entityFactory,
