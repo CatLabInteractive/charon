@@ -211,6 +211,33 @@ trait ResourceController
     }
 
     /**
+     * Transform a resource into (an existing?) entity.
+     * @param RESTResource $resource
+     * @param Context $context
+     * @param null $existingEntity
+     * @param null $resourceDefinition
+     * @param null $entityFactory
+     */
+    public function toEntity(
+        RESTResource $resource,
+        Context $context,
+        $existingEntity = null,
+        $resourceDefinition = null,
+        $entityFactory = null
+    ) {
+        $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
+        $entityFactory = $entityFactory ?? new EntityFactory();
+
+        $this->resourceTransformer->toEntity(
+            $resource,
+            $resourceDefinition,
+            $entityFactory,
+            $context,
+            $existingEntity
+        );
+    }
+
+    /**
      * @param Context $context
      * @param null $resourceDefinition
      * @return RESTResource
