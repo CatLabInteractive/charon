@@ -9,9 +9,11 @@ use CatLab\Base\Models\Grammar\OrConjunction;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Factories\EntityFactory;
+use CatLab\Charon\Interfaces\SerializableResource;
 use CatLab\Charon\Laravel\InputParsers\JsonBodyInputParser;
 use CatLab\Charon\Laravel\InputParsers\PostInputParser;
 use CatLab\Charon\Models\ResourceDefinition;
+use CatLab\Charon\Models\ResourceResponse;
 use CatLab\Laravel\Database\SelectQueryTransformer;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -387,14 +389,17 @@ trait ResourceController
     }
 
     /**
+     * @deprecated Use new ResourceResponse()
      * @param $data
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function toResponse($data)
     {
-        // First make sure all collections and resources are transformed to arrays.
-        $data = $this->resourceToArray($data);
-        return Response::json($data);
+        if ($data instanceof SerializableResource) {
+            return new ResourceResponse($data);
+        } else {
+            return \Illuminate\Http\Response::json($this->resourceToArray($data));
+        }
     }
 
     /**
@@ -404,7 +409,7 @@ trait ResourceController
      */
     protected function resourceToArray($data)
     {
-        if ($data instanceof Collection) {
+        if ($data instanceof ResourceCollection) {
             return $data->toArray();
         } else if ($data instanceof RESTResource) {
             return $data->toArray();

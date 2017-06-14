@@ -8,7 +8,7 @@ use CatLab\Charon\Collections\PropertyValueCollection;
  * Class Resource
  * @package CatLab\RESTResource\Contracts
  */
-interface RESTResource
+interface RESTResource extends SerializableResource
 {
     /**
      * @return mixed
