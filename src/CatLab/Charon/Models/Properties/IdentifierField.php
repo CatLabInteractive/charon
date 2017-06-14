@@ -37,7 +37,11 @@ class IdentifierField extends ResourceField
      */
     public function shouldInclude(Context $context, CurrentPath $currentPath)
     {
-        return true;
+        if (Action::isReadContext($context->getAction())) {
+            return true;
+        } else {
+            return parent::shouldInclude($context, $currentPath);
+        }
     }
 
     /**
