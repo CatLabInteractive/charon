@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 trait CrudController
 {
-    use ResourceController;
     use AuthorizesRequests {
         authorize as laravelAuthorize;
     }
