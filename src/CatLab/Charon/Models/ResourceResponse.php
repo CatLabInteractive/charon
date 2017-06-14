@@ -25,15 +25,29 @@ class ResourceResponse extends Response
     private $jsonContent;
 
     /**
+     * @var \CatLab\Charon\Interfaces\Context
+     */
+    private $context;
+
+    /**
      * ResourceResponse constructor.
      * @param SerializableResource $resource
+     * @param Context $context
      * @param int $status
      * @param array $headers
      */
-    public function __construct(SerializableResource $resource, $status = 200, $headers = [])
-    {
+    public function __construct(
+        SerializableResource $resource,
+        Context $context = null,
+        $status = 200,
+        $headers = []
+    ) {
         parent::__construct('', $status, $headers);
         $this->resource = $resource;
+
+        if (isset($context)) {
+            $this->setContext($context);
+        }
     }
 
     /**
@@ -68,5 +82,23 @@ class ResourceResponse extends Response
             $this->jsonContent = json_encode($this->resource->toArray());;
         }
         return $this->jsonContent;
+    }
+
+    /**
+     * @return \CatLab\Charon\Interfaces\Context
+     */
+    public function getContext(): \CatLab\Charon\Interfaces\Context
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param \CatLab\Charon\Interfaces\Context $context
+     * @return ResourceResponse
+     */
+    public function setContext(\CatLab\Charon\Interfaces\Context $context): ResourceResponse
+    {
+        $this->context = $context;
+        return $this;
     }
 }

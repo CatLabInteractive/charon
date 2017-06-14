@@ -391,12 +391,13 @@ trait ResourceController
     /**
      * @deprecated Use new ResourceResponse()
      * @param $data
+     * @param Context|null $context
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function toResponse($data)
+    protected function toResponse($data, Context $context = null)
     {
         if ($data instanceof SerializableResource) {
-            return new ResourceResponse($data);
+            return new ResourceResponse($data, $context);
         } else {
             return \Illuminate\Http\Response::json($this->resourceToArray($data));
         }
