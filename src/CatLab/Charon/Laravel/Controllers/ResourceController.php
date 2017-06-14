@@ -165,6 +165,22 @@ trait ResourceController
     }
 
     /**
+     * @return ResourceDefinitionContract
+     */
+    public function getResourceDefinition(): ResourceDefinitionContract
+    {
+        return $this->resourceDefinition;
+    }
+
+    /**
+     * @return ResourceTransformer
+     */
+    public function getResourceTransformer(): ResourceTransformer
+    {
+        return $this->resourceTransformer;
+    }
+
+    /**
      * @param mixed $entity
      * @param Context $context
      * @return \CatLab\Charon\Interfaces\RESTResource
