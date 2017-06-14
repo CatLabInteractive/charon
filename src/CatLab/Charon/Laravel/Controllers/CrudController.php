@@ -5,10 +5,13 @@ namespace CatLab\Charon\Laravel\Controllers;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Exceptions\ResourceException;
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Models\ResourceResponse;
+use CatLab\Charon\Models\RESTResource;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -21,6 +24,16 @@ use Symfony\Component\HttpFoundation\Response;
  */
 trait CrudController
 {
+    /*
+     * Required methods
+     */
+    abstract function getContext($action = Action::VIEW, $parameters = []) : \CatLab\Charon\Interfaces\Context;
+    abstract function getModels($queryBuilder, Context $context, $resourceDefinition = null, $records = null);
+    abstract function toResources($entities, Context $context, $resourceDefinition = null);
+    abstract function notFound($id, $resource);
+    abstract function bodyToResource(Context $context, $resourceDefinition = null) : RESTResource;
+
+
     use AuthorizesRequests {
         authorize as laravelAuthorize;
     }
@@ -40,9 +53,9 @@ trait CrudController
     /**
      * @return Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $this->authorize('index');
+        $this->authorize('index', $this->getEntityClassName());
         $context = $this->getContext(Action::INDEX);
 
         $models = $this->getModels($this->callEntityMethod('query'), $context);
@@ -53,13 +66,14 @@ trait CrudController
 
     /**
      * View an entity
+     * @param Request $request
      * @param $id
      * @return Response
      */
-    public function view($id)
+    public function show(Request $request, $id)
     {
         $entity = $this->callEntityMethod('find', $id);
-        $this->authorize('view', $entity);
+        $this->authorize('show', $entity);
 
         if (!$entity) {
             return $this->notFound($id, $this->getEntityClassName());
@@ -74,7 +88,7 @@ trait CrudController
      */
     public function create()
     {
-        $this->authorize('create');
+        $this->authorize('create', $this->getEntityClassName());
 
         $writeContext = $this->getContext(Action::CREATE);
 
@@ -93,24 +107,6 @@ trait CrudController
 
         // Turn back into a resource
         return $this->createViewEntityResponse($entity);
-    }
-
-    /**
-     * Authorize a method call.
-     * @param $ability
-     * @param array $arguments
-     * @param string|null $entityClassName
-     * @return mixed
-     */
-    public function authorize($ability, $arguments = [], string $entityClassName = null)
-    {
-        if ($entityClassName === null) {
-            $entityClassName = $this->getResourceDefinition()->getEntityClassName();
-        }
-
-        array_unshift($arguments, $entityClassName);
-
-        return $this->laravelAuthorize($ability, ...$arguments);
     }
 
     /**

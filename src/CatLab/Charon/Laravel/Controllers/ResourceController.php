@@ -217,7 +217,6 @@ trait ResourceController
      * @param null $existingEntity
      * @param null $resourceDefinition
      * @param null $entityFactory
-     * @return mixed
      */
     public function toEntity(
         RESTResource $resource,
@@ -244,7 +243,7 @@ trait ResourceController
      * @return RESTResource
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function bodyToResource(Context $context, $resourceDefinition = null)
+    public function bodyToResource(Context $context, $resourceDefinition = null) : RESTResource
     {
         $resources = $this->bodyToResources($context, $resourceDefinition);
         return $resources->first();
@@ -255,7 +254,7 @@ trait ResourceController
      * @param null $resourceDefinition
      * @return \CatLab\Charon\Collections\ResourceCollection
      */
-    public function bodyToResources(Context $context, $resourceDefinition = null)
+    public function bodyToResources(Context $context, $resourceDefinition = null) : ResourceCollection
     {
         $resourceDefinition = $resourceDefinition ?? $this->resourceDefinition;
         return $this->resourceTransformer->fromInput($resourceDefinition, $context);
@@ -289,7 +288,7 @@ trait ResourceController
      * @param array $parameters
      * @return Context|string
      */
-    protected function getContext($action = Action::VIEW, $parameters = [])
+    protected function getContext($action = Action::VIEW, $parameters = []) : \CatLab\Charon\Interfaces\Context
     {
         $context = new \CatLab\Charon\Models\Context($action, $parameters);
 
