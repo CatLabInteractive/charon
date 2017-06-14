@@ -2,7 +2,6 @@
 
 namespace CatLab\Charon\Laravel\Controllers;
 
-
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Exceptions\ResourceException;
@@ -152,7 +151,7 @@ trait CrudController
 
         $entity->delete();
 
-        return \Illuminate\Http\Response::json([
+        return $this->toResponse([
             'success' => true,
             'message' => 'Successfully deleted entity.'
         ]);
