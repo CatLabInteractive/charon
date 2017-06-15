@@ -3,8 +3,7 @@
 namespace CatLab\RESTResource\Tests;
 
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Laravel\InputParsers\JsonBodyInputParser;
-use CatLab\Charon\Laravel\InputParsers\PostInputParser;
+use CatLab\Charon\InputParsers\JsonBodyInputParser;
 use CatLab\Charon\Models\Context;
 use CatLab\Charon\Swagger\Authentication\OAuth2Authentication;
 use CatLab\Charon\Swagger\SwaggerBuilder;

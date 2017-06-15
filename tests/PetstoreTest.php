@@ -9,7 +9,7 @@ use Tests\Petstore\Models\Pet;
 use Tests\Petstore\Models\Photo;
 use Tests\Petstore\Models\Tag;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Laravel\Transformers\ResourceTransformer;
+use CatLab\Charon\Transformers\ResourceTransformer;
 use CatLab\Charon\Models\Context;
 
 use PHPUnit_Framework_TestCase;
