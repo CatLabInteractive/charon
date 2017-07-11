@@ -136,7 +136,7 @@ class PropertyValueCollection
     public function getIdentifiers()
     {
         return $this->filter(
-            function(PropertyValue $v) {
+            function(Value $v) {
                 return $v->getField() instanceof IdentifierField;
             }
         );
@@ -149,7 +149,7 @@ class PropertyValueCollection
     public function getResourceFields()
     {
         return $this->filter(
-            function(PropertyValue $v) {
+            function(Value $v) {
                 return $v->getField() instanceof ResourceField;
             }
         );
@@ -162,7 +162,7 @@ class PropertyValueCollection
     public function getRelationships()
     {
         return $this->filter(
-            function(PropertyValue $v) {
+            function(Value $v) {
                 return $v->getField() instanceof RelationshipField;
             }
         );
@@ -175,7 +175,7 @@ class PropertyValueCollection
     public function getFromName(string $name)
     {
         return $this->filter(
-            function(PropertyValue $v) use ($name) {
+            function(\CatLab\Charon\Models\Values\Base\Value $v) use ($name) {
                 return $v->getField()->getName() === $name;
             }
         )->first();
@@ -191,7 +191,7 @@ class PropertyValueCollection
         $out = new self();
         foreach ($this->getValues() as $value) {
             if (call_user_func($filter, $value)) {
-                $out[] = $value;
+                $out->add($value);
             }
         }
 
