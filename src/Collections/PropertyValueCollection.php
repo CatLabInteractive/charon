@@ -4,6 +4,8 @@ namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
+use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\Values\Base\Value;
 use CatLab\Charon\Models\Values\ChildrenValue;
 use CatLab\Charon\Models\Values\ChildValue;
@@ -133,14 +135,37 @@ class PropertyValueCollection
      */
     public function getIdentifiers()
     {
-        $out = new self();
-        foreach ($this->getValues() as $v) {
-            if ($v->getField() instanceof IdentifierField) {
-                $out->values[] = $v;
+        return $this->filter(
+            function(PropertyValue $v) {
+                return $v->getField() instanceof IdentifierField;
             }
-        }
+        );
+    }
 
-        return $out;
+    /**
+     * Returns all (plain) resource fields.
+     * @return PropertyValueCollection
+     */
+    public function getResourceFields()
+    {
+        return $this->filter(
+            function(PropertyValue $v) {
+                return $v->getField() instanceof ResourceField;
+            }
+        );
+    }
+
+    /**
+     * Return all relationship fields.
+     * @return PropertyValueCollection
+     */
+    public function getRelationships()
+    {
+        return $this->filter(
+            function(PropertyValue $v) {
+                return $v->getField() instanceof RelationshipField;
+            }
+        );
     }
 
     /**
@@ -149,12 +174,28 @@ class PropertyValueCollection
      */
     public function getFromName(string $name)
     {
-        foreach ($this->getValues() as $v) {
-            if ($v->getField()->getName() === $name) {
-                return $v;
+        return $this->filter(
+            function(PropertyValue $v) use ($name) {
+                return $v->getField()->getName() === $name;
+            }
+        )->first();
+    }
+
+    /**
+     * Filter and return a new collection.
+     * @param callable $filter
+     * @return array|PropertyValueCollection
+     */
+    public function filter(callable $filter)
+    {
+        $out = new self();
+        foreach ($this->getValues() as $value) {
+            if (call_user_func($filter, $value)) {
+                $out[] = $value;
             }
         }
-        return null;
+
+        return $out;
     }
 
     /**
@@ -168,5 +209,13 @@ class PropertyValueCollection
         }
 
         return $out;
+    }
+
+    /**
+     * @return PropertyValue
+     */
+    public function first()
+    {
+        return isset($this->values[0]) ? $this->values[0] : null;
     }
 }
