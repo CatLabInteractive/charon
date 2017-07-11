@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Collections;
 
+use CatLab\Base\Collections\Collection;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\RelationshipField;
@@ -16,30 +17,17 @@ use CatLab\Charon\Models\Values\PropertyValue;
  * Class PropertyValues
  * @package CatLab\RESTResource\Collections
  */
-class PropertyValueCollection
+class PropertyValueCollection extends Collection
 {
-    /**
-     * @var PropertyValue[]
-     */
-    private $values;
-
-    /**
-     * PropertyValues constructor.
-     */
-    public function __construct()
-    {
-        $this->values = [];
-    }
-
     /**
      * @param Value $value
      * @return $this
      */
-    public function add(Value $value)
+    public function add($value)
     {
         $key = spl_object_hash($value->getField());
 
-        $this->values[$key] = $value;
+        $this[$key] = $value;
         return $this;
     }
 
@@ -60,8 +48,8 @@ class PropertyValueCollection
     {
         $key = spl_object_hash($resourceField);
 
-        if (isset($this->values[$key])) {
-            return $this->values[$key];
+        if (isset($this[$key])) {
+            return $this[$key];
         }
         return null;
     }
@@ -98,7 +86,7 @@ class PropertyValueCollection
      */
     public function getValues()
     {
-        return array_values($this->values);
+        return array_values($this->toArray());
     }
 
     /**
@@ -108,8 +96,8 @@ class PropertyValueCollection
     public function clear(Field $field)
     {
         $key = spl_object_hash($field);
-        if (isset($this->values[$key])) {
-            unset ($this->values[$key]);
+        if (isset($this[$key])) {
+            unset ($this[$key]);
         }
         return $this;
     }
@@ -123,11 +111,11 @@ class PropertyValueCollection
     {
         $key = spl_object_hash($resourceField);
 
-        if (!isset($this->values[$key])) {
+        if (!isset($this[$key])) {
             $this->add(new $propertyValueClass($resourceField));
         }
 
-        return $this->values[$key];
+        return $this[$key];
     }
 
     /**
@@ -175,27 +163,10 @@ class PropertyValueCollection
     public function getFromName(string $name)
     {
         return $this->filter(
-            function(\CatLab\Charon\Models\Values\Base\Value $v) use ($name) {
+            function(Value $v) use ($name) {
                 return $v->getField()->getName() === $name;
             }
         )->first();
-    }
-
-    /**
-     * Filter and return a new collection.
-     * @param callable $filter
-     * @return array|PropertyValueCollection
-     */
-    public function filter(callable $filter)
-    {
-        $out = new self();
-        foreach ($this->getValues() as $value) {
-            if (call_user_func($filter, $value)) {
-                $out->add($value);
-            }
-        }
-
-        return $out;
     }
 
     /**
@@ -209,13 +180,5 @@ class PropertyValueCollection
         }
 
         return $out;
-    }
-
-    /**
-     * @return PropertyValue
-     */
-    public function first()
-    {
-        return isset($this->values[0]) ? $this->values[0] : null;
     }
 }
