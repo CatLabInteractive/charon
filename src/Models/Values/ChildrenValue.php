@@ -33,6 +33,14 @@ class ChildrenValue extends RelationshipValue
     }
 
     /**
+     * @return ResourceCollection
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
      * @return array
      */
     public function getValue()
