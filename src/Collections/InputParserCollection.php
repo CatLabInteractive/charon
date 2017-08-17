@@ -24,19 +24,21 @@ class InputParserCollection extends Collection implements InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param null $request
      * @return IdentifierCollection|null
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) {
         $this->checkExists();
 
         /** @var InputParser $inputParser */
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
-            $content = $inputParser->getIdentifiers($resourceTransformer, $resourceDefinition, $context);
+            $content = $inputParser->getIdentifiers($resourceTransformer, $resourceDefinition, $context, $request);
 
             if ($content) {
                 return $content;
@@ -51,19 +53,21 @@ class InputParserCollection extends Collection implements InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param null $request
      * @return ResourceCollection|null
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) {
         $this->checkExists();
 
         /** @var InputParser $inputParser */
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
-            $content = $inputParser->getResources($resourceTransformer, $resourceDefinition, $context);
+            $content = $inputParser->getResources($resourceTransformer, $resourceDefinition, $context, $request);
             if ($content) {
                 return $content;
             }
@@ -77,13 +81,15 @@ class InputParserCollection extends Collection implements InputParser
      * @param Route $route
      * @param ResourceParameter $parameter
      * @param ResourceDefinition $resourceDefinition
+     * @param null $request
      * @return ParameterCollection
      */
     public function getResourceRouteParameters(
         DescriptionBuilder $builder,
         Route $route,
         ResourceParameter $parameter,
-        ResourceDefinition $resourceDefinition
+        ResourceDefinition $resourceDefinition,
+        $request = null
     ): ParameterCollection
     {
         $this->checkExists();
@@ -93,7 +99,7 @@ class InputParserCollection extends Collection implements InputParser
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
 
-            $parameters = $inputParser->getResourceRouteParameters($builder, $route, $parameter, $resourceDefinition);
+            $parameters = $inputParser->getResourceRouteParameters($builder, $route, $parameter, $resourceDefinition, $request);
             $out->merge($parameters);
         }
 

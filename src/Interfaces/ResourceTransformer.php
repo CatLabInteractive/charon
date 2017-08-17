@@ -124,21 +124,25 @@ interface ResourceTransformer
      * Create resources from whatever is in the inputs defined from the input parsers.
      * @param $resourceDefinition
      * @param Context $context
+     * @param $resource
      * @return ResourceCollection
      */
     public function fromInput(
         $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) : ResourceCollection;
 
     /**
      * Create resource identifiers from whatever is in the inputs defined from the input parsers
      * @param $resourceDefinition
      * @param Context $context
-     * @return mixed
+     * @param null $request
+     * @return IdentifierCollection
      */
     public function identifiersFromInput(
         $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) : IdentifierCollection;
 }

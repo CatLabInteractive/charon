@@ -20,12 +20,14 @@ interface InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param mixed $request
      * @return IdentifierCollection|null
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     );
 
     /**
@@ -33,12 +35,14 @@ interface InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param mixed $request
      * @return ResourceCollection|null
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     );
 
     /**
@@ -46,12 +50,14 @@ interface InputParser
      * @param Route $route
      * @param ResourceParameter $parameter
      * @param ResourceDefinition $resourceDefinition
+     * @param mixed $request
      * @return ParameterCollection
      */
     public function getResourceRouteParameters(
         DescriptionBuilder $builder,
         Route $route,
         ResourceParameter $parameter,
-        ResourceDefinition $resourceDefinition
+        ResourceDefinition $resourceDefinition,
+        $request = null
     ) : ParameterCollection;
 }

@@ -32,12 +32,14 @@ class PostInputParser extends AbstractInputParser implements InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param null $request
      * @return IdentifierCollection|null
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) {
         if (!$this->hasApplicableContentType()) {
             return;
@@ -45,7 +47,9 @@ class PostInputParser extends AbstractInputParser implements InputParser
 
         $identifierCollection = new IdentifierCollection();
 
-        $identifier = $this->arrayToIdentifier($resourceDefinition, $_POST);
+        $post = $this->getPostFromRequest($request);
+
+        $identifier = $this->arrayToIdentifier($resourceDefinition, $post);
         if ($identifier) {
             $identifierCollection->add($identifier);
         }
@@ -58,19 +62,21 @@ class PostInputParser extends AbstractInputParser implements InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param null $request
      * @return ResourceCollection|null
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) {
         if (!$this->hasApplicableContentType()) {
             return;
         }
 
         // @TODO this can probably be improved at some point
-        $content = $_POST;
+        $content = $this->getPostFromRequest($request);
 
         $resource = $resourceTransformer->fromArray(
             $resourceDefinition,
@@ -103,13 +109,15 @@ class PostInputParser extends AbstractInputParser implements InputParser
      * @param Route $route
      * @param ResourceParameter $parameter
      * @param ResourceDefinition $resourceDefinition
+     * @param null $request
      * @return ParameterCollection
      */
     public function getResourceRouteParameters(
         DescriptionBuilder $builder,
         Route $route,
         ResourceParameter $parameter,
-        ResourceDefinition $resourceDefinition
+        ResourceDefinition $resourceDefinition,
+        $request = null
     ): ParameterCollection
     {
         $route->consumes('multipart/form-data');
@@ -175,5 +183,14 @@ class PostInputParser extends AbstractInputParser implements InputParser
         }
 
         return $post;
+    }
+
+    /**
+     * @param null $request
+     * @return mixed
+     */
+    protected function getPostFromRequest($request = null)
+    {
+        return $_POST;
     }
 }

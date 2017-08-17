@@ -643,11 +643,13 @@ class ResourceTransformer implements ResourceTransformerContract
      * Create resources from whatever is in the inputs defined from the input parsers.
      * @param $resourceDefinition
      * @param ContextContract $context
+     * @param null $request
      * @return ResourceCollection
      */
     public function fromInput(
         $resourceDefinition,
-        ContextContract $context
+        ContextContract $context,
+        $request = null
     ): ResourceCollection
     {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
@@ -655,7 +657,8 @@ class ResourceTransformer implements ResourceTransformerContract
         $resources = $context->getInputParser()->getResources(
             $this,
             $resourceDefinition,
-            $context
+            $context,
+            $request
         );
 
         if (!$resources) {
@@ -669,11 +672,13 @@ class ResourceTransformer implements ResourceTransformerContract
      * Create resource identifiers from whatever is in the inputs defined from the input parsers
      * @param $resourceDefinition
      * @param ContextContract $context
-     * @return mixed
+     * @param null $request
+     * @return IdentifierCollection
      */
     public function identifiersFromInput(
         $resourceDefinition,
-        ContextContract $context
+        ContextContract $context,
+        $request = null
     ) : IdentifierCollection
     {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
@@ -681,7 +686,8 @@ class ResourceTransformer implements ResourceTransformerContract
         $identifiers = $context->getInputParser()->getIdentifiers(
             $this,
             $resourceDefinition,
-            $context
+            $context,
+            $request
         );
 
         if (!$identifiers) {

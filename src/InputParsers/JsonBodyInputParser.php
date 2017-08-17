@@ -29,12 +29,14 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param null $resource
      * @return IdentifierCollection|null
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $resource = null
     ) {
         if (!$this->hasApplicableContentType()) {
             return null;
@@ -72,12 +74,14 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
      * @param ResourceTransformer $resourceTransformer
      * @param ResourceDefinition $resourceDefinition
      * @param Context $context
+     * @param null $request
      * @return ResourceCollection|null
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
         ResourceDefinition $resourceDefinition,
-        Context $context
+        Context $context,
+        $request = null
     ) {
         if (!$this->hasApplicableContentType()) {
             return null;
@@ -122,13 +126,15 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
      * @param Route $route
      * @param ResourceParameter $parameter
      * @param ResourceDefinition $resourceDefinition
+     * @param null $resource
      * @return ParameterCollection
      */
     public function getResourceRouteParameters(
         DescriptionBuilder $builder,
         Route $route,
         ResourceParameter $parameter,
-        ResourceDefinition $resourceDefinition
+        ResourceDefinition $resourceDefinition,
+        $resource = null
     ): ParameterCollection
     {
         $route->consumes('application/json');
