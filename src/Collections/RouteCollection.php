@@ -221,6 +221,89 @@ class RouteCollection extends RouteProperties
     }
 
     /**
+     * Set all crud actions, including documentation
+     * Really only usable for the default case
+     * @param $resourceDefinition
+     * @param $parentPath
+     * @param $childPath
+     * @param string $controller
+     * @param $options
+     * @return RouteCollection
+     * @internal param string $path
+     */
+    public function childResource($resourceDefinition, $parentPath, $childPath, $controller, $options)
+    {
+        $id = $options['id'] ?? 'id';
+        $parentId = $options['parentId'] ?? 'parentId';
+
+        $only = $options['only'] ?? [ 'index', 'view', 'store', 'edit', 'destroy' ];
+
+        $group = $this->group([]);
+
+        if (in_array('index', $only)) {
+            $group->get($parentPath, $controller . '@index')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
+                    return 'Returns all ' . $entityName;
+                })
+                ->parameters()->path($parentId)->int()->required()
+                ->returns()->statusCode(200)->many($resourceDefinition);
+        }
+
+        if (in_array('view', $only)) {
+            $group->get($childPath . '/{' . $id . '}', $controller . '@view')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'View a single ' . $entityName;
+                })
+                ->parameters()->path($id)->int()->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
+
+        if (in_array('store', $only)) {
+            $group->post($parentPath, $controller . '@store')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'Create a new ' . $entityName;
+                })
+                ->parameters()->resource($resourceDefinition)->required()
+                ->parameters()->path($parentId)->int()->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
+
+        if (in_array('edit', $only)) {
+            $group->put($childPath . '/{' . $id . '}', $controller . '@edit')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'Update an existing ' . $entityName;
+                })
+                ->parameters()->path($id)->int()->required()
+                ->parameters()->resource($resourceDefinition)->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
+
+        if (in_array('destroy', $only)) {
+            $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'Delete a ' . $entityName;
+                })
+                ->parameters()->path($id)->int()->required()
+            ;
+        }
+
+        return $group;
+    }
+
+    /**
      * Return a flat list of routes
      * @return Route[]
      */

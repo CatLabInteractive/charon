@@ -357,7 +357,7 @@ class Field implements Property, ResourceDefinitionManipulator
      */
     public function datetime()
     {
-        $this->setType(PropertyType::DATETIME);
+        $this->type = PropertyType::DATETIME;
         $this->transformer(DateTransformer::class);
         return $this;
     }
