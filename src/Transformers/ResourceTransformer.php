@@ -176,6 +176,8 @@ class ResourceTransformer implements ResourceTransformerContract
         }
 
         $resource = new RESTResource($resourceDefinition);
+        $resource->setSource($entity);
+
         $fields = $resourceDefinition->getFields();
 
         $this->parents->push($entity);
@@ -271,6 +273,8 @@ class ResourceTransformer implements ResourceTransformerContract
         }
 
         $resource = new RESTResource($resourceDefinition);
+        $resource->setSource($body);
+
         $fields = $resourceDefinition->getFields();
 
         foreach ($fields as $field) {
@@ -513,6 +517,11 @@ class ResourceTransformer implements ResourceTransformerContract
      */
     private function relationshipFromArray(RelationshipField $field, &$body, RESTResource $resource, Context $context)
     {
+        // If no data is provided, don't set the property.
+        if (!$this->propertyResolver->hasRelationshipInput($this, $body, $field, $context)) {
+            return;
+        }
+
         switch ($field->getCardinality()) {
             case Cardinality::MANY:
                 $children = $this->propertyResolver->resolveManyRelationshipInput(

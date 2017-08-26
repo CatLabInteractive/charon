@@ -110,12 +110,28 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         &$input,
         Field $field,
         Context $context
-    )
-    {
+    ) {
         if (isset($input[$field->getDisplayName()])) {
             return $input[$field->getDisplayName()];
         }
         return null;
+    }
+
+    /**
+     * Check if input contains data.
+     * @param ResourceTransformer $transformer
+     * @param $input
+     * @param Field $field
+     * @param Context $context
+     * @return bool
+     */
+    public function hasPropertyInput(
+        ResourceTransformer $transformer,
+        &$input,
+        Field $field,
+        Context $context
+    ): bool {
+        return isset($input[$field->getDisplayName()]);
     }
 
     /**
@@ -142,6 +158,23 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         }
 
         return $out;
+    }
+
+    /**
+     * Check if relationship data exists in input.
+     * @param ResourceTransformer $transformer
+     * @param $input
+     * @param RelationshipField $field
+     * @param Context $context
+     * @return bool
+     */
+    public function hasRelationshipInput(
+        ResourceTransformer $transformer,
+        &$input,
+        RelationshipField $field,
+        Context $context
+    ) : bool {
+        return $this->hasPropertyInput($transformer, $input, $field, $context);
     }
 
     /**

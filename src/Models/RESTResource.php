@@ -31,6 +31,11 @@ class RESTResource implements ResourceContract
     private $properties;
 
     /**
+     * @var mixed
+     */
+    private $source;
+
+    /**
      * Resource constructor.
      * @param ResourceDefinitionContract $resourceDefinition
      */
@@ -175,6 +180,27 @@ class RESTResource implements ResourceContract
     public function getIdentifiers()
     {
         return $this->getProperties()->getIdentifiers();
+    }
+
+    /**
+     * @param $source
+     * @return $this
+     */
+    public function setSource(&$source)
+    {
+        $this->source = $source;
+        return $this;
+    }
+
+    /**
+     * Return the source object of the resource.
+     * This way you can use the entity of a resource in a post processor.
+     * The source should never leave the server.
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->source;
     }
 
     /**

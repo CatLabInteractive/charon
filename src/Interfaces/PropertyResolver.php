@@ -86,6 +86,36 @@ interface PropertyResolver
     );
 
     /**
+     * Check if input contains data.
+     * @param ResourceTransformer $transformer
+     * @param $input
+     * @param Field $field
+     * @param Context $context
+     * @return bool
+     */
+    public function hasPropertyInput(
+        ResourceTransformer $transformer,
+        &$input,
+        Field $field,
+        Context $context
+    ) : bool;
+
+    /**
+     * Check if relationship data exists in input.
+     * @param ResourceTransformer $transformer
+     * @param $input
+     * @param RelationshipField $field
+     * @param Context $context
+     * @return bool
+     */
+    public function hasRelationshipInput(
+        ResourceTransformer $transformer,
+        &$input,
+        RelationshipField $field,
+        Context $context
+    ) : bool;
+
+    /**
      * @param ResourceTransformer $transformer
      * @param mixed &$input,
      * @param RelationshipField $field

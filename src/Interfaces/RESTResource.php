@@ -26,6 +26,14 @@ interface RESTResource extends SerializableResource
     public function getResourceDefinition();
 
     /**
+     * Return the source object of the resource.
+     * This way you can use the entity of a resource in a post processor.
+     * The source should never leave the server.
+     * @return mixed
+     */
+    public function getSource();
+
+    /**
      * @return mixed
      */
     public function validate();

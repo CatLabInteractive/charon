@@ -4,6 +4,7 @@ namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
+use CatLab\Requirements\InArray;
 
 /**
  * Class Field
@@ -90,5 +91,23 @@ class ResourceField extends Field
     public function isSortable()
     {
         return $this->sortable;
+    }
+
+    /**
+     * Is only a selected set of values allowed?
+     * @return string[]
+     */
+    public function getAllowedValues()
+    {
+        $inArrayFilters = $this->getRequirements()->filter(
+            function($value) {
+                return $value instanceof InArray;
+            }
+        );
+
+        if (count($inArrayFilters) > 0) {
+            return $inArrayFilters->first()->getValues();
+        }
+        return [];
     }
 }
