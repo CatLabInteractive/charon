@@ -20,6 +20,10 @@ class BooleanTransformer implements Transformer
      */
     public function toResourceValue($value, Context $context)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return !!$value;
     }
 
@@ -30,6 +34,10 @@ class BooleanTransformer implements Transformer
      */
     public function toEntityValue($value, Context $context)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return !!$value;
     }
 }
