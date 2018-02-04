@@ -165,6 +165,11 @@ class RESTResource implements ResourceContract
      */
     public function isNew()
     {
+        // No identifiers found? Then all entries are always new.
+        if ($identifiers = $this->getProperties()->getIdentifiers()->count() === 0) {
+            return true;
+        }
+
         $identifiers = $this->getProperties()->getIdentifiers()->getValues();
         foreach ($identifiers as $identifier) {
             if (!$identifier->getValue()) {
