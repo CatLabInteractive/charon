@@ -94,14 +94,26 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
             throw new \InvalidArgumentException("Could not decode body: " . $rawContent);
         }
 
-        $resource = $resourceTransformer->fromArray(
-            $resourceDefinition,
-            $content,
-            $context
-        );
-
         $resourceCollection = new ResourceCollection();
-        $resourceCollection->add($resource);
+
+        if (isset($content[ResourceTransformer::RELATIONSHIP_ITEMS])) {
+            // This is a list of items
+            foreach ($content[ResourceTransformer::RELATIONSHIP_ITEMS] as $item) {
+                $resource = $resourceTransformer->fromArray(
+                    $resourceDefinition,
+                    $item,
+                    $context
+                );
+                $resourceCollection->add($resource);
+            }
+        } else {
+            $resource = $resourceTransformer->fromArray(
+                $resourceDefinition,
+                $content,
+                $context
+            );
+            $resourceCollection->add($resource);
+        }
 
         return $resourceCollection;
     }
