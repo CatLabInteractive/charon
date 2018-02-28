@@ -170,6 +170,19 @@ class PropertyValueCollection extends Collection
     }
 
     /**
+     * @param string $name
+     * @return PropertyValue
+     */
+    public function getFromDisplayName(string $name)
+    {
+        return $this->filter(
+            function(Value $v) use ($name) {
+                return $v->getField()->getDisplayName() === $name;
+            }
+        )->first();
+    }
+
+    /**
      * @return array|\CatLab\Charon\Models\Values\Base\Value[]
      */
     public function toMap()
