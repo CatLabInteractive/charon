@@ -6,15 +6,16 @@ use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
-use CatLab\Charon\Collections\IdentifierCollection;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
-use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DynamicContext;
-use CatLab\Charon\Interfaces\InputParser;
+use CatLab\Charon\Interfaces\IdentifierCollection;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
+use CatLab\Charon\Interfaces\ResourceCollection;
+use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\Context as ContextContract;
@@ -43,36 +44,48 @@ class ResourceTransformer implements ResourceTransformerContract
     /**
      * @var PropertyResolver
      */
-    private $propertyResolver;
+    protected $propertyResolver;
 
     /**
      * @var PropertySetter
      */
-    private $propertySetter;
+    protected $propertySetter;
+
+    /**
+     * @var ResourceFactoryInterface
+     */
+    protected $resourceFactory;
 
     /**
      * @var CurrentPath
      */
-    private $currentPath;
+    protected $currentPath;
 
     /**
      * @var mixed[]
      */
-    private $parents;
+    protected $parents;
 
     /**
      * @var int
      */
-    private $maxDepth = 50;
+    protected $maxDepth = 50;
+
+    /**
+     * @var InputParserCollection
+     */
+    protected $inputParsers;
 
     /**
      * ResourceTransformer constructor.
-     * @param PropertyResolver $propertyResolver
-     * @param PropertySetter $propertySetter
+     * @param PropertyResolver|null $propertyResolver
+     * @param PropertySetter|null $propertySetter
+     * @param ResourceFactory|null $resourceFactory
      */
     public function __construct(
         PropertyResolver $propertyResolver = null,
-        PropertySetter $propertySetter = null
+        PropertySetter $propertySetter = null,
+        ResourceFactory $resourceFactory = null
     ) {
         if (!isset($propertyResolver)) {
             $propertyResolver = new \CatLab\Charon\Resolvers\PropertyResolver();
@@ -82,11 +95,16 @@ class ResourceTransformer implements ResourceTransformerContract
             $propertySetter = new \CatLab\Charon\Resolvers\PropertySetter();
         }
 
+        if (!isset($resourceFactory)) {
+            $resourceFactory = new ResourceFactory();
+        }
+
         $this->propertyResolver = $propertyResolver;
         $this->propertySetter = $propertySetter;
-        $this->parents = new ParentEntityCollection();
+        $this->resourceFactory = $resourceFactory;
 
         $this->currentPath = new CurrentPath();
+        $this->parents = new ParentEntityCollection();
         $this->inputParsers = new InputParserCollection();
     }
 
@@ -107,6 +125,7 @@ class ResourceTransformer implements ResourceTransformerContract
      * @return ResourceCollection
      * @throws InvalidContextAction
      * @throws InvalidEntityException
+     * @throws InvalidPropertyException
      */
     public function toResources(
         $resourceDefinition,
@@ -114,14 +133,14 @@ class ResourceTransformer implements ResourceTransformerContract
         ContextContract $context,
         RelationshipValue $parent = null,
         $parentEntity = null
-    ) : ResourceCollection {
+    ) : \CatLab\Charon\Interfaces\ResourceCollection {
         if (!ArrayHelper::isIterable($entities)) {
             throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities.');
         }
 
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
 
-        $out = new ResourceCollection();
+        $out = $this->getResourceFactory()->createResourceCollection();
 
         foreach ($entities as $entity) {
             $out->add($this->toResource($resourceDefinition, $entity, $context, $parent, $parentEntity));
@@ -637,6 +656,14 @@ class ResourceTransformer implements ResourceTransformerContract
     public function getPropertySetter() : PropertySetter
     {
         return $this->propertySetter;
+    }
+
+    /**
+     * @return ResourceFactoryInterface
+     */
+    public function getResourceFactory(): ResourceFactoryInterface
+    {
+        return $this->resourceFactory;
     }
 
     /**

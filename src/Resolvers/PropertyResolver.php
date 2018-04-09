@@ -139,7 +139,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param mixed &$input ,
      * @param RelationshipField $field
      * @param Context $context
-     * @return ResourceCollection
+     * @return \CatLab\Charon\Interfaces\ResourceCollection
      */
     public function resolveManyRelationshipInput(
         ResourceTransformer $transformer,
@@ -147,7 +147,8 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         RelationshipField $field,
         Context $context
     ) : ResourceCollection {
-        $out = new ResourceCollection();
+
+        $out = $transformer->getResourceFactory()->createResourceCollection();
 
         $children = $this->resolveChildrenListInput($transformer, $input, $field, $context);
         if ($children) {

@@ -3,7 +3,6 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
-use CatLab\Charon\Interfaces\SerializableResource;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Transformers\ResourceTransformer;
 
@@ -11,7 +10,7 @@ use CatLab\Charon\Transformers\ResourceTransformer;
  * Class RESTResourceCollection
  * @package CatLab\RESTResource\Collections
  */
-class ResourceCollection extends Collection implements SerializableResource
+class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces\ResourceCollection
 {
     /**
      * @var string
