@@ -2,10 +2,11 @@
 
 namespace CatLab\Charon\Swagger;
 
+use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceDefinition;
-use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Exceptions\RouteAlreadyDefined;
 use CatLab\Charon\Library\PrettyEntityNameLibrary;
@@ -21,79 +22,89 @@ class SwaggerBuilder implements DescriptionBuilder
     /**
      * @var string
      */
-    private $host;
+    protected $host;
 
     /**
      * @var string
      */
-    private $basePath;
+    protected $basePath;
 
     /**
      * @var mixed[]
      */
-    private $paths;
+    protected $paths;
 
     /**
      * @var mixed[]
      */
-    private $schemas;
+    protected $schemas;
 
     /**
      * @var PrettyEntityNameLibrary
      */
-    private $entityNameLibrary;
+    protected $entityNameLibrary;
 
     /**
      * @var string
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      */
-    private $description;
+    protected $description;
 
     /**
      * @var string
      */
-    private $termsOfService;
+    protected $termsOfService;
 
     /**
      * @var string[]
      */
-    private $contact;
+    protected $contact;
 
     /**
      * @var string
      */
-    private $license;
+    protected $license;
 
     /**
      * @var string
      */
-    private $version;
+    protected $version;
 
     /**
      * @var Authentication[]
      */
-    private $authentications;
+    protected $authentications;
 
     /**
      * @var Route
      */
-    private $routes;
+    protected $routes;
+
+    /**
+     * @var ResourceFactoryInterface
+     */
+    protected $resourceFactory;
 
     /**
      * SwaggerBuilder constructor.
      * @param string $host
      * @param string $basePath
+     * @param ResourceFactoryInterface|null $resourceFactory
      */
-    public function __construct(string $host, string $basePath)
-    {
+    public function __construct(
+        string $host,
+        string $basePath,
+        ResourceFactoryInterface $resourceFactory = null
+    ) {
         $this->paths = [];
         $this->schemas = [];
         $this->authentications = [];
 
+        $this->resourceFactory = $resourceFactory ?? new ResourceFactory();
         $this->entityNameLibrary = new PrettyEntityNameLibrary();
 
         $this->host = $host;
@@ -154,40 +165,6 @@ class SwaggerBuilder implements DescriptionBuilder
                 $action
             );
         }
-    }
-
-    /**
-     * @return array
-     */
-    protected function getInfoObject()
-    {
-        $out = [];
-
-        if (isset($this->title)) {
-            $out['title'] = $this->title;
-        }
-
-        if (isset($this->description)) {
-            $out['description'] = $this->description;
-        }
-
-        if (isset($this->termsOfService)) {
-            $out['termsOfService'] = $this->termsOfService;
-        }
-
-        if (isset($this->contact)) {
-            $out['contact'] = $this->contact;
-        }
-
-        if (isset($this->license)) {
-            $out['license'] = $this->license;
-        }
-
-        if (isset($this->version)) {
-            $out['version'] = $this->version;
-        }
-
-        return $out;
     }
 
     /**
@@ -276,30 +253,6 @@ class SwaggerBuilder implements DescriptionBuilder
     }
 
     /**
-     * @param string $name
-     * @param string $reference
-     * @param string $action
-     * @return mixed|string
-     */
-    private function addItemListDefinition(string $name, string $reference, string $action) : string
-    {
-        $name = $name . '_' . $action . '_items';
-        if (!array_key_exists($name, $this->schemas)) {
-            $this->schemas[$name] = [
-                'properties' => [
-                    ResourceTransformer::RELATIONSHIP_ITEMS => [
-                        'type' => 'array',
-                        'items' => [
-                            '$ref' => $reference
-                        ]
-                    ]
-                ]
-            ];
-        }
-        return '#/definitions/' . $name;
-    }
-
-    /**
      * @param Authentication $authentication
      * @return $this
      */
@@ -349,5 +302,56 @@ class SwaggerBuilder implements DescriptionBuilder
         $method = $route->getHttpMethod();
 
         $this->paths[$path][$method] = $route->toSwagger($this, $context);
+    }
+
+    /**
+     * @param string $name
+     * @param string $reference
+     * @param string $action
+     * @return mixed|string
+     */
+    protected function addItemListDefinition(string $name, string $reference, string $action) : string
+    {
+        $name = $name . '_' . $action . '_items';
+        if (!array_key_exists($name, $this->schemas)) {
+
+            $resourceCollection = $this->resourceFactory->createResourceCollection();
+            $this->schemas[$name] = $resourceCollection->getSwaggerDescription($reference);
+        }
+        return '#/definitions/' . $name;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getInfoObject()
+    {
+        $out = [];
+
+        if (isset($this->title)) {
+            $out['title'] = $this->title;
+        }
+
+        if (isset($this->description)) {
+            $out['description'] = $this->description;
+        }
+
+        if (isset($this->termsOfService)) {
+            $out['termsOfService'] = $this->termsOfService;
+        }
+
+        if (isset($this->contact)) {
+            $out['contact'] = $this->contact;
+        }
+
+        if (isset($this->license)) {
+            $out['license'] = $this->license;
+        }
+
+        if (isset($this->version)) {
+            $out['version'] = $this->version;
+        }
+
+        return $out;
     }
 }

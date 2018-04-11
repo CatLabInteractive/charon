@@ -158,30 +158,6 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     }
 
     /**
-     * @param SwaggerBuilder $builder
-     * @param string $action
-     * @return mixed[]
-     */
-    public function toSwagger(SwaggerBuilder $builder, $action)
-    {
-        $out = [];
-
-        $out['properties'] = [];
-        foreach ($this->getFields() as $field) {
-            /** @var ResourceField $field */
-            if ($field->hasAction($action)) {
-                $out['properties'][$field->getDisplayName()] = $field->toSwagger($builder, $action);
-            }
-        }
-
-        if (count($out['properties']) === 0) {
-            $out['properties'] = (object) [];
-        }
-
-        return $out;
-    }
-
-    /**
      * @return string
      */
     public function getUrl()
@@ -213,5 +189,30 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function getDefaultOrder()
     {
         return $this->defaultOrder;
+    }
+
+    /**
+     * @param SwaggerBuilder $builder
+     * @param string $action
+     * @return mixed[]
+     */
+    public function toSwagger(SwaggerBuilder $builder, $action)
+    {
+        $out = [];
+
+        $out['type'] = 'object';
+        $out['properties'] = [];
+        foreach ($this->getFields() as $field) {
+            /** @var ResourceField $field */
+            if ($field->hasAction($action)) {
+                $out['properties'][$field->getDisplayName()] = $field->toSwagger($builder, $action);
+            }
+        }
+
+        if (count($out['properties']) === 0) {
+            $out['properties'] = (object) [];
+        }
+
+        return $out;
     }
 }

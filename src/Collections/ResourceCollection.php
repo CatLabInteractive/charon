@@ -57,4 +57,23 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
 
         return $out;
     }
+
+    /**
+     * @param $reference
+     * @return array
+     */
+    public function getSwaggerDescription($reference)
+    {
+        return [
+            'type' => 'object',
+            'properties' => [
+                ResourceTransformer::RELATIONSHIP_ITEMS => [
+                    'type' => 'array',
+                    'items' => [
+                        '$ref' => $reference
+                    ]
+                ]
+            ]
+        ];
+    }
 }

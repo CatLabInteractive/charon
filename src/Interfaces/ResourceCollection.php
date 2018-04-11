@@ -21,4 +21,11 @@ interface ResourceCollection extends SerializableResource
      * @return void
      */
     public function add($value);
+
+    /**
+     * Get a swagger description of how this collection will be returned.
+     * @param $reference
+     * @return array
+     */
+    public function getSwaggerDescription($reference);
 }
