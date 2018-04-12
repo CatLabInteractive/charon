@@ -12,6 +12,7 @@ use CatLab\Charon\Models\Routing\Route;
 use CatLab\Requirements\Exists;
 use CatLab\Requirements\InArray;
 use CatLab\Requirements\Interfaces\Requirement;
+use CatLab\Requirements\Enums\PropertyType;
 
 /**
  * Class Parameter
@@ -232,45 +233,6 @@ abstract class Parameter implements RouteMutator
         return $this->route->summary($summary);
     }
 
-
-    /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
-     */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
-    {
-        $out = [];
-
-        $out['name'] = $this->getName();
-        $out['type'] = $this->getType();
-        $out['in'] = $this->getIn();
-        $out['required'] = $this->isRequired();
-
-        if (isset($this->description)) {
-            $out['description'] = $this->description;
-        }
-
-        if (isset($this->default)) {
-            $out['default'] = $this->default;
-        }
-
-        if (isset($this->allowMultiple)) {
-            //$out['allowMultiple'] = $this->allowMultiple;
-            $out['type'] = 'array';
-            $out['items'] = array(
-                'type' => $this->getType()
-            );
-        }
-
-        if (isset($this->values)) {
-            $out['enum'] = $this->values;
-
-        }
-
-        return $out;
-    }
-
     /**
      * @param string $mimetype
      * @return RouteMutator
@@ -327,5 +289,69 @@ abstract class Parameter implements RouteMutator
         }
 
         return $this;
+    }
+
+    /**
+     * @param DescriptionBuilder $builder
+     * @param Context $context
+     * @return array
+     */
+    public function toSwagger(DescriptionBuilder $builder, Context $context)
+    {
+        $out = [];
+
+        $out['name'] = $this->getName();
+        $out['type'] = $this->getSwaggerType();
+        $out['in'] = $this->getIn();
+        $out['required'] = $this->isRequired();
+
+        if (isset($this->description)) {
+            $out['description'] = $this->description;
+        }
+
+        if (isset($this->default)) {
+            $out['default'] = $this->default;
+        }
+
+        if (isset($this->allowMultiple)) {
+            //$out['allowMultiple'] = $this->allowMultiple;
+            $out['type'] = 'array';
+            $out['items'] = array(
+                'type' => $this->getSwaggerType()
+            );
+        }
+
+        if (isset($this->values)) {
+            $out['enum'] = $this->values;
+
+        }
+
+        return $out;
+    }
+
+    /**
+     * Translate the local property type to swagger type.
+     * @return string
+     */
+    protected function getSwaggerType()
+    {
+        $type = $this->getType();
+        switch ($type) {
+            case null:
+                return 'string';
+
+            case PropertyType::INTEGER:
+            case PropertyType::STRING:
+            case PropertyType::NUMBER:
+            case PropertyType::BOOL:
+            case PropertyType::OBJECT:
+                return $type;
+
+            case PropertyType::DATETIME:
+                return 'string';
+
+            default:
+                throw new \InvalidArgumentException("Type cannot be matched with a swagger type.");
+        }
     }
 }
