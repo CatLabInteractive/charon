@@ -22,4 +22,11 @@ interface Transformer
      * @return mixed
      */
     public function toEntityValue($value, Context $context);
+
+    /**
+     * Translate the raw input from a parameter to something usable.
+     * @param $value
+     * @return mixed
+     */
+    public function toParameterValue($value);
 }

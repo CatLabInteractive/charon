@@ -3,10 +3,7 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
-use CatLab\Charon\Collections\IdentifierCollection;
-use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Models\Properties\Base\Field;
-use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -107,6 +104,11 @@ interface ResourceTransformer
     public function getPropertySetter() : PropertySetter;
 
     /**
+     * @return ResourceFactory
+     */
+    public function getResourceFactory(): ResourceFactory;
+
+    /**
      * @param Field $field
      * @return string
      */
@@ -124,7 +126,7 @@ interface ResourceTransformer
      * Create resources from whatever is in the inputs defined from the input parsers.
      * @param $resourceDefinition
      * @param Context $context
-     * @param $resource
+     * @param null $request
      * @return ResourceCollection
      */
     public function fromInput(

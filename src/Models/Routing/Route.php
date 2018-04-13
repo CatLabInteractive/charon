@@ -215,7 +215,7 @@ class Route extends RouteProperties implements RouteMutator
      * @param bool TRUE if at least one return value consists of multiple models.
      * @return Parameter[]
      */
-    private function getExtraParameters($hasCardinalityMany)
+    protected function getExtraParameters($hasCardinalityMany)
     {
         $returnValues = $this->getReturnValues();
 
@@ -324,7 +324,7 @@ class Route extends RouteProperties implements RouteMutator
      * @param Field $field
      * @return Parameter
      */
-    private function getFilterField(Field $field)
+    protected function getFilterField(Field $field)
     {
         $filter = (new QueryParameter($field->getDisplayName()))
             ->setType($field->getType())
@@ -344,7 +344,7 @@ class Route extends RouteProperties implements RouteMutator
      * @param Field $field
      * @return Parameter
      */
-    private function getSearchField(Field $field)
+    protected function getSearchField(Field $field)
     {
         $filter = (new QueryParameter($field->getDisplayName()))
             ->setType($field->getType())

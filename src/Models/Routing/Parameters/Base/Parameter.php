@@ -7,11 +7,14 @@ use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
+use CatLab\Charon\Interfaces\Transformer;
+use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Requirements\Exists;
 use CatLab\Requirements\InArray;
 use CatLab\Requirements\Interfaces\Requirement;
+use CatLab\Requirements\Enums\PropertyType;
 
 /**
  * Class Parameter
@@ -30,27 +33,27 @@ abstract class Parameter implements RouteMutator
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string[]
      */
-    private $values;
+    protected $values;
 
     /**
      * @var string
      */
-    private $in;
+    protected $in;
 
     /**
      * @var bool
      */
-    private $required;
+    protected $required;
 
     /**
      * @var string
      */
-    private $type;
+    protected $type;
 
     /**
      * @var Route
@@ -60,17 +63,22 @@ abstract class Parameter implements RouteMutator
     /**
      * @var string
      */
-    private $description;
+    protected $description;
 
     /**
      * @var string
      */
-    private $default;
+    protected $default;
 
     /**
      * @var bool
      */
-    private $allowMultiple;
+    protected $allowMultiple;
+
+    /**
+     * @var string
+     */
+    protected $transformer;
 
     /**
      * Parameter constructor.
@@ -121,6 +129,16 @@ abstract class Parameter implements RouteMutator
     public function allowMultiple($multiple = true)
     {
         $this->allowMultiple = $multiple;
+        return $this;
+    }
+
+    /**
+     * Allow multiple values.
+     * @return $this
+     */
+    public function array()
+    {
+        $this->allowMultiple(true);
         return $this;
     }
 
@@ -200,6 +218,7 @@ abstract class Parameter implements RouteMutator
      * @param string $type
      * @param string $action
      * @return ReturnValue
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
     public function returns(string $type = null, string $action = null) : ReturnValue
     {
@@ -230,45 +249,6 @@ abstract class Parameter implements RouteMutator
     public function summary($summary) : RouteMutator
     {
         return $this->route->summary($summary);
-    }
-
-
-    /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
-     */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
-    {
-        $out = [];
-
-        $out['name'] = $this->getName();
-        $out['type'] = $this->getType();
-        $out['in'] = $this->getIn();
-        $out['required'] = $this->isRequired();
-
-        if (isset($this->description)) {
-            $out['description'] = $this->description;
-        }
-
-        if (isset($this->default)) {
-            $out['default'] = $this->default;
-        }
-
-        if (isset($this->allowMultiple)) {
-            //$out['allowMultiple'] = $this->allowMultiple;
-            $out['type'] = 'array';
-            $out['items'] = array(
-                'type' => $this->getType()
-            );
-        }
-
-        if (isset($this->values)) {
-            $out['enum'] = $this->values;
-
-        }
-
-        return $out;
     }
 
     /**
@@ -327,5 +307,104 @@ abstract class Parameter implements RouteMutator
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $transformer
+     * @return $this
+     */
+    public function transformer(string $transformer)
+    {
+        $this->transformer = $transformer;
+        return $this;
+    }
+
+    /**
+     * @return Transformer|null
+     */
+    public function getTransformer()
+    {
+        if (isset($this->transformer)) {
+            return TransformerLibrary::make($this->transformer);
+        }
+        return null;
+    }
+
+    /**
+     * @param string $transformer
+     * @return $this
+     */
+    public function datetime($transformer = null)
+    {
+        if ($transformer !== null) {
+            $this->transformer($transformer);
+        }
+
+        $this->setType(PropertyType::DATETIME);
+        return $this;
+    }
+
+    /**
+     * @param DescriptionBuilder $builder
+     * @param Context $context
+     * @return array
+     */
+    public function toSwagger(DescriptionBuilder $builder, Context $context)
+    {
+        $out = [];
+
+        $out['name'] = $this->getName();
+        $out['type'] = $this->getSwaggerType();
+        $out['in'] = $this->getIn();
+        $out['required'] = $this->isRequired();
+
+        if (isset($this->description)) {
+            $out['description'] = $this->description;
+        }
+
+        if (isset($this->default)) {
+            $out['default'] = $this->default;
+        }
+
+        if (isset($this->allowMultiple)) {
+            //$out['allowMultiple'] = $this->allowMultiple;
+            $out['type'] = 'array';
+            $out['items'] = array(
+                'type' => $this->getSwaggerType()
+            );
+        }
+
+        if (isset($this->values)) {
+            $out['enum'] = $this->values;
+
+        }
+
+        return $out;
+    }
+
+    /**
+     * Translate the local property type to swagger type.
+     * @return string
+     */
+    protected function getSwaggerType()
+    {
+        $type = $this->getType();
+        switch ($type) {
+            case null:
+                return PropertyType::STRING;
+
+            case PropertyType::INTEGER:
+            case PropertyType::STRING:
+            case PropertyType::NUMBER:
+            case PropertyType::BOOL:
+            case PropertyType::OBJECT:
+                return $type;
+
+            case PropertyType::DATETIME:
+                return PropertyType::STRING;
+
+            default:
+                throw new \InvalidArgumentException("Type cannot be matched with a swagger type.");
+        }
     }
 }

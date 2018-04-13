@@ -151,6 +151,7 @@ class RouteCollection extends RouteProperties
      * @param string $controller
      * @param $options
      * @return RouteCollection
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
     public function resource($resourceDefinition, $path, $controller, $options)
     {
@@ -229,7 +230,7 @@ class RouteCollection extends RouteProperties
      * @param string $controller
      * @param $options
      * @return RouteCollection
-     * @internal param string $path
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
     public function childResource($resourceDefinition, $parentPath, $childPath, $controller, $options)
     {

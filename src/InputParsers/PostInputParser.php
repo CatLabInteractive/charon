@@ -84,7 +84,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
             $context
         );
 
-        $resourceCollection = new ResourceCollection();
+        $resourceCollection = $resourceTransformer->getResourceFactory()->createResourceCollection();
         $resourceCollection->add($resource);
 
         return $resourceCollection;
