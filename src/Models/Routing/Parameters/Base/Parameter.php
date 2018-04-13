@@ -133,6 +133,14 @@ abstract class Parameter implements RouteMutator
     }
 
     /**
+     * @return bool
+     */
+    public function isAllowMultiple()
+    {
+        return $this->allowMultiple;
+    }
+
+    /**
      * Allow multiple values.
      * @return $this
      */
@@ -140,6 +148,14 @@ abstract class Parameter implements RouteMutator
     {
         $this->allowMultiple(true);
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArray()
+    {
+        return $this->isAllowMultiple();
     }
 
     /**
