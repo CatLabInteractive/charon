@@ -16,7 +16,6 @@ class BooleanTransformer implements Transformer
      * @param $value
      * @param Context $context
      * @return mixed
-     * @throws InvalidPropertyException
      */
     public function toResourceValue($value, Context $context)
     {
@@ -33,6 +32,16 @@ class BooleanTransformer implements Transformer
      * @return mixed
      */
     public function toEntityValue($value, Context $context)
+    {
+        return $this->toParameterValue($value);
+    }
+
+    /**
+     * Translate the raw input from a parameter to something usable.
+     * @param $value
+     * @return mixed
+     */
+    public function toParameterValue($value)
     {
         if ($value === null) {
             return null;

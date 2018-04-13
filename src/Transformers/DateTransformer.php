@@ -40,6 +40,16 @@ class DateTransformer implements Transformer
      */
     public function toEntityValue($value, Context $context)
     {
+        return $this->toParameterValue($value);
+    }
+
+    /**
+     * Translate the raw input from a parameter to something usable.
+     * @param $value
+     * @return mixed
+     */
+    public function toParameterValue($value)
+    {
         if ($value === null) {
             return null;
         }

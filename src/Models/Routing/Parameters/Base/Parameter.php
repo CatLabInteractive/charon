@@ -7,6 +7,8 @@ use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
+use CatLab\Charon\Interfaces\Transformer;
+use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Requirements\Exists;
@@ -31,27 +33,27 @@ abstract class Parameter implements RouteMutator
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string[]
      */
-    private $values;
+    protected $values;
 
     /**
      * @var string
      */
-    private $in;
+    protected $in;
 
     /**
      * @var bool
      */
-    private $required;
+    protected $required;
 
     /**
      * @var string
      */
-    private $type;
+    protected $type;
 
     /**
      * @var Route
@@ -61,17 +63,22 @@ abstract class Parameter implements RouteMutator
     /**
      * @var string
      */
-    private $description;
+    protected $description;
 
     /**
      * @var string
      */
-    private $default;
+    protected $default;
 
     /**
      * @var bool
      */
-    private $allowMultiple;
+    protected $allowMultiple;
+
+    /**
+     * @var string
+     */
+    protected $transformer;
 
     /**
      * Parameter constructor.
@@ -122,6 +129,16 @@ abstract class Parameter implements RouteMutator
     public function allowMultiple($multiple = true)
     {
         $this->allowMultiple = $multiple;
+        return $this;
+    }
+
+    /**
+     * Allow multiple values.
+     * @return $this
+     */
+    public function array()
+    {
+        $this->allowMultiple(true);
         return $this;
     }
 
@@ -201,6 +218,7 @@ abstract class Parameter implements RouteMutator
      * @param string $type
      * @param string $action
      * @return ReturnValue
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
     public function returns(string $type = null, string $action = null) : ReturnValue
     {
@@ -292,6 +310,41 @@ abstract class Parameter implements RouteMutator
     }
 
     /**
+     * @param string $transformer
+     * @return $this
+     */
+    public function transformer(string $transformer)
+    {
+        $this->transformer = $transformer;
+        return $this;
+    }
+
+    /**
+     * @return Transformer|null
+     */
+    public function getTransformer()
+    {
+        if (isset($this->transformer)) {
+            return TransformerLibrary::make($this->transformer);
+        }
+        return null;
+    }
+
+    /**
+     * @param string $transformer
+     * @return $this
+     */
+    public function datetime($transformer = null)
+    {
+        if ($transformer !== null) {
+            $this->transformer($transformer);
+        }
+
+        $this->setType(PropertyType::DATETIME);
+        return $this;
+    }
+
+    /**
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
@@ -338,7 +391,7 @@ abstract class Parameter implements RouteMutator
         $type = $this->getType();
         switch ($type) {
             case null:
-                return 'string';
+                return PropertyType::STRING;
 
             case PropertyType::INTEGER:
             case PropertyType::STRING:
@@ -348,7 +401,7 @@ abstract class Parameter implements RouteMutator
                 return $type;
 
             case PropertyType::DATETIME:
-                return 'string';
+                return PropertyType::STRING;
 
             default:
                 throw new \InvalidArgumentException("Type cannot be matched with a swagger type.");
