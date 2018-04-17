@@ -7,7 +7,7 @@ namespace CatLab\Charon\Interfaces;
 * Interface Route
 * @package CatLab\RESTResource\Contracts
 */
-interface Transformer
+interface Transformer extends Serializable
 {
     /**
      * @param $value

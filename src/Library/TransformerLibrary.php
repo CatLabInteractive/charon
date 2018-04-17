@@ -2,8 +2,10 @@
 
 namespace CatLab\Charon\Library;
 
+use CatLab\Base\Helpers\StringHelper;
 use CatLab\Charon\Exceptions\InvalidTransformer;
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\Serializable;
 use CatLab\Charon\Interfaces\Transformer;
 
 /**
@@ -12,6 +14,8 @@ use CatLab\Charon\Interfaces\Transformer;
  */
 class TransformerLibrary
 {
+    const SERIALIZED_PREFIX = 'serialized|';
+
     /**
      * @return TransformerLibrary
      */
@@ -37,15 +41,41 @@ class TransformerLibrary
     /**
      * @param string $classname
      * @return Transformer
+     * @throws InvalidTransformer
      */
     public static function make($classname)
     {
         if ($classname instanceof Transformer) {
-            self::instance()->transformers[get_class($classname)] = $classname;
+            self::instance()->transformers[self::serialize($classname)] = $classname;
             return $classname;
         } else {
             return self::instance()->makeTransformer($classname);
         }
+    }
+
+    /**
+     * Serialize a transformer.
+     * A serialized transformed can be made/wake up by the TransformerLibrary::make function.
+     * @param Transformer $transformer
+     * @return string
+     */
+    public static function serialize($transformer = null)
+    {
+        if ($transformer === null) {
+            return null;
+        }
+
+        // Instance of transformer?
+        if ($transformer instanceof Serializable) {
+            return self::SERIALIZED_PREFIX . base64_encode(serialize($transformer));
+        }
+
+        // Instance of transformer?
+        if ($transformer instanceof Transformer) {
+            return get_class($transformer);
+        }
+
+        return $transformer;
     }
 
     /**
@@ -57,7 +87,15 @@ class TransformerLibrary
     {
         if (!isset($this->transformers[$classname])) {
             try {
-                $this->transformers[$classname] = new $classname;
+                // is this serialized data?
+                if (StringHelper::startsWith($classname, self::SERIALIZED_PREFIX)) {
+                    $serializedData = base64_decode(
+                        StringHelper::substr($classname, StringHelper::length(self::SERIALIZED_PREFIX))
+                    );
+                    $this->transformers[$classname] = unserialize($serializedData);
+                } else {
+                    $this->transformers[$classname] = new $classname;
+                }
             }
             catch (\Exception $e) {
                 throw new InvalidTransformer(
@@ -69,7 +107,7 @@ class TransformerLibrary
             
             if (! ($this->transformers[$classname] instanceof Transformer)) {
                 throw new InvalidTransformer(
-                    "All resources definitions must implement " . ResourceDefinition::class . "; " .
+                    "All Transformers must implement " . Transformer::class . "; " .
                     $classname . " does not."
                 );
             }

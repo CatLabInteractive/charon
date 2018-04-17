@@ -11,6 +11,8 @@ use CatLab\Charon\Interfaces\Transformer;
 use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
+use CatLab\Charon\Transformers\ArrayTransformer;
+use CatLab\Charon\Transformers\TransformerQueue;
 use CatLab\Requirements\Exists;
 use CatLab\Requirements\InArray;
 use CatLab\Requirements\Interfaces\Requirement;
@@ -76,9 +78,9 @@ abstract class Parameter implements RouteMutator
     protected $allowMultiple;
 
     /**
-     * @var string
+     * @var string[]
      */
-    protected $transformer;
+    protected $transformers;
 
     /**
      * Parameter constructor.
@@ -91,6 +93,7 @@ abstract class Parameter implements RouteMutator
         $this->in = $type;
         $this->required = false;
         $this->type = 'string';
+        $this->transformers = [];
     }
 
     /**
@@ -124,11 +127,18 @@ abstract class Parameter implements RouteMutator
 
     /**
      * @param bool $multiple
+     * @param string $transformer
      * @return $this
      */
-    public function allowMultiple($multiple = true)
+    public function allowMultiple($multiple = true, $transformer = ArrayTransformer::class)
     {
         $this->allowMultiple = $multiple;
+
+        if ($multiple && $transformer !== null) {
+            // Add array transformer to the start of the transformer array.
+            array_unshift($this->transformers, $transformer);
+        }
+
         return $this;
     }
 
@@ -142,11 +152,12 @@ abstract class Parameter implements RouteMutator
 
     /**
      * Allow multiple values.
+     * @param string $transformer   Transformer that should be used to translate plain values to arrays.
      * @return $this
      */
-    public function array()
+    public function array($transformer = ArrayTransformer::class)
     {
-        $this->allowMultiple(true);
+        $this->allowMultiple(true, $transformer);
         return $this;
     }
 
@@ -331,19 +342,41 @@ abstract class Parameter implements RouteMutator
      */
     public function transformer(string $transformer)
     {
-        $this->transformer = $transformer;
+        $this->transformers[] = $transformer;
         return $this;
     }
 
     /**
      * @return Transformer|null
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function getTransformer()
     {
-        if (isset($this->transformer)) {
-            return TransformerLibrary::make($this->transformer);
+        $transformers = $this->getTransformers();
+        if (count($transformers) === 0) {
+            return null;
         }
-        return null;
+
+        return new TransformerQueue($transformers);
+    }
+
+    /**
+     * Get all transformers attached to this parameter.
+     * @return array|null
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     */
+    public function getTransformers()
+    {
+        if (count($this->transformers) === null) {
+            return null;
+        }
+
+        $out = [];
+        foreach ($this->transformers as $transformer) {
+            $out[] = TransformerLibrary::make($transformer);
+        }
+
+        return $out;
     }
 
     /**
