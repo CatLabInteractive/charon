@@ -46,6 +46,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param Context $context
      * @return ResourceCollection
      * @internal param RelationshipField $field
+     * @throws InvalidPropertyException
      */
     public function resolveManyRelationship(
         ResourceTransformer $transformer,
@@ -70,7 +71,6 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param RelationshipValue $value
      * @param Context $context
      * @return RESTResource
-     * @throws InvalidPropertyException
      */
     public function resolveOneRelationship(
         ResourceTransformer $transformer,
@@ -184,6 +184,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param RelationshipField $field
      * @param Context $context
      * @return RESTResource
+     * @throws ValueUndefined
      */
     public function resolveOneRelationshipInput(
         ResourceTransformer $transformer,
@@ -232,6 +233,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
+     * @throws InvalidPropertyException
      */
     public function getChildByIdentifiers(
         ResourceTransformer $transformer,

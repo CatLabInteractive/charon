@@ -99,6 +99,17 @@ class RouteCollection extends RouteProperties
      * @param array $options
      * @return Route
      */
+    public function patch($path, $action, array $options = [])
+    {
+        return $this->action('patch', $path, $action, $options);
+    }
+
+    /**
+     * @param string $path
+     * @param string|callable $action
+     * @param array $options
+     * @return Route
+     */
     public function delete($path, $action, array $options = [])
     {
         return $this->action('delete', $path, $action, $options);
