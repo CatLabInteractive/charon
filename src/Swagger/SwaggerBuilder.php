@@ -167,7 +167,7 @@ class SwaggerBuilder implements DescriptionBuilder
             return $refId;
         } else {
             return $this->addItemListDefinition(
-                $this->entityNameLibrary->toPretty($resourceDefinition->getEntityClassName()),
+                $this->getResourceDefinitionName($resourceDefinition),
                 $refId,
                 $action
             );
