@@ -29,11 +29,17 @@ class ResourceField extends Field
      * @var bool
      */
     private $sortable;
+
+    /**
+     * @var bool
+     */
+    private $isArray;
     
     public function __construct(ResourceDefinition $resourceDefinition, $fieldName)
     {
         parent::__construct($resourceDefinition, $fieldName);
 
+        $this->isArray = false;
         $this->sortable = false;
     }
 
@@ -109,5 +115,22 @@ class ResourceField extends Field
             return $inArrayFilters->first()->getValues();
         }
         return [];
+    }
+
+    /**
+     * @return $this
+     */
+    public function array()
+    {
+        $this->isArray = true;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArray()
+    {
+        return $this->isArray;
     }
 }

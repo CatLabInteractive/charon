@@ -40,6 +40,12 @@ class SwaggerBuilder implements DescriptionBuilder
     protected $schemas;
 
     /**
+     * Keep a list of unique resource definition names.
+     * @var mixed[]
+     */
+    protected $resourceDefinitionNames;
+
+    /**
      * @var PrettyEntityNameLibrary
      */
     protected $entityNameLibrary;
@@ -106,6 +112,7 @@ class SwaggerBuilder implements DescriptionBuilder
 
         $this->resourceFactory = $resourceFactory ?? new ResourceFactory();
         $this->entityNameLibrary = new PrettyEntityNameLibrary();
+        $this->resourceDefinitionNames = [];
 
         $this->host = $host;
         $this->basePath = $basePath;
@@ -148,7 +155,7 @@ class SwaggerBuilder implements DescriptionBuilder
         string $action,
         string $cardinality = Cardinality::ONE
     ) {
-        $name = $this->entityNameLibrary->toPretty($resourceDefinition->getEntityClassName()) . '_' . $action;
+        $name = $this->getResourceDefinitionName($resourceDefinition) . '_' . $action;
         if (!array_key_exists($name, $this->schemas)) {
             $this->schemas[$name] = null; // Set key to avoid circular references
             $this->schemas[$name] = $resourceDefinition->toSwagger($this, $action);
@@ -165,6 +172,32 @@ class SwaggerBuilder implements DescriptionBuilder
                 $action
             );
         }
+    }
+
+    /**
+     * Get a unique, pretty name for a resource definition.
+     * @param $resourceDefinition
+     * @return string
+     */
+    protected function getResourceDefinitionName(ResourceDefinition $resourceDefinition)
+    {
+        $resourceDefinitionClassName = get_class($resourceDefinition);
+        if (!isset($this->resourceDefinitionNames[$resourceDefinitionClassName])) {
+
+            $prettyName = $this->entityNameLibrary->toPretty($resourceDefinition->getEntityClassName());
+            $name = $prettyName;
+
+            // check if this name is already in use
+            $counter = 1;
+            while (in_array($name, $this->resourceDefinitionNames)) {
+                $counter ++;
+                $name = $prettyName . $counter;
+            }
+
+            $this->resourceDefinitionNames[$resourceDefinitionClassName] = $name;
+        }
+
+        return $this->resourceDefinitionNames[$resourceDefinitionClassName];
     }
 
     /**

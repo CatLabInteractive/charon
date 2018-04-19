@@ -343,6 +343,7 @@ class Field implements Property, ResourceDefinitionManipulator
 
     /**
      * @return Transformer|null
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function getTransformer()
     {
@@ -353,6 +354,7 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
+     * @param string $transformer
      * @return $this
      */
     public function datetime($transformer = DateTransformer::class)

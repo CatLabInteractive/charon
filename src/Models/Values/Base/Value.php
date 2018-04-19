@@ -82,6 +82,7 @@ abstract class Value
      * @param PropertySetter $propertySetter
      * @param EntityFactory $factory
      * @param Context $context
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toEntity(
         $entity,

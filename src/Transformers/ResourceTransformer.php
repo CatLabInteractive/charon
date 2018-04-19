@@ -8,6 +8,7 @@ use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
+use CatLab\Charon\Exceptions\IterableExpected;
 use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DynamicContext;
@@ -126,6 +127,8 @@ class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidContextAction
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
+     * @throws IterableExpected
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toResources(
         $resourceDefinition,
@@ -168,6 +171,8 @@ class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidContextAction
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
+     * @throws IterableExpected
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toResource(
         $resourceDefinition,
@@ -212,11 +217,33 @@ class ResourceTransformer implements ResourceTransformerContract
                     } else {
                         $this->linkRelationship($field, $entity, $resource, $context, $visible);
                     }
-                } else {
+                } elseif ($field instanceof ResourceField) {
                     $value = $this->propertyResolver->resolveProperty($this, $entity, $field, $context);
 
-                    if ($transformer = $field->getTransformer()) {
-                        $value = $transformer->toResourceValue($value, $context);
+                    if ($field->isArray()) {
+                        if (!ArrayHelper::isIterable($value)) {
+                            throw IterableExpected::make($field, $value);
+                        }
+
+                        // Translate to regular array (otherwise we might get in trouble)
+                        $transformedValue = [];
+                        $transformer = $field->getTransformer();
+
+                        if ($transformer) {
+                            foreach ($value as $k => $v) {
+                                $transformedValue[$k] = $transformer->toResourceValue($v, $context);
+                            }
+                        } else {
+                            foreach ($value as $k => $v) {
+                                $transformedValue[$k] = $v;
+                            }
+                        }
+                        $value = $transformedValue;
+
+                    } else {
+                        if ($transformer = $field->getTransformer()) {
+                            $value = $transformer->toResourceValue($value, $context);
+                        }
                     }
 
                     $resource->setProperty(
@@ -224,6 +251,8 @@ class ResourceTransformer implements ResourceTransformerContract
                         $value,
                         $visible
                     );
+                } else {
+                    throw new \InvalidArgumentException("Unexpected field type found: " . get_class($field));
                 }
             }
             $this->currentPath->pop();
@@ -249,6 +278,7 @@ class ResourceTransformer implements ResourceTransformerContract
      * @param mixed|null $entity
      * @param ContextContract $context
      * @return mixed $entity
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toEntity(
         ResourceContract $resource,
