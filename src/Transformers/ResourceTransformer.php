@@ -628,6 +628,12 @@ class ResourceTransformer implements ResourceTransformerContract
     private function checkEntityType(ResourceDefinition $resourceDefinition, $entity)
     {
         $entityClassName = $resourceDefinition->getEntityClassName();
+
+        if ($entityClassName === null) {
+            // Null given? Ok!
+            return;
+        }
+
         if (! ($entity instanceof $entityClassName)) {
 
             if (is_object($entity)) {
