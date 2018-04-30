@@ -4,6 +4,7 @@ namespace CatLab\Charon\Resolvers;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 use CatLab\Charon\Interfaces\DynamicContext;
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -104,6 +105,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param Field $field
      * @param Context $context
      * @return mixed
+     * @throws ValueUndefined
      */
     public function resolvePropertyInput(
         ResourceTransformer $transformer,
@@ -111,10 +113,10 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         Field $field,
         Context $context
     ) {
-        if (isset($input[$field->getDisplayName()])) {
-            return $input[$field->getDisplayName()];
+        if (!isset($input[$field->getDisplayName()])) {
+            throw ValueUndefined::make($field->getDisplayName());
         }
-        return null;
+        return $input[$field->getDisplayName()];
     }
 
     /**
