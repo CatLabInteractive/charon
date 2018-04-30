@@ -344,6 +344,7 @@
   },
   "definitions": {
     "Pet_index": {
+      "type": "object",
       "properties": {
         "pet-id": {
           "type": "integer"
@@ -351,6 +352,7 @@
       }
     },
     "Pet_index_items": {
+      "type": "object",
       "properties": {
         "items": {
           "type": "array",
@@ -361,6 +363,7 @@
       }
     },
     "Pet_view": {
+      "type": "object",
       "properties": {
         "pet-id": {
           "type": "integer"
@@ -395,6 +398,7 @@
       }
     },
     "Pet_edit": {
+      "type": "object",
       "properties": {
         "pet-id": {
           "type": "integer"
@@ -411,6 +415,7 @@
       }
     },
     "Photo_create": {
+      "type": "object",
       "properties": {
         "url": {
           "type": "string"
@@ -418,6 +423,7 @@
       }
     },
     "Photo_create_items": {
+      "type": "object",
       "properties": {
         "items": {
           "type": "array",
@@ -428,6 +434,7 @@
       }
     },
     "Tag_identifier": {
+      "type": "object",
       "properties": {
         "tag-id": {
           "type": "integer"
@@ -435,6 +442,7 @@
       }
     },
     "Tag_identifier_items": {
+      "type": "object",
       "properties": {
         "items": {
           "type": "array",
