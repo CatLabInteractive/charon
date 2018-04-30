@@ -186,7 +186,6 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param RelationshipField $field
      * @param Context $context
      * @return RESTResource
-     * @throws ValueUndefined
      */
     public function resolveOneRelationshipInput(
         ResourceTransformer $transformer,
@@ -194,12 +193,17 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         RelationshipField $field,
         Context $context
     ) {
-        $child = $this->resolvePropertyInput($transformer, $input, $field, $context);
+        try {
+            $child = $this->resolvePropertyInput($transformer, $input, $field, $context);
 
-        if ($child) {
-            $childContext = $this->getInputChildContext($transformer, $field, $context);
-            return $transformer->fromArray($field->getChildResource(), $child, $childContext);
+            if ($child) {
+                $childContext = $this->getInputChildContext($transformer, $field, $context);
+                return $transformer->fromArray($field->getChildResource(), $child, $childContext);
+            }
+        } catch (ValueUndefined $e) {
+            // Don't worry be happy.
         }
+        return null;
     }
 
     /**
@@ -309,8 +313,12 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         $identifiers = $resourceDefinition->getFields()->getIdentifiers();
         if (count($identifiers) > 0) {
             foreach ($identifiers as $field) {
-                $value = $this->resolvePropertyInput($transformer, $input, $field, $context);
-                if (!$value) {
+                try {
+                    $value = $this->resolvePropertyInput($transformer, $input, $field, $context);
+                    if (!$value) {
+                        return false;
+                    }
+                } catch (ValueUndefined $e) {
                     return false;
                 }
             }
@@ -332,7 +340,12 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         Field $field,
         Context $context
     ) {
-        $children = $this->resolvePropertyInput($transformer, $input, $field, $context);
+        try {
+            $children = $this->resolvePropertyInput($transformer, $input, $field, $context);
+        } catch (ValueUndefined $e) {
+            return null;
+        }
+
 
         if (
             $children &&
