@@ -92,4 +92,9 @@ class CurrentPath implements Countable
     {
         return $this->displayNames;
     }
+
+    public function __toString()
+    {
+        return implode('.', $this->toArray());
+    }
 }

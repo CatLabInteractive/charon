@@ -138,7 +138,7 @@ class ResourceTransformer implements ResourceTransformerContract
         $parentEntity = null
     ) : \CatLab\Charon\Interfaces\ResourceCollection {
         if (!ArrayHelper::isIterable($entities)) {
-            throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities.');
+            throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities at ' . $this->currentPath);
         }
 
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
@@ -221,6 +221,11 @@ class ResourceTransformer implements ResourceTransformerContract
                     $value = $this->propertyResolver->resolveProperty($this, $entity, $field, $context);
 
                     if ($field->isArray()) {
+                        // Null values = emtpy arrays.
+                        if ($value === null) {
+                            $value = [];
+                        }
+
                         if (!ArrayHelper::isIterable($value)) {
                             throw IterableExpected::make($field, $value);
                         }
