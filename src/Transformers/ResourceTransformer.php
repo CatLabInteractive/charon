@@ -6,6 +6,7 @@ use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
+use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
 use CatLab\Charon\Exceptions\IterableExpected;

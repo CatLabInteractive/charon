@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Routing\Parameters\Base;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
+use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -130,9 +131,13 @@ abstract class Parameter implements RouteMutator
      * @param string $transformer
      * @return $this
      */
-    public function allowMultiple($multiple = true, $transformer = ArrayTransformer::class)
+    public function allowMultiple($multiple = true, $transformer = null)
     {
         $this->allowMultiple = $multiple;
+
+        if ($transformer === null) {
+            $transformer = CharonConfig::instance()->getDefaultArrayTransformer();
+        }
 
         if ($multiple && $transformer !== null) {
             // Add array transformer to the start of the transformer array.
@@ -155,7 +160,7 @@ abstract class Parameter implements RouteMutator
      * @param string $transformer   Transformer that should be used to translate plain values to arrays.
      * @return $this
      */
-    public function array($transformer = ArrayTransformer::class)
+    public function array($transformer = null)
     {
         $this->allowMultiple(true, $transformer);
         return $this;
