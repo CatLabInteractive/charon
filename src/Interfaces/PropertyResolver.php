@@ -4,6 +4,7 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\RESTResource;
@@ -77,6 +78,7 @@ interface PropertyResolver
      * @param Field $field
      * @param Context $context
      * @return mixed
+     * @throws ValueUndefined
      */
     public function resolvePropertyInput(
         ResourceTransformer $transformer,

@@ -4,6 +4,7 @@ namespace CatLab\Charon\Resolvers;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 use CatLab\Charon\Interfaces\DynamicContext;
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -46,6 +47,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param Context $context
      * @return ResourceCollection
      * @internal param RelationshipField $field
+     * @throws InvalidPropertyException
      */
     public function resolveManyRelationship(
         ResourceTransformer $transformer,
@@ -70,7 +72,6 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param RelationshipValue $value
      * @param Context $context
      * @return RESTResource
-     * @throws InvalidPropertyException
      */
     public function resolveOneRelationship(
         ResourceTransformer $transformer,
@@ -104,6 +105,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param Field $field
      * @param Context $context
      * @return mixed
+     * @throws ValueUndefined
      */
     public function resolvePropertyInput(
         ResourceTransformer $transformer,
@@ -111,10 +113,10 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         Field $field,
         Context $context
     ) {
-        if (isset($input[$field->getDisplayName()])) {
-            return $input[$field->getDisplayName()];
+        if (!isset($input[$field->getDisplayName()])) {
+            throw ValueUndefined::make($field->getDisplayName());
         }
-        return null;
+        return $input[$field->getDisplayName()];
     }
 
     /**
@@ -191,12 +193,17 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         RelationshipField $field,
         Context $context
     ) {
-        $child = $this->resolvePropertyInput($transformer, $input, $field, $context);
+        try {
+            $child = $this->resolvePropertyInput($transformer, $input, $field, $context);
 
-        if ($child) {
-            $childContext = $this->getInputChildContext($transformer, $field, $context);
-            return $transformer->fromArray($field->getChildResource(), $child, $childContext);
+            if ($child) {
+                $childContext = $this->getInputChildContext($transformer, $field, $context);
+                return $transformer->fromArray($field->getChildResource(), $child, $childContext);
+            }
+        } catch (ValueUndefined $e) {
+            // Don't worry be happy.
         }
+        return null;
     }
 
     /**
@@ -232,6 +239,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return mixed
+     * @throws InvalidPropertyException
      */
     public function getChildByIdentifiers(
         ResourceTransformer $transformer,
@@ -305,8 +313,12 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         $identifiers = $resourceDefinition->getFields()->getIdentifiers();
         if (count($identifiers) > 0) {
             foreach ($identifiers as $field) {
-                $value = $this->resolvePropertyInput($transformer, $input, $field, $context);
-                if (!$value) {
+                try {
+                    $value = $this->resolvePropertyInput($transformer, $input, $field, $context);
+                    if (!$value) {
+                        return false;
+                    }
+                } catch (ValueUndefined $e) {
                     return false;
                 }
             }
@@ -328,7 +340,12 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         Field $field,
         Context $context
     ) {
-        $children = $this->resolvePropertyInput($transformer, $input, $field, $context);
+        try {
+            $children = $this->resolvePropertyInput($transformer, $input, $field, $context);
+        } catch (ValueUndefined $e) {
+            return null;
+        }
+
 
         if (
             $children &&

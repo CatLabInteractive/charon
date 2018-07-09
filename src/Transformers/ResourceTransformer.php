@@ -9,6 +9,7 @@ use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
+use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\IterableExpected;
 use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
@@ -339,14 +340,18 @@ class ResourceTransformer implements ResourceTransformerContract
                 if ($field instanceof RelationshipField) {
                     $this->relationshipFromArray($field, $body, $resource, $context);
                 } else {
-                    $value = $this->propertyResolver->resolvePropertyInput(
-                        $this,
-                        $body,
-                        $field,
-                        $context
-                    );
+                    try {
+                        $value = $this->propertyResolver->resolvePropertyInput(
+                            $this,
+                            $body,
+                            $field,
+                            $context
+                        );
 
-                    $resource->setProperty($field, $value, true);
+                        $resource->setProperty($field, $value, true);
+                    } catch (ValueUndefined $e) {
+                        // Don't worry, be happy.
+                    }
                 }
             }
             $this->currentPath->pop();
