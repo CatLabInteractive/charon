@@ -409,7 +409,7 @@ class Parameter implements RouteMutator, Property
 
         $values = $this->getEnumValues();
         if ($values !== null) {
-            $out['enum'] = $this->values;
+            $out['enum'] = $values;
 
         }
 
