@@ -17,8 +17,5 @@ class PathParameter extends Parameter
     public function __construct(string $name)
     {
         parent::__construct($name, self::IN_PATH);
-
-        // Always required.
-        $this->required();
     }
 }
