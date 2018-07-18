@@ -25,6 +25,7 @@ class CurrentPath implements Countable
     public function __construct()
     {
         $this->fields = [];
+        $this->displayNames = [];
     }
 
     /**
