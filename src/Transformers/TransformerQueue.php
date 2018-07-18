@@ -39,6 +39,7 @@ class TransformerQueue implements Transformer
      * @param $value
      * @param Context $context
      * @return mixed
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toResourceValue($value, Context $context)
     {
@@ -53,6 +54,7 @@ class TransformerQueue implements Transformer
      * @param $value
      * @param Context $context
      * @return mixed
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toEntityValue($value, Context $context)
     {
@@ -67,6 +69,7 @@ class TransformerQueue implements Transformer
      * Translate the raw input from a parameter to something usable.
      * @param $value
      * @return mixed
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toParameterValue($value)
     {
@@ -80,6 +83,7 @@ class TransformerQueue implements Transformer
     /**
      * Get a list of all transformers.
      * @return Transformer[]
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     protected function getTransformers()
     {
@@ -100,6 +104,7 @@ class TransformerQueue implements Transformer
 
     /**
      * Serialize object
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function __sleep()
     {

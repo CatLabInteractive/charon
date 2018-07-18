@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Routing\Parameters\Base;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
+use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -12,9 +13,11 @@ use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Transformers\ArrayTransformer;
+use CatLab\Charon\Transformers\BooleanTransformer;
 use CatLab\Charon\Transformers\TransformerQueue;
 use CatLab\Requirements\Exists;
 use CatLab\Requirements\InArray;
+use CatLab\Requirements\Interfaces\Property;
 use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Enums\PropertyType;
 
@@ -22,9 +25,11 @@ use CatLab\Requirements\Enums\PropertyType;
  * Class Parameter
  * @package App\CatLab\RESTResource\Models\Parameters\Base
  */
-abstract class Parameter implements RouteMutator
+class Parameter implements RouteMutator, Property
 {
-    use \CatLab\Requirements\Traits\TypeSetter;
+    use \CatLab\Requirements\Traits\RequirementSetter {
+        setType as traitSetType;
+    }
 
     const IN_PATH = 'path';
     const IN_QUERY = 'query';
@@ -46,11 +51,6 @@ abstract class Parameter implements RouteMutator
      * @var string
      */
     protected $in;
-
-    /**
-     * @var bool
-     */
-    protected $required;
 
     /**
      * @var string
@@ -82,28 +82,20 @@ abstract class Parameter implements RouteMutator
      */
     protected $transformers;
 
+
+    protected $validator;
+
     /**
      * Parameter constructor.
      * @param string $name
      * @param $type
      */
-    protected function __construct($name, $type)
+    public function __construct($name, $type)
     {
         $this->name = $name;
         $this->in = $type;
-        $this->required = false;
         $this->type = 'string';
         $this->transformers = [];
-    }
-
-    /**
-     * @param $type
-     * @return $this
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
     }
 
     /**
@@ -116,13 +108,16 @@ abstract class Parameter implements RouteMutator
     }
 
     /**
-     * @param string[] $values
-     * @return $this
+     * @return string[]|null
      */
-    public function enum(array $values)
+    public function getEnumValues()
     {
-        $this->values = $values;
-        return $this;
+        foreach ($this->getRequirements() as $requirement) {
+            if ($requirement instanceof InArray) {
+                return $requirement->getValues();
+            }
+        }
+        return null;
     }
 
     /**
@@ -130,9 +125,13 @@ abstract class Parameter implements RouteMutator
      * @param string $transformer
      * @return $this
      */
-    public function allowMultiple($multiple = true, $transformer = ArrayTransformer::class)
+    public function allowMultiple($multiple = true, $transformer = null)
     {
         $this->allowMultiple = $multiple;
+
+        if ($transformer === null) {
+            $transformer = CharonConfig::instance()->getDefaultArrayTransformer();
+        }
 
         if ($multiple && $transformer !== null) {
             // Add array transformer to the start of the transformer array.
@@ -155,7 +154,7 @@ abstract class Parameter implements RouteMutator
      * @param string $transformer   Transformer that should be used to translate plain values to arrays.
      * @return $this
      */
-    public function array($transformer = ArrayTransformer::class)
+    public function array($transformer = null)
     {
         $this->allowMultiple(true, $transformer);
         return $this;
@@ -167,16 +166,6 @@ abstract class Parameter implements RouteMutator
     public function isArray()
     {
         return $this->isAllowMultiple();
-    }
-
-    /**
-     * @param bool $required
-     * @return $this
-     */
-    public function required($required = true)
-    {
-        $this->required = $required;
-        return $this;
     }
 
     /**
@@ -198,27 +187,20 @@ abstract class Parameter implements RouteMutator
     }
 
     /**
+     * Return the human readable path of the property.
+     * @return string
+     */
+    public function getPropertyName(): string
+    {
+        return $this->getName();
+    }
+
+    /**
      * @return string
      */
     public function getIn()
     {
         return $this->in;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRequired()
-    {
-        return $this->required;
     }
 
     /**
@@ -298,31 +280,16 @@ abstract class Parameter implements RouteMutator
     }
 
     /**
-     * Set parameter requirements from a CatLab Requirement
-     * @param Requirement $requirement
-     */
-    public function setFromRequirement(Requirement $requirement)
-    {
-        $class = get_class($requirement);
-        switch ($class) {
-            case Exists::class:
-                //$this->required();
-                // This causes trouble when allowing multiple input methods.
-                return;
-
-            case InArray::class:
-                $this->enum($requirement->getValues());
-        }
-    }
-
-    /**
      * Merge properties
      * @param Parameter $parameter
      * @return $this
      */
     public function merge(Parameter $parameter)
     {
-        $this->required($parameter->isRequired());
+        foreach ($parameter->getRequirements() as $requirement) {
+            $parameter->addRequirement($requirement);
+        }
+
         $this->allowMultiple($parameter->allowMultiple);
 
         if ($parameter->description) {
@@ -394,6 +361,23 @@ abstract class Parameter implements RouteMutator
     }
 
     /**
+     * @param $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->traitSetType($type);
+
+        switch ($type) {
+            case PropertyType::BOOL:
+                $this->transformer(BooleanTransformer::class);
+                break;
+        }
+
+        return $this;
+    }
+
+    /**
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
@@ -423,8 +407,9 @@ abstract class Parameter implements RouteMutator
             );
         }
 
-        if (isset($this->values)) {
-            $out['enum'] = $this->values;
+        $values = $this->getEnumValues();
+        if ($values !== null) {
+            $out['enum'] = $values;
 
         }
 

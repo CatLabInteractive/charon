@@ -47,6 +47,6 @@ class BooleanTransformer implements Transformer
             return null;
         }
 
-        return !!$value;
+        return !!$value && $value !== 'false';
     }
 }

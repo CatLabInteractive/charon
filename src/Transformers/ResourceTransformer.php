@@ -6,8 +6,11 @@ use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
+use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
+use CatLab\Charon\Exceptions\ValueUndefined;
+use CatLab\Charon\Exceptions\IterableExpected;
 use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DynamicContext;
@@ -126,6 +129,8 @@ class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidContextAction
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
+     * @throws IterableExpected
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toResources(
         $resourceDefinition,
@@ -135,7 +140,7 @@ class ResourceTransformer implements ResourceTransformerContract
         $parentEntity = null
     ) : \CatLab\Charon\Interfaces\ResourceCollection {
         if (!ArrayHelper::isIterable($entities)) {
-            throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities.');
+            throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities at ' . $this->currentPath);
         }
 
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
@@ -168,6 +173,8 @@ class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidContextAction
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
+     * @throws IterableExpected
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toResource(
         $resourceDefinition,
@@ -212,11 +219,38 @@ class ResourceTransformer implements ResourceTransformerContract
                     } else {
                         $this->linkRelationship($field, $entity, $resource, $context, $visible);
                     }
-                } else {
+                } elseif ($field instanceof ResourceField) {
                     $value = $this->propertyResolver->resolveProperty($this, $entity, $field, $context);
 
-                    if ($transformer = $field->getTransformer()) {
-                        $value = $transformer->toResourceValue($value, $context);
+                    if ($field->isArray()) {
+                        // Null values = emtpy arrays.
+                        if ($value === null) {
+                            $value = [];
+                        }
+
+                        if (!ArrayHelper::isIterable($value)) {
+                            throw IterableExpected::make($field, $value);
+                        }
+
+                        // Translate to regular array (otherwise we might get in trouble)
+                        $transformedValue = [];
+                        $transformer = $field->getTransformer();
+
+                        if ($transformer) {
+                            foreach ($value as $k => $v) {
+                                $transformedValue[$k] = $transformer->toResourceValue($v, $context);
+                            }
+                        } else {
+                            foreach ($value as $k => $v) {
+                                $transformedValue[$k] = $v;
+                            }
+                        }
+                        $value = $transformedValue;
+
+                    } else {
+                        if ($transformer = $field->getTransformer()) {
+                            $value = $transformer->toResourceValue($value, $context);
+                        }
                     }
 
                     $resource->setProperty(
@@ -224,6 +258,8 @@ class ResourceTransformer implements ResourceTransformerContract
                         $value,
                         $visible
                     );
+                } else {
+                    throw new \InvalidArgumentException("Unexpected field type found: " . get_class($field));
                 }
             }
             $this->currentPath->pop();
@@ -249,6 +285,7 @@ class ResourceTransformer implements ResourceTransformerContract
      * @param mixed|null $entity
      * @param ContextContract $context
      * @return mixed $entity
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function toEntity(
         ResourceContract $resource,
@@ -303,14 +340,18 @@ class ResourceTransformer implements ResourceTransformerContract
                 if ($field instanceof RelationshipField) {
                     $this->relationshipFromArray($field, $body, $resource, $context);
                 } else {
-                    $value = $this->propertyResolver->resolvePropertyInput(
-                        $this,
-                        $body,
-                        $field,
-                        $context
-                    );
+                    try {
+                        $value = $this->propertyResolver->resolvePropertyInput(
+                            $this,
+                            $body,
+                            $field,
+                            $context
+                        );
 
-                    $resource->setProperty($field, $value, true);
+                        $resource->setProperty($field, $value, true);
+                    } catch (ValueUndefined $e) {
+                        // Don't worry, be happy.
+                    }
                 }
             }
             $this->currentPath->pop();
@@ -598,6 +639,12 @@ class ResourceTransformer implements ResourceTransformerContract
     private function checkEntityType(ResourceDefinition $resourceDefinition, $entity)
     {
         $entityClassName = $resourceDefinition->getEntityClassName();
+
+        if ($entityClassName === null) {
+            // Null given? Ok!
+            return;
+        }
+
         if (! ($entity instanceof $entityClassName)) {
 
             if (is_object($entity)) {

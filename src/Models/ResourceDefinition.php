@@ -52,7 +52,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      * ResourceDefinition constructor.
      * @param string $entityClassName
      */
-    public function __construct($entityClassName)
+    public function __construct($entityClassName = null)
     {
         $this->entityClassName = $entityClassName;
         $this->fields = new ResourceFieldCollection();
@@ -122,7 +122,11 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function getEntityName($plural = false)
     {
         $entityClassName = $this->getEntityClassName();
-        $entityName = ObjectHelper::class_basename($entityClassName);
+        if ($entityClassName !== null) {
+            $entityName = ObjectHelper::class_basename($entityClassName);
+        } else {
+            $entityName = ObjectHelper::class_basename($this);
+        }
 
         if ($plural) {
             return StringHelper::plural($entityName, is_numeric($plural) ? $plural : 2);

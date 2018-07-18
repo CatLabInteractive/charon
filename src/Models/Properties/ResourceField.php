@@ -4,6 +4,7 @@ namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
+use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\InArray;
 
 /**
@@ -29,11 +30,17 @@ class ResourceField extends Field
      * @var bool
      */
     private $sortable;
+
+    /**
+     * @var bool
+     */
+    private $isArray;
     
     public function __construct(ResourceDefinition $resourceDefinition, $fieldName)
     {
         parent::__construct($resourceDefinition, $fieldName);
 
+        $this->isArray = false;
         $this->sortable = false;
     }
 
@@ -109,5 +116,42 @@ class ResourceField extends Field
             return $inArrayFilters->first()->getValues();
         }
         return [];
+    }
+
+    /**
+     * @return $this
+     */
+    public function array()
+    {
+        $this->isArray = true;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArray()
+    {
+        return $this->isArray;
+    }
+
+    /**
+     * @param SwaggerBuilder $builder
+     * @param $action
+     * @return mixed[]
+     */
+    public function toSwagger(SwaggerBuilder $builder, $action)
+    {
+        $description = parent::toSwagger($builder, $action);
+
+        // Is array? Wrap in array definition
+        if ($this->isArray()) {
+            return [
+                'type' => 'array',
+                'items' => $description
+            ];
+        }
+
+        return $description;
     }
 }

@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
