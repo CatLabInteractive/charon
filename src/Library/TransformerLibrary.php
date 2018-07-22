@@ -46,8 +46,11 @@ class TransformerLibrary
     public static function make($classname)
     {
         if ($classname instanceof Transformer) {
-            self::instance()->transformers[self::serialize($classname)] = $classname;
-            return $classname;
+            $serialized = self::serialize($classname);
+            if (!isset(self::instance()->transformers[$serialized])) {
+                self::instance()->transformers[$serialized] = $classname;
+            }
+            return self::instance()->transformers[$serialized];
         } else {
             return self::instance()->makeTransformer($classname);
         }

@@ -23,7 +23,6 @@ class HeaderParameter extends Parameter
     public function __construct($name)
     {
         parent::__construct($name, self::IN_FORM);
-        $this->setType('header');
     }
 
     public function getIn()
