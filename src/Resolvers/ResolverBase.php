@@ -66,6 +66,11 @@ class ResolverBase
      */
     protected function splitPathParameters(string $path)
     {
+        // can we do this easier?
+        if (strpos($path, self::CHILDPATH_VARIABLE_OPEN) === false) {
+            return explode('/', $path);
+        }
+
         // First detect all variables
         $regex = '/' . self::REGEX_ACCOLADE_PARAMETER . '|' . self::REGEX_REGULAR_PARAMETER . '/';
 
@@ -182,6 +187,7 @@ class ResolverBase
      * @param Context $context
      * @return mixed
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     protected function resolveChildPath(
         ResourceTransformer $transformer,
@@ -245,6 +251,8 @@ class ResolverBase
      * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return bool
+     * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     protected function entityEquals(
         ResourceTransformer $transformer,
@@ -275,6 +283,7 @@ class ResolverBase
      * @param Context $context
      * @return bool
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     protected function entityExists(
         ResourceTransformer $transformer,
