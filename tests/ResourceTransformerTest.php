@@ -33,11 +33,7 @@ class ResourceTransformerTest extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $start = microtime(true);
         $resource = $transformer->toResource($definition, $model, $context);
-        $took = microtime(true) - $start;
-
-        var_dump($took * 1000);
 
         $this->assertEquals(
             [
