@@ -319,11 +319,14 @@ class ResolverBase
      */
     protected function methodExists($model, $method)
     {
-        if (!is_object($model)) {
-            return false;
+        // figure out the class name.
+        if (is_string($model)) {
+            $class = $model;
+        } else {
+            $class = get_class($model);
         }
 
-        $class = get_class($model);
+        // check if we have done this kind of thing before
         if (!isset($this->methodSniffer[$class])) {
             $this->methodSniffer[$class] = [];
         }
