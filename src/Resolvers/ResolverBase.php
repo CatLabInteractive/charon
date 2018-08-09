@@ -33,6 +33,11 @@ class ResolverBase
     const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
 
     /**
+     * @var array
+     */
+    private $methodSniffer = [];
+
+    /**
      * @param ResourceTransformer $transformer
      * @param $entity
      * @param string $path
@@ -154,11 +159,11 @@ class ResolverBase
     protected function getValueFromEntity($entity, $name, array $getterParameters)
     {
         // Check for get method
-        if (method_exists($entity, 'get'.ucfirst($name))) {
+        if ($this->methodExists($entity, 'get'.ucfirst($name))) {
             return call_user_func_array(array($entity, 'get'.ucfirst($name)), $getterParameters);
         }
 
-        elseif (method_exists($entity, 'is'.ucfirst($name))) {
+        elseif ($this->methodExists($entity, 'is'.ucfirst($name))) {
             return call_user_func_array(array($entity, 'is'.ucfirst($name)), $getterParameters);
         }
 
@@ -304,6 +309,26 @@ class ResolverBase
             }
         }
         return true;
+    }
+
+    /**
+     * Drop in replacement for method_exists, with caching.
+     * @param $model
+     * @param $method
+     * @return mixed
+     */
+    protected function methodExists($model, $method)
+    {
+        $class = get_class($model);
+        if (!isset($this->methodSniffer[$class])) {
+            $this->methodSniffer[$class] = [];
+        }
+
+        if (!isset($this->methodSniffer[$class][$method])) {
+            $this->methodSniffer[$class][$method] = method_exists($model, $method);
+        }
+
+        return $this->methodSniffer[$class][$method];
     }
 
     /**

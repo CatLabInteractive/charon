@@ -393,7 +393,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         $method = self::EAGER_LOAD_METHOD_PREFIX . ucfirst($name);
 
         // Check if method exist
-        if (method_exists($entityClassName, $method)) {
+        if ($this->methodExists($entityClassName, $method)) {
             $eagerLoadMethod = $entityClassName . '::' . $method;
             call_user_func_array($eagerLoadMethod, array_merge([ $entityCollection ], $parameters));
         }
