@@ -33,6 +33,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param Context $context
      * @return mixed
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     public function resolveProperty(ResourceTransformer $transformer, $entity, Field $field, Context $context)
     {
@@ -45,9 +46,9 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param mixed $entity
      * @param RelationshipValue $value
      * @param Context $context
-     * @return ResourceCollection
-     * @internal param RelationshipField $field
+     * @return \CatLab\Charon\Interfaces\ResourceCollection
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     public function resolveManyRelationship(
         ResourceTransformer $transformer,
@@ -71,7 +72,8 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param mixed $entity
      * @param RelationshipValue $value
      * @param Context $context
-     * @return RESTResource
+     * @return \CatLab\Charon\Interfaces\RESTResource
+     * @throws VariableNotFoundInContext
      */
     public function resolveOneRelationship(
         ResourceTransformer $transformer,
@@ -156,7 +158,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         if ($children) {
             foreach ($children as $child) {
                 $childContext = $this->getInputChildContext($transformer, $field, $context);
-                $out[] = $transformer->fromArray($field->getChildResource(), $child, $childContext);
+                $out->add($transformer->fromArray($field->getChildResource(), $child, $childContext));
             }
         }
 
@@ -240,6 +242,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param Context $context
      * @return mixed
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     public function getChildByIdentifiers(
         ResourceTransformer $transformer,
@@ -262,6 +265,8 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param RESTResource $resource
      * @param Context $context
      * @return bool
+     * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     public function doesResourceRepresentEntity(
         ResourceTransformer $transformer,
@@ -388,7 +393,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         $method = self::EAGER_LOAD_METHOD_PREFIX . ucfirst($name);
 
         // Check if method exist
-        if (method_exists($entityClassName, $method)) {
+        if ($this->methodExists($entityClassName, $method)) {
             $eagerLoadMethod = $entityClassName . '::' . $method;
             call_user_func_array($eagerLoadMethod, array_merge([ $entityCollection ], $parameters));
         }

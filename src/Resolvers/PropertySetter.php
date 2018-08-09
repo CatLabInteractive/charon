@@ -31,7 +31,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     protected function addChildrenToEntity($entity, $name, array $childEntities, $parameters = [])
     {
         // Check for add method
-        if (method_exists($entity, 'add'.ucfirst($name))) {
+        if ($this->methodExists($entity, 'add'.ucfirst($name))) {
             array_unshift($parameters, $childEntities);
             call_user_func_array(array($entity, 'add'.ucfirst($name)), $parameters);
         } else {
@@ -49,7 +49,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     protected function editChildrenInEntity($entity, $name, array $childEntities, $parameters = [])
     {
         // Check for add method
-        if (method_exists($entity, 'edit'.ucfirst($name))) {
+        if ($this->methodExists($entity, 'edit'.ucfirst($name))) {
             array_unshift($parameters, $childEntities);
             call_user_func_array(array($entity, 'edit'.ucfirst($name)), $parameters);
         } else {
@@ -67,7 +67,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     protected function removeChildrenFromEntity($entity, $name, $childEntities, $parameters = [])
     {
         // Check for add method
-        if (method_exists($entity, 'remove'.ucfirst($name))) {
+        if ($this->methodExists($entity, 'remove'.ucfirst($name))) {
             array_unshift($parameters, $childEntities);
             call_user_func_array(array($entity, 'remove'.ucfirst($name)), $parameters);
         } else {
@@ -86,7 +86,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     protected function setValueInEntity($entity, $name, $value, $setterParameters = [])
     {
         // Check for get method
-        if (method_exists($entity, 'set'.ucfirst($name))) {
+        if ($this->methodExists($entity, 'set'.ucfirst($name))) {
             array_unshift($setterParameters, $value);
             return call_user_func_array(array($entity, 'set'.ucfirst($name)), $setterParameters);
         }
@@ -99,7 +99,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         }
 
         elseif (
-            method_exists($entity, 'hasAttribute') &&
+            $this->methodExists($entity, 'hasAttribute') &&
             call_user_func([ $entity, 'hasAttribute'], $name)
         ) {
             $entity->$name = $value;
