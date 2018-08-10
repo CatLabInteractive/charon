@@ -73,7 +73,7 @@ class ResolverBase
     {
         // can we do this easier?
         if (strpos($path, self::CHILDPATH_VARIABLE_OPEN) === false) {
-            return explode('/', $path);
+            return explode(self::CHILDPATH_PATH_SEPARATOR, $path);
         }
 
         // First detect all variables
