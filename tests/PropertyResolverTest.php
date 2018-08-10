@@ -22,6 +22,11 @@ class PropertyResolverTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
+            [ 'parameter', 'parameter2' ],
+            $propertyResolver->splitPathParameters('parameter.parameter2')
+        );
+
+        $this->assertEquals(
             [ 'parameter', '{variable}' ],
             $propertyResolver->splitPathParameters('parameter.{variable}')
         );
