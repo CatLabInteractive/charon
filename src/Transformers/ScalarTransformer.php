@@ -101,7 +101,7 @@ class ScalarTransformer implements Transformer
     {
         switch ($this->type) {
             case PropertyType::BOOL:
-                return !!$value;
+                return !!$value && strtolower($value) !== 'false';
 
             case PropertyType::INTEGER:
                 return intval($value);
