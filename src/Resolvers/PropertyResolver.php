@@ -115,7 +115,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         Field $field,
         Context $context
     ) {
-        if (!isset($input[$field->getDisplayName()])) {
+        if (!array_key_exists($field->getDisplayName(), $input)) {
             throw ValueUndefined::make($field->getDisplayName());
         }
         return $input[$field->getDisplayName()];
