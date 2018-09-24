@@ -104,12 +104,20 @@ class ScalarTransformer implements Transformer
                 return !!$value && strtolower($value) !== 'false';
 
             case PropertyType::INTEGER:
+                if (!is_int($value)) {
+                    return null;
+                }
+
                 return intval($value);
 
             case PropertyType::NUMBER:
+                if (!is_numeric($value)) {
+                    return null;
+                }
+
                 return floatval($value);
 
-            case PropertyType::NUMBER:
+            case PropertyType::STRING:
                 return strval($value);
 
             default:
