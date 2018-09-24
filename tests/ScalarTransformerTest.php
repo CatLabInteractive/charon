@@ -32,4 +32,18 @@ class ScalarTransformerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($transformer->toParameterValue(1));
         $this->assertTrue($transformer->toParameterValue('1'));
     }
+
+    /**
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
+     */
+    public function testIntegerTransformer()
+    {
+        $transformer = new ScalarTransformer(PropertyType::INTEGER);
+
+        $this->assertEquals(1, $transformer->toParameterValue('1'));
+        $this->assertEquals(3, $transformer->toParameterValue(3));
+
+        $this->assertNull($transformer->toParameterValue('2.2'));
+        $this->assertNull($transformer->toParameterValue('fubar'));
+    }
 }
