@@ -8,6 +8,9 @@ use CatLab\Charon\Interfaces\Transformer;
 
 /**
  * Class BooleanTransformer
+ *
+ * @deprecated Use ScalarTransformer
+ *
  * @package CatLab\Charon\Transformers
  */
 class BooleanTransformer implements Transformer

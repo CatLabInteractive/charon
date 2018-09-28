@@ -7,10 +7,12 @@ require_once 'Models/MockResourceDefinition.php';
 /**
  * Class ResourceTransformerTest
  */
-class ResourceTransformerTest
+class ResourceTransformerTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     * @throws \CatLab\Charon\Exceptions\InvalidEntityException
+     * @throws \CatLab\Charon\Exceptions\InvalidPropertyException
      */
     public function testResourceTransformer()
     {

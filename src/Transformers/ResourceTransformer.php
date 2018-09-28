@@ -190,15 +190,21 @@ class ResourceTransformer implements ResourceTransformerContract
             throw InvalidContextAction::expectedReadable($context->getAction());
         }
 
-        // Always start from a fresh context.
-        $context = $context->fork();
+        // Dynamic context required?
+        if (
+            $resourceDefinition instanceof DynamicContext ||
+            $entity instanceof DynamicContext
+        ) {
+            // In case of dynamic context we must start from a fork of the context
+            $context = $context->fork();
 
-        if ($resourceDefinition instanceof DynamicContext) {
-            $resourceDefinition->transformContext($context, $entity);
-        }
+            if ($resourceDefinition instanceof DynamicContext) {
+                $resourceDefinition->transformContext($context, $entity);
+            }
 
-        if ($entity instanceof DynamicContext) {
-            $entity->transformContext($context, $entity);
+            if ($entity instanceof DynamicContext) {
+                $entity->transformContext($context, $entity);
+            }
         }
 
         $resource = new RESTResource($resourceDefinition);

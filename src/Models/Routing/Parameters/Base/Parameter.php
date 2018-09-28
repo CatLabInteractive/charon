@@ -14,6 +14,7 @@ use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Transformers\ArrayTransformer;
 use CatLab\Charon\Transformers\BooleanTransformer;
+use CatLab\Charon\Transformers\ScalarTransformer;
 use CatLab\Charon\Transformers\TransformerQueue;
 use CatLab\Requirements\Exists;
 use CatLab\Requirements\InArray;
@@ -307,7 +308,7 @@ class Parameter implements RouteMutator, Property
      * @param string $transformer
      * @return $this
      */
-    public function transformer(string $transformer)
+    public function transformer($transformer)
     {
         $this->transformers[] = $transformer;
         return $this;
@@ -349,6 +350,7 @@ class Parameter implements RouteMutator, Property
     /**
      * @param string $transformer
      * @return $this
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     public function datetime($transformer = null)
     {
@@ -362,16 +364,25 @@ class Parameter implements RouteMutator, Property
 
     /**
      * @param $type
+     * @param string $transformer
      * @return $this
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    public function setType($type)
+    public function setType($type, $transformer = 'default')
     {
         $this->traitSetType($type);
 
-        switch ($type) {
-            case PropertyType::BOOL:
-                $this->transformer(BooleanTransformer::class);
-                break;
+        if ($transformer === 'default') {
+            switch ($type) {
+                case PropertyType::BOOL:
+                case PropertyType::INTEGER:
+                case PropertyType::NUMBER:
+                case PropertyType::STRING:
+                    $this->transformer(new ScalarTransformer($type));
+                    break;
+            }
+        } elseif ($transformer !== null) {
+            $this->transformer($transformer);
         }
 
         return $this;

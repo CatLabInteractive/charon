@@ -33,6 +33,11 @@ class ResolverBase
     const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
 
     /**
+     * @var array
+     */
+    private $methodSniffer = [];
+
+    /**
      * @param ResourceTransformer $transformer
      * @param $entity
      * @param string $path
@@ -66,6 +71,11 @@ class ResolverBase
      */
     protected function splitPathParameters(string $path)
     {
+        // can we do this easier?
+        if (strpos($path, self::CHILDPATH_VARIABLE_OPEN) === false) {
+            return explode(self::CHILDPATH_PATH_SEPARATOR, $path);
+        }
+
         // First detect all variables
         $regex = '/' . self::REGEX_ACCOLADE_PARAMETER . '|' . self::REGEX_REGULAR_PARAMETER . '/';
 
@@ -149,11 +159,11 @@ class ResolverBase
     protected function getValueFromEntity($entity, $name, array $getterParameters)
     {
         // Check for get method
-        if (method_exists($entity, 'get'.ucfirst($name))) {
+        if ($this->methodExists($entity, 'get'.ucfirst($name))) {
             return call_user_func_array(array($entity, 'get'.ucfirst($name)), $getterParameters);
         }
 
-        elseif (method_exists($entity, 'is'.ucfirst($name))) {
+        elseif ($this->methodExists($entity, 'is'.ucfirst($name))) {
             return call_user_func_array(array($entity, 'is'.ucfirst($name)), $getterParameters);
         }
 
@@ -182,6 +192,7 @@ class ResolverBase
      * @param Context $context
      * @return mixed
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     protected function resolveChildPath(
         ResourceTransformer $transformer,
@@ -245,6 +256,8 @@ class ResolverBase
      * @param PropertyValueCollection $identifiers
      * @param Context $context
      * @return bool
+     * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     protected function entityEquals(
         ResourceTransformer $transformer,
@@ -275,6 +288,7 @@ class ResolverBase
      * @param Context $context
      * @return bool
      * @throws InvalidPropertyException
+     * @throws VariableNotFoundInContext
      */
     protected function entityExists(
         ResourceTransformer $transformer,
@@ -295,6 +309,17 @@ class ResolverBase
             }
         }
         return true;
+    }
+
+    /**
+     * Drop in replacement for method_exists, with caching.
+     * @param $model
+     * @param $method
+     * @return mixed
+     */
+    protected function methodExists($model, $method)
+    {
+        return method_exists($model, $method);
     }
 
     /**

@@ -108,9 +108,8 @@ class TransformerQueue implements Transformer
      */
     public function __sleep()
     {
-        // We only need to store the classnames of the transformers.
         foreach ($this->getTransformers() as $k => $v) {
-            $this->transformers[$k] = get_class($v);
+            $this->transformers[$k] = TransformerLibrary::serialize($v);
         }
 
         return [
