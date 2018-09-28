@@ -34,7 +34,9 @@ interface RESTResource extends SerializableResource
     public function getSource();
 
     /**
+     * @param Context $context
+     * @param string $path
      * @return mixed
      */
-    public function validate();
+    public function validate(Context $context, string $path = '');
 }

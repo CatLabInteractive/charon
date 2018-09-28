@@ -227,12 +227,12 @@ abstract class RelationshipValue extends Value
     }
 
     /**
+     * @param Context $context
      * @param string $path
      * @throws PropertyValidationException
      * @throws ResourceException
-     * @throws \CatLab\Requirements\Exceptions\ResourceValidationException
      */
-    public function validate(string $path)
+    public function validate(Context $context, string $path)
     {
         $messages = new MessageCollection();
 
@@ -249,7 +249,7 @@ abstract class RelationshipValue extends Value
                 /** @var RESTResource $child */
                 if ($child) {
                     try {
-                        $child->validate($this->appendToPath($path, $field));
+                        $child->validate($context, $this->appendToPath($path, $field));
                     } catch (ResourceValidationException $e) {
                         $messages->merge($e->getMessages());
                     }

@@ -145,8 +145,9 @@ abstract class Value
     }
 
     /**
+     * @param Context $context
      * @param string $path
      * @return
      */
-    abstract public function validate(string $path);
+    abstract public function validate(Context $context, string $path);
 }

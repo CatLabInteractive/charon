@@ -21,6 +21,7 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
     public function testPetInput()
     {
         $transformer = new ResourceTransformer();
+        $context = new Context(Action::CREATE);
 
         $resource = $transformer->fromArray(
             PetDefinition::class,
@@ -37,10 +38,10 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            new Context(Action::CREATE)
+            $context
         );
 
-        $resource->validate();
+        $resource->validate($context);
     }
 
     /**
@@ -49,6 +50,7 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
     public function testPetNotEnoughPhotos()
     {
         $transformer = new ResourceTransformer();
+        $context = new Context(Action::CREATE);
 
         $resource = $transformer->fromArray(
             PetDefinition::class,
@@ -62,9 +64,9 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            new Context(Action::CREATE)
+            $context
         );
 
-        $resource->validate();
+        $resource->validate($context);
     }
 }

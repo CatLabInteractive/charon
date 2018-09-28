@@ -67,9 +67,11 @@ class LinkValue extends Value
     }
 
     /**
+     * @param Context $context
      * @param string $path
+     * @throws PropertyValidationException
      */
-    public function validate(string $path)
+    public function validate(Context $context, string $path)
     {
         $this->getField()->validate($this->value, $path);
     }

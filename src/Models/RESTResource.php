@@ -209,23 +209,31 @@ class RESTResource implements ResourceContract
     }
 
     /**
+     * @param \CatLab\Charon\Interfaces\Context $context
      * @param string $path
      * @return mixed
      * @throws ResourceValidationException
      */
-    public function validate(string $path = '')
+    public function validate(\CatLab\Charon\Interfaces\Context $context, string $path = '')
     {
         $messages = new MessageCollection();
 
         foreach ($this->getResourceDefinition()->getFields() as $field) {
+
             /** @var ResourceField $field */
+
+            // Is field applicable?
+            if (!$field->hasAction($context->getAction())) {
+                continue;
+            }
+
             $value = $this->properties->getProperty($field);
 
             try {
                 if (!isset($value)) {
                     $field->validate(null, $path);
                 } else {
-                    $value->validate($path);
+                    $value->validate($context, $path);
                 }
             } catch(PropertyValidationException $e) {
                 $messages->merge($e->getMessages());
