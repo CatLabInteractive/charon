@@ -224,6 +224,16 @@ class Field implements Property, ResourceDefinitionManipulator
 
     /**
      * Finish this field and start a new one
+     * @param array $name
+     * @return ResourceField
+     */
+    public function fields(array $name)
+    {
+        return $this->resourceDefinition->fields($name);
+    }
+
+    /**
+     * Finish this field and start a new one
      * @param string $name
      * @param string $resourceDefinitionClass
      * @return RelationshipField
