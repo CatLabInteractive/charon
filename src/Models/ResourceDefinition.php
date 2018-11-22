@@ -55,6 +55,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function __construct($entityClassName = null)
     {
         $this->entityClassName = $entityClassName;
+
         $this->fields = new ResourceFieldCollection();
         $this->validators = new ValidatorCollection();
     }
@@ -72,15 +73,18 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     }
 
     /**
-     * @param string $name
+     * @param string|array $name
      * @return ResourceField|PropertyGroup
      */
     public function field($name)
     {
         if (is_array($name)) {
             $fields = [];
-            foreach ($name as $v) {
+            foreach ($name as $k => $v) {
                 $field = new ResourceField($this, $v);
+                if (!is_int($k)) {
+                    $field->setDisplayName($k);
+                }
                 $fields[] = $field;
                 $this->fields->add($field);
             }
@@ -91,6 +95,15 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
 
             return $field;
         }
+    }
+
+    /**
+     * @param array $fields
+     * @return PropertyGroup|ResourceField
+     */
+    public function fields(array $fields)
+    {
+        return $this->field($fields);
     }
 
     /**
