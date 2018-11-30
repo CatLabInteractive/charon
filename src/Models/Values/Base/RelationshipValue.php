@@ -249,7 +249,7 @@ abstract class RelationshipValue extends Value
                 /** @var RESTResource $child */
                 if ($child) {
                     try {
-                        $child->validate($context, $this->appendToPath($path, $field));
+                        $child->validate($context, null, $this->appendToPath($path, $field));
                     } catch (ResourceValidationException $e) {
                         $messages->merge($e->getMessages());
                     }

@@ -35,8 +35,9 @@ interface RESTResource extends SerializableResource
 
     /**
      * @param Context $context
+     * @param null $original Original source entity
      * @param string $path
      * @return mixed
      */
-    public function validate(Context $context, string $path = '');
+    public function validate(Context $context, $original = null, string $path = '');
 }

@@ -3,8 +3,10 @@
 namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Models\Values\PropertyValue;
+use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
+use CatLab\Requirements\Exceptions\RequirementValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
@@ -211,11 +213,16 @@ class RESTResource implements ResourceContract
     /**
      * @param \CatLab\Charon\Interfaces\Context $context
      * @param string $path
+     * @param null $original
      * @return mixed
      * @throws ResourceValidationException
+     * @throws RequirementValidationException
      */
-    public function validate(\CatLab\Charon\Interfaces\Context $context, string $path = '')
-    {
+    public function validate(
+        \CatLab\Charon\Interfaces\Context $context,
+        $original = null,
+        string $path = ''
+    ) {
         $messages = new MessageCollection();
 
         foreach ($this->getResourceDefinition()->getFields() as $field) {
@@ -241,10 +248,17 @@ class RESTResource implements ResourceContract
         }
 
         // Also check all resource wide requirements
-        try {
-            $this->getResourceDefinition()->getValidators()->validate($this);
-        } catch(ResourceValidationException $e) {
-            $messages->merge($e->getMessages());
+        foreach ($this->getResourceDefinition()->getValidators() as $validator) {
+            try {
+                if ($validator instanceof ResourceValidator) {
+                    $validator->setOriginal($original);
+                }
+                $validator->validate($this);
+            } catch(ValidatorValidationException $e) {
+                $messages->add($e->getValidator()->getErrorMessage($e));
+            } catch(RequirementValidationException $e) {
+                throw $e;
+            }
         }
 
         if (count($messages) > 0) {
