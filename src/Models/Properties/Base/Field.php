@@ -342,10 +342,10 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
-     * @param string $transformer
+     * @param string|Transformer $transformer
      * @return $this
      */
-    public function transformer(string $transformer)
+    public function transformer($transformer)
     {
         $this->transformer = $transformer;
         return $this;
