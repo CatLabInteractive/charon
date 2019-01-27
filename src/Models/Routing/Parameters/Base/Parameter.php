@@ -288,7 +288,7 @@ class Parameter implements RouteMutator, Property
     public function merge(Parameter $parameter)
     {
         foreach ($parameter->getRequirements() as $requirement) {
-            $parameter->addRequirement($requirement);
+            $this->addRequirement($requirement);
         }
 
         $this->allowMultiple($parameter->allowMultiple);
