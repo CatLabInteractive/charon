@@ -21,6 +21,13 @@ interface ResourceDefinitionManipulator
 
     /**
      * Finish this field and start a new one
+     * @param array $fields
+     * @return ResourceField
+     */
+    public function fields(array $fields);
+
+    /**
+     * Finish this field and start a new one
      * @param string $name
      * @param string $resourceDefinitionClass
      * @return RelationshipField
