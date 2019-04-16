@@ -2,7 +2,6 @@
 
 namespace CatLab\Charon\Models;
 
-use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
