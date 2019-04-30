@@ -188,7 +188,7 @@ class RouteCollection extends RouteProperties
 
                     return 'View a single ' . $entityName;
                 })
-                ->parameters()->path($id)->int()->required()
+                ->parameters()->path($id)->string()->required()
                 ->returns()->statusCode(200)->one($resourceDefinition);
         }
 
@@ -212,7 +212,7 @@ class RouteCollection extends RouteProperties
 
                     return 'Update an existing ' . $entityName;
                 })
-                ->parameters()->path($id)->int()->required()
+                ->parameters()->path($id)->string()->required()
                 ->parameters()->resource($resourceDefinition)->required()
                 ->returns()->statusCode(200)->one($resourceDefinition);
         }
@@ -225,7 +225,7 @@ class RouteCollection extends RouteProperties
 
                     return 'Delete a ' . $entityName;
                 })
-                ->parameters()->path($id)->int()->required()
+                ->parameters()->path($id)->string()->required()
             ;
         }
 
@@ -258,7 +258,7 @@ class RouteCollection extends RouteProperties
                     $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
-                ->parameters()->path($parentId)->int()->required()
+                ->parameters()->path($parentId)->string()->required()
                 ->returns()->statusCode(200)->many($resourceDefinition);
         }
 
@@ -270,7 +270,7 @@ class RouteCollection extends RouteProperties
 
                     return 'View a single ' . $entityName;
                 })
-                ->parameters()->path($id)->int()->required()
+                ->parameters()->path($id)->string()->required()
                 ->returns()->statusCode(200)->one($resourceDefinition);
         }
 
@@ -283,7 +283,7 @@ class RouteCollection extends RouteProperties
                     return 'Create a new ' . $entityName;
                 })
                 ->parameters()->resource($resourceDefinition)->required()
-                ->parameters()->path($parentId)->int()->required()
+                ->parameters()->path($parentId)->string()->required()
                 ->returns()->statusCode(200)->one($resourceDefinition);
         }
 
@@ -295,7 +295,7 @@ class RouteCollection extends RouteProperties
 
                     return 'Update an existing ' . $entityName;
                 })
-                ->parameters()->path($id)->int()->required()
+                ->parameters()->path($id)->string()->required()
                 ->parameters()->resource($resourceDefinition)->required()
                 ->returns()->statusCode(200)->one($resourceDefinition);
         }
@@ -308,7 +308,7 @@ class RouteCollection extends RouteProperties
 
                     return 'Delete a ' . $entityName;
                 })
-                ->parameters()->path($id)->int()->required()
+                ->parameters()->path($id)->string()->required()
             ;
         }
 

@@ -2,11 +2,13 @@
 
 namespace CatLab\Charon\Models\Properties\Base;
 
+use CatLab\Charon\Exceptions\InvalidScalarException;
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
 use CatLab\Charon\Interfaces\Transformer;
 use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Transformers\DateTransformer;
+use CatLab\Charon\Transformers\ScalarTransformer;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Interfaces\Property;
 use CatLab\Charon\Enums\Action;
@@ -25,7 +27,9 @@ use CatLab\Requirements\Interfaces\Validator;
  */
 class Field implements Property, ResourceDefinitionManipulator
 {
-    use \CatLab\Requirements\Traits\RequirementSetter;
+    use \CatLab\Requirements\Traits\RequirementSetter {
+        setType as traitSetType;
+    }
 
     /**
      * Define in which contexts this attribute should be visible
@@ -79,6 +83,27 @@ class Field implements Property, ResourceDefinitionManipulator
         $this->name = $fieldName;
         $this->displayName = $fieldName;
         $this->resourceDefinition = $resourceDefinition;
+    }
+
+    /**
+     * @param string $type
+     * @param bool $useTransformer
+     * @return $this
+     */
+    public function setType($type, $useTransformer = true)
+    {
+        $this->traitSetType($type);
+
+        // Set scalar transformer if type is not string.
+        if ($useTransformer && $type !== PropertyType::STRING) {
+            try {
+                $this->transformer(new ScalarTransformer($type));
+            } catch (InvalidScalarException $e) {
+                // silently ignore
+            }
+        }
+
+        return $this;
     }
 
     /**
