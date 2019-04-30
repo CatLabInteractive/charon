@@ -95,11 +95,20 @@ class Field implements Property, ResourceDefinitionManipulator
         $this->traitSetType($type);
 
         // Set scalar transformer if type is not string.
-        if ($useTransformer && $type !== PropertyType::STRING) {
-            try {
-                $this->transformer(new ScalarTransformer($type));
-            } catch (InvalidScalarException $e) {
-                // silently ignore
+        if ($useTransformer) {
+
+            switch ($type) {
+                case PropertyType::BOOL:
+                case PropertyType::INTEGER:
+                case PropertyType::NUMBER:
+
+                    try {
+                        $this->transformer(new ScalarTransformer($type));
+                    } catch (InvalidScalarException $e) {
+                        // silently ignore
+                    }
+
+                    break;
             }
         }
 
