@@ -58,7 +58,7 @@ class ChildrenValue extends RelationshipValue
     }
 
     /**
-     * @return \Resource[]
+     * @return ResourceCollection
      */
     protected function getChildrenToProcess()
     {

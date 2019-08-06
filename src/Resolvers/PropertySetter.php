@@ -87,25 +87,25 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     {
         // Check for get method
         if ($this->methodExists($entity, 'set'.ucfirst($name))) {
+
             array_unshift($setterParameters, $value);
             return call_user_func_array(array($entity, 'set'.ucfirst($name)), $setterParameters);
-        }
 
-        elseif (
+        } elseif (
             is_object($entity) &&
             property_exists($entity, $name)
         ) {
-            $entity->$name = $value;
-        }
 
-        elseif (
+            $entity->$name = $value;
+
+        } elseif (
             $this->methodExists($entity, 'hasAttribute') &&
             call_user_func([ $entity, 'hasAttribute'], $name)
         ) {
-            $entity->$name = $value;
-        }
 
-        else {
+            $entity->$name = $value;
+
+        } else {
             throw InvalidPropertyException::create($name, get_class($entity));
         }
     }
@@ -143,6 +143,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param Field $field
      * @param mixed $value
      * @param Context $context
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function setEntityValue(
         ResourceTransformer $transformer,
@@ -163,6 +165,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param $childEntities
      * @param Context $context
      * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function addChildren(
         ResourceTransformer $transformer,
@@ -182,6 +185,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param RelationshipField $field
      * @param $childEntities
      * @param Context $context
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function editChildren(
         ResourceTransformer $transformer,
@@ -202,6 +207,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param RelationshipField $field
      * @param $childEntities
      * @param Context $context
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function removeChildren(
         ResourceTransformer $transformer,
@@ -220,6 +227,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param RelationshipField $field
      * @param mixed $value
      * @param Context $context
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function setChild(
         ResourceTransformer $transformer,
@@ -237,6 +246,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param mixed $entity
      * @param RelationshipField $field
      * @param Context $context
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function clearChild(
         ResourceTransformer $transformer,
@@ -256,6 +267,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param Context $context
      * @return array
      * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     protected function resolvePath(
         ResourceTransformer $transformer,
@@ -287,6 +299,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param PropertyValueCollection[] $identifiers
      * @param Context $context
      * @return mixed
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function removeAllChildrenExcept(
         ResourceTransformer $transformer,
@@ -313,7 +327,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
             )) {
                 continue 1;
             }
-            
+
             $found = false;
             foreach ($identifiers as $identifierk => $identifier) {
                 if ($this->entityEquals($transformer, $child, $identifier, $context)) {

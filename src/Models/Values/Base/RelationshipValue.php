@@ -8,7 +8,6 @@ use CatLab\Requirements\Exceptions\RequirementValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
 use CatLab\Requirements\Exists;
 use CatLab\Charon\Collections\PropertyValueCollection;
-use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\EntityFactory;
@@ -21,8 +20,6 @@ use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Models\Properties\RelationshipField;
-use CatLab\Charon\Models\Properties\ResourceField;
-use CatLab\Charon\Models\Values\ChildrenValue;
 
 /**
  * Class RelationshipValue
@@ -43,6 +40,25 @@ abstract class RelationshipValue extends Value
      * @return
      */
     abstract protected function addChildren(
+        ResourceTransformer $transformer,
+        PropertySetter $propertySetter,
+        $entity,
+        RelationshipField $field,
+        array $childEntities,
+        Context $context
+    );
+
+    /**
+     * Add a child to a collection
+     * @param ResourceTransformer $transformer
+     * @param PropertySetter $propertySetter
+     * @param $entity
+     * @param RelationshipField $field
+     * @param array $childEntities
+     * @param Context $context
+     * @return
+     */
+    abstract protected function editChildren(
         ResourceTransformer $transformer,
         PropertySetter $propertySetter,
         $entity,
@@ -124,74 +140,25 @@ abstract class RelationshipValue extends Value
          */
         $identifiersToKeep = [];
 
-        /** @var RelationshipField $field */
-        $field = $this->getField();
-
         foreach ($children as $child) {
             if (!$child) {
-                continue;
+                return;
             }
 
-            /** @var RESTResource $child */
-
-            /** @var bool $isNew */
-            $isNew = $child->isNew();
-
-            $childIdentifiers = $child->getProperties()->getIdentifiers();
-
-            $childEntity = null;
-            if (!$isNew) {
-                $childEntity = $this->getChildByIdentifiers(
-                    $resourceTransformer,
-                    $propertyResolver,
-                    $parent,
-                    $childIdentifiers,
-                    $context
-                );
-
-                if ($childEntity) {
-                    $identifiersToKeep[] = $childIdentifiers;
-                }
-            }
-
-            // Do we just link the resource? In this case we can't edit it right now.
-            if ($field->canLinkExistingEntities()) {
-                $entity = $factory->resolveLinkedEntity(
-                    $parent,
-                    $child->getResourceDefinition()->getEntityClassName(),
-                    $childIdentifiers->toMap(),
-                    $context
-                );
-
-                if ($entity) {
-                    $childrenToAdd[] = $entity;
-                    $identifiersToKeep[] = $childIdentifiers;
-                    continue;
-                }
-            }
-
-            // Is this a new child? We might not be able to add it...
-            if (!$childEntity && !$field->canCreateNewChildren()) {
-                throw new InvalidPropertyException(
-                    "Only existing items can be linked to " . get_class($parent) . "->" . $field->getName()
-                );
-            }
-
-            $entity = $resourceTransformer->toEntity(
+            $this->childResourceToEntity(
+                $parent,
                 $child,
-                $child->getResourceDefinition(),
+                $resourceTransformer,
+                $propertyResolver,
                 $factory,
                 $context,
-                $childEntity
+                $childrenToAdd,
+                $childrenToEdit,
+                $identifiersToKeep
             );
-
-            if (!isset($childEntity)) {
-                $childrenToAdd[] = $entity;
-            } else {
-                $childrenToEdit[] = $entity;
-            }
         }
 
+        // Now do the actual executing
         if (count($childrenToAdd) > 0) {
             $this->addChildren(
                 $resourceTransformer,
@@ -227,10 +194,98 @@ abstract class RelationshipValue extends Value
     }
 
     /**
+     * @param $parent
+     * @param RESTResource $child
+     * @param ResourceTransformer $resourceTransformer
+     * @param PropertyResolver $propertyResolver
+     * @param EntityFactory $factory
+     * @param Context $context
+     * @throws InvalidPropertyException
+     */
+    private function childResourceToEntity(
+        $parent,
+        RESTResource $child,
+        ResourceTransformer $resourceTransformer,
+        PropertyResolver $propertyResolver,
+        EntityFactory $factory,
+        Context $context,
+        &$childrenToAdd,
+        &$childrenToEdit,
+        &$identifiersToKeep
+    ) {
+        /** @var RelationshipField $field */
+        $field = $this->getField();
+
+        $childIdentifiers = $child->getProperties()->getIdentifiers();
+
+        /** @var bool $isNew */
+        $isNew = $child->isNew();
+
+        $childEntity = null;
+
+        if (!$isNew) {
+            $childEntity = $this->getChildByIdentifiers(
+                $resourceTransformer,
+                $propertyResolver,
+                $parent,
+                $childIdentifiers,
+                $context
+            );
+
+            if ($childEntity) {
+                $identifiersToKeep[] = $childIdentifiers;
+
+                // if we can't edit the child from here, there is no points in going further.
+                if (!$field->canCreateNewChildren()) {
+                    return;
+                }
+            }
+        }
+
+        // Do we just link the resource? In this case we can't edit it right now.
+        if ($field->canLinkExistingEntities() && !$childEntity) {
+            $entity = $factory->resolveLinkedEntity(
+                $parent,
+                $child->getResourceDefinition()->getEntityClassName(),
+                $childIdentifiers->toMap(),
+                $context
+            );
+
+            if ($entity) {
+                $childrenToAdd[] = $entity;
+                $identifiersToKeep[] = $childIdentifiers;
+                return;
+            }
+        }
+
+        // Is this a new child? We might not be able to add it...
+        if (!$childEntity && !$field->canCreateNewChildren()) {
+            throw new InvalidPropertyException(
+                "Only existing items can be linked to " . get_class($parent) . "->" . $field->getName()
+            );
+        }
+
+        $entity = $resourceTransformer->toEntity(
+            $child,
+            $child->getResourceDefinition(),
+            $factory,
+            $context,
+            $childEntity
+        );
+
+        if (!isset($childEntity)) {
+            $childrenToAdd[] = $entity;
+        } elseif ($field->canCreateNewChildren()) {
+            $childrenToEdit[] = $entity;
+        }
+    }
+
+    /**
      * @param Context $context
      * @param string $path
      * @throws PropertyValidationException
      * @throws ResourceException
+     * @throws RequirementValidationException
      */
     public function validate(Context $context, string $path)
     {

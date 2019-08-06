@@ -82,6 +82,23 @@ class ChildValue extends RelationshipValue
     }
 
     /**
+     * Add a child to a collection
+     * @param ResourceTransformer $transformer
+     * @param PropertySetter $propertySetter
+     * @param $entity
+     * @param RelationshipField $field
+     * @param array $childEntities
+     * @param Context $context
+     * @return
+     */
+    protected function editChildren(ResourceTransformer $transformer, PropertySetter $propertySetter, $entity, RelationshipField $field, array $childEntities, Context $context)
+    {
+        if (count($childEntities) > 0) {
+            $propertySetter->editChildren($transformer, $entity, $this->getField(), $childEntities[0], $context);
+        }
+    }
+
+    /**
      * @param ResourceTransformer $transformer
      * @param PropertyResolver $propertyResolver
      * @param $parent

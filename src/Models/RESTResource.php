@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models;
 
+use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -166,7 +167,7 @@ class RESTResource implements ResourceContract
      */
     public function isNew()
     {
-        // No identifiers found? Then all entries are always new.
+        // No identifiers found? Then all entries are always new... unless the field is linkable.
         if ($identifiers = $this->getProperties()->getIdentifiers()->count() === 0) {
             return true;
         }

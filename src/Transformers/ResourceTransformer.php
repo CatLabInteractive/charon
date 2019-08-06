@@ -175,6 +175,7 @@ class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidPropertyException
      * @throws IterableExpected
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
     public function toResource(
         $resourceDefinition,
