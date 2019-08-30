@@ -14,6 +14,11 @@ use CatLab\Requirements\Collections\ValidatorCollection;
 interface ResourceDefinition
 {
     /**
+     * @return string
+     */
+    public function getType();
+
+    /**
      * Return the full class name of the expected entities.
      * @return string
      */

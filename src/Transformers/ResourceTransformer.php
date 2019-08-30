@@ -543,6 +543,7 @@ class ResourceTransformer implements ResourceTransformerContract
             return;
         }
 
+        $url = $this->propertyResolver->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         switch ($field->getCardinality()) {
             case Cardinality::MANY:
                 $children = $this->propertyResolver->resolveManyRelationship(
@@ -552,7 +553,7 @@ class ResourceTransformer implements ResourceTransformerContract
                     $context
                 );
 
-                $resource->setChildrenProperty($field, $children, $visible);
+                $resource->setChildrenProperty($field, $url, $children, $visible);
                 break;
 
             case Cardinality::ONE:
@@ -564,9 +565,9 @@ class ResourceTransformer implements ResourceTransformerContract
                 );
 
                 if ($child) {
-                    $resource->setChildProperty($field, $child, $visible);
+                    $resource->setChildProperty($field, $url, $child, $visible);
                 } else {
-                    $resource->clearProperty($field);
+                    $resource->clearProperty($field, $url);
                 }
                 break;
 
@@ -598,15 +599,15 @@ class ResourceTransformer implements ResourceTransformerContract
                     $context
                 );
 
-                $resource->setChildrenProperty($field, $children, true);
+                $resource->setChildrenProperty($field, null, $children, true);
                 break;
 
             case Cardinality::ONE:
                 $child = $this->propertyResolver->resolveOneRelationshipInput($this, $body, $field, $context);
                 if ($child) {
-                    $resource->setChildProperty($field, $child, true);
+                    $resource->setChildProperty($field, null, $child, true);
                 } else {
-                    $resource->setChildProperty($field, null, true);
+                    $resource->setChildProperty($field, null, null, true);
                 }
                 break;
 
@@ -631,11 +632,8 @@ class ResourceTransformer implements ResourceTransformerContract
         Context $context,
         $visible
     ) {
-        $resource->setLink(
-            $field,
-            $this->propertyResolver->resolvePathParameters($this, $entity, $field->getUrl(), $context),
-            $visible
-        );
+        $url = $this->propertyResolver->resolvePathParameters($this, $entity, $field->getUrl(), $context);
+        $resource->setLink($field, $url, $visible);
     }
 
     /**

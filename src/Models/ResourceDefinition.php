@@ -49,6 +49,11 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     private $defaultOrder;
 
     /**
+     * @var string
+     */
+    private $type;
+
+    /**
      * ResourceDefinition constructor.
      * @param string $entityClassName
      */
@@ -58,6 +63,28 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
 
         $this->fields = new ResourceFieldCollection();
         $this->validators = new ValidatorCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        if (isset($this->type)) {
+            return $this->type;
+        }
+
+        return mb_strtolower($this->getEntityName());
+    }
+
+    /**
+     * @param $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
     }
 
     /**

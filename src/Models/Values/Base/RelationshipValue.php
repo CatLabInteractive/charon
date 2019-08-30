@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Values\Base;
 
+use CatLab\Charon\Models\Values\ChildrenValue;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\RequirementValidationException;
@@ -27,6 +28,16 @@ use CatLab\Charon\Models\Properties\RelationshipField;
  */
 abstract class RelationshipValue extends Value
 {
+    /**
+     * @var string
+     */
+    private $url;
+
+    /**
+     * @return RESTResource[]
+     */
+    abstract public function getChildren();
+
     abstract protected function getChildrenToProcess();
 
     /**
@@ -102,6 +113,24 @@ abstract class RelationshipValue extends Value
         PropertyValueCollection $identifiers,
         Context $context
     );
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     * @return RelationshipValue
+     */
+    public function setUrl(string $url): RelationshipValue
+    {
+        $this->url = $url;
+        return $this;
+    }
 
     /**
      * @return RelationshipField

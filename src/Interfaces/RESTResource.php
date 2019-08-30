@@ -11,6 +11,11 @@ use CatLab\Charon\Collections\PropertyValueCollection;
 interface RESTResource extends SerializableResource
 {
     /**
+     * @return string
+     */
+    public function getType();
+
+    /**
      * @return mixed
      */
     public function toArray();

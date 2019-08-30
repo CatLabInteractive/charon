@@ -84,16 +84,16 @@ class RESTResource implements ResourceContract
      * @param Field $field
      * @return \CatLab\Charon\Models\Values\ChildrenValue
      */
-    public function touchChildrenProperty(Field $field)
+    public function touchChildrenProperty(Field $field, $url)
     {
-        return $this->properties->getChildren($field);
+        return $this->properties->getChildren($field, $url);
     }
 
     /**
      * @param Field $field
      * @return $this
      */
-    public function clearProperty(Field $field)
+    public function clearProperty(Field $field, $url)
     {
         $this->properties->clear($field);
         return $this;
@@ -105,9 +105,9 @@ class RESTResource implements ResourceContract
      * @param bool $visible
      * @return $this
      */
-    public function setChildrenProperty(Field $field, ResourceCollection $children, $visible)
+    public function setChildrenProperty(Field $field, $url, ResourceCollection $children, $visible)
     {
-        $this->properties->getChildren($field)->setChildren($children)->setVisible($visible);
+        $this->properties->getChildren($field, $url)->setChildren($children)->setVisible($visible);
         return $this;
     }
 
@@ -118,10 +118,11 @@ class RESTResource implements ResourceContract
      * @param bool $visible
      * @return $this
      */
-    public function setChildProperty(Field $field, RESTResource $child = null, $visible)
+    public function setChildProperty(Field $field, $url, RESTResource $child = null, $visible)
     {
         $childProperty = $this->properties->getChild($field);
         $childProperty->setVisible($visible);
+        $childProperty->setUrl($url);
 
         if ($child) {
             $childProperty->setChild($child);
@@ -208,6 +209,14 @@ class RESTResource implements ResourceContract
     public function getSource()
     {
         return $this->source;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->getResourceDefinition()->getType();
     }
 
     /**

@@ -35,6 +35,30 @@ class ChildValue extends RelationshipValue
     }
 
     /**
+     * @return RESTResource
+     */
+    public function getChild()
+    {
+        return $this->child;
+    }
+
+    /**
+     * @return RESTResource
+     */
+    public function getResource()
+    {
+        return $this->child;
+    }
+
+    /**
+     * @return RESTResource[]
+     */
+    public function getResources()
+    {
+        return [ $this->child ];
+    }
+
+    /**
      * @return array
      */
     public function getValue()
@@ -51,6 +75,11 @@ class ChildValue extends RelationshipValue
             return null;
         }
         return $this->child->toArray();
+    }
+
+    public function getChildren()
+    {
+        return $this->getChildrenToProcess();
     }
 
     protected function getChildrenToProcess()
