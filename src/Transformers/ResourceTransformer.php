@@ -11,12 +11,12 @@ use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\IterableExpected;
-use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DynamicContext;
 use CatLab\Charon\Interfaces\IdentifierCollection;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
+use CatLab\Charon\Interfaces\RequestResolver;
 use CatLab\Charon\Interfaces\ResourceCollection;
 use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
@@ -37,6 +37,7 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Interfaces\ResourceTransformer as ResourceTransformerContract;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
+use CatLab\Charon\Interfaces\ResourceFactory;
 
 /**
  * Class ResourceTransformer
@@ -53,6 +54,11 @@ class ResourceTransformer implements ResourceTransformerContract
      * @var PropertySetter
      */
     protected $propertySetter;
+
+    /**
+     * @var RequestResolver
+     */
+    protected $requestResolver;
 
     /**
      * @var ResourceFactoryInterface
@@ -88,6 +94,7 @@ class ResourceTransformer implements ResourceTransformerContract
     public function __construct(
         PropertyResolver $propertyResolver = null,
         PropertySetter $propertySetter = null,
+        RequestResolver $requestResolver = null,
         ResourceFactory $resourceFactory = null
     ) {
         if (!isset($propertyResolver)) {
@@ -99,12 +106,17 @@ class ResourceTransformer implements ResourceTransformerContract
         }
 
         if (!isset($resourceFactory)) {
-            $resourceFactory = new ResourceFactory();
+            $resourceFactory = new \CatLab\Charon\Factories\ResourceFactory();
+        }
+
+        if (!isset($requestResolver)) {
+            $requestResolver = new \CatLab\Charon\Resolvers\RequestResolver();
         }
 
         $this->propertyResolver = $propertyResolver;
         $this->propertySetter = $propertySetter;
         $this->resourceFactory = $resourceFactory;
+        $this->requestResolver = $requestResolver;
 
         $this->currentPath = new CurrentPath();
         $this->parents = new ParentEntityCollection();
@@ -462,8 +474,8 @@ class ResourceTransformer implements ResourceTransformerContract
 
                 // Filterable fields
                 if ($field->isFilterable()) {
-                    $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
-                    if ($parameter) {
+                    $parameter = $this->getRequestResolver()->getFilter($request, $field);
+                    if ($parameter !== null) {
                         $queryBuilder->where(
                             new WhereParameter(
                                 $field->getName(),
@@ -473,8 +485,8 @@ class ResourceTransformer implements ResourceTransformerContract
                         );
                     }
                 } elseif ($field->isSearchable()) {
-                    $parameter = $this->propertyResolver->getParameterFromRequest($request, $field->getDisplayName());
-                    if ($parameter) {
+                    $parameter = $this->getRequestResolver()->getFilter($request, $field->getDisplayName());
+                    if ($parameter !== null) {
                         $queryBuilder->where(
                             new WhereParameter(
                                 $field->getName(),
@@ -708,6 +720,14 @@ class ResourceTransformer implements ResourceTransformerContract
     public function getPropertySetter() : PropertySetter
     {
         return $this->propertySetter;
+    }
+
+    /**
+     * @return RequestResolver
+     */
+    public function getRequestResolver(): RequestResolver
+    {
+        return $this->requestResolver;
     }
 
     /**

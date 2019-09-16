@@ -70,13 +70,12 @@ class PaginationProcessor implements Processor
         if (isset($records)) {
             $builder->limit($records);
         } else {
-            $builder->limit(
-                $transformer->getPropertyResolver()->getParameterFromRequest(
-                    $request,
-                    ResourceTransformer::LIMIT_PARAMETER,
-                    10
-                )
-            );
+            $limit = $transformer->getRequestResolver()->getRecords($request);
+            if ($limit === null) {
+                $limit = 10;
+            }
+
+            $builder->limit($limit);
         }
 
         // Build the filters
@@ -265,10 +264,7 @@ class PaginationProcessor implements Processor
             }
         }
 
-        $sorting = $transformer->getPropertyResolver()->getParameterFromRequest(
-            $request,
-            ResourceTransformer::SORT_PARAMETER
-        );
+        $sorting = $transformer->getRequestResolver()->getSorting($request);
 
         $sortedOn = [];
 

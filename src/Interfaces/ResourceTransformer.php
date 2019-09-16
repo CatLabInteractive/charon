@@ -100,6 +100,11 @@ interface ResourceTransformer
     public function getPropertyResolver() : PropertyResolver;
 
     /**
+     * @return RequestResolver
+     */
+    public function getRequestResolver(): RequestResolver;
+
+    /**
      * @return PropertySetter
      */
     public function getPropertySetter() : PropertySetter;

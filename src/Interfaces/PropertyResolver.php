@@ -176,18 +176,6 @@ interface PropertyResolver
     ) : bool;
 
     /**
-     * @param $request
-     * @param string $key
-     * @param null $default
-     * @return mixed
-     */
-    public function getParameterFromRequest(
-        $request,
-        string $key,
-        $default = null
-    );
-
-    /**
      * @param Field $field
      * @return mixed
      */

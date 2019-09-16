@@ -278,21 +278,6 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
     }
 
     /**
-     * @param $request
-     * @param string $key
-     * @param mixed $default
-     * @return null|mixed
-     */
-    public function getParameterFromRequest($request, string $key, $default = null)
-    {
-        if (isset($request[$key])) {
-            return $request[$key];
-        } else {
-            return $default;
-        }
-    }
-
-    /**
      * @param Field $field
      * @return string
      */

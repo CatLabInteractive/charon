@@ -37,6 +37,14 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
     }
 
     /**
+     * @return array|string
+     */
+    public function getMeta()
+    {
+        return $this->meta;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
