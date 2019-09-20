@@ -166,7 +166,7 @@ class SwaggerBuilder implements DescriptionBuilder
         $refId = '#/definitions/' . $name;
 
         if ($cardinality === Cardinality::ONE) {
-            return $refId;
+            return $this->addItemDefinition($this->getResourceDefinitionName($resourceDefinition), $refId, $action);
         } else {
             return $this->addItemListDefinition(
                 $this->getResourceDefinitionName($resourceDefinition),
@@ -217,6 +217,19 @@ class SwaggerBuilder implements DescriptionBuilder
      * @return array[]
      */
     public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
+    {
+        return [
+            '$ref' => $this->addResourceDefinition($resourceDefinition, $action, $cardinality)
+        ];
+    }
+
+    /**
+     * @param ResourceDefinition $resourceDefinition
+     * @param string $action
+     * @param string $cardinality
+     * @return array[]
+     */
+    public function getResponseSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
     {
         return [
             '$ref' => $this->addResourceDefinition($resourceDefinition, $action, $cardinality)
@@ -353,11 +366,21 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param string $action
      * @return mixed
      */
+    protected function addItemDefinition(string $name, string $reference, string $action) : string
+    {
+        return $reference;
+    }
+
+    /**
+     * @param string $name
+     * @param string $reference
+     * @param string $action
+     * @return mixed
+     */
     protected function addItemListDefinition(string $name, string $reference, string $action) : string
     {
         $name = $name . '_' . $action . '_items';
         if (!array_key_exists($name, $this->schemas)) {
-
             $resourceCollection = $this->resourceFactory->createResourceCollection();
             $this->schemas[$name] = $resourceCollection->getSwaggerDescription($reference);
         }

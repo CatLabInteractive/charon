@@ -35,5 +35,13 @@ interface DescriptionBuilder
      * @param string $cardinality
      * @return $this
      */
+    public function getResponseSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality);
+
+    /**
+     * @param ResourceDefinition $resourceDefinition
+     * @param string $action
+     * @param string $cardinality
+     * @return $this
+     */
     public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality);
 }
