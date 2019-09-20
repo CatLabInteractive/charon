@@ -67,12 +67,9 @@ class PropertyValueCollection extends Collection
      * @param Field $resourceField
      * @return ChildrenValue
      */
-    public function getChildren(Field $resourceField, $url)
+    public function getChildren(Field $resourceField)
     {
-        $children = $this->touchPropertyValue($resourceField, ChildrenValue::class);
-        $children->setUrl($url);
-
-        return $children;
+        return $this->touchPropertyValue($resourceField, ChildrenValue::class);
     }
 
     /**

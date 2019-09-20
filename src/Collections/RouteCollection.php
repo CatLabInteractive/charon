@@ -217,6 +217,19 @@ class RouteCollection extends RouteProperties
                 ->returns()->statusCode(200)->one($resourceDefinition);
         }
 
+        if (in_array('patch', $only)) {
+            $group->patch($path . '/{' . $id . '}', $controller . '@edit')
+                ->summary(function () use ($resourceDefinition) {
+                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
+                        ->getEntityName(false);
+
+                    return 'Update an existing ' . $entityName;
+                })
+                ->parameters()->path($id)->string()->required()
+                ->parameters()->resource($resourceDefinition)->required()
+                ->returns()->statusCode(200)->one($resourceDefinition);
+        }
+
         if (in_array('destroy', $only)) {
             $group->delete($path . '/{' . $id . '}', $controller . '@destroy')
                 ->summary(function () use ($resourceDefinition) {

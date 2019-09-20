@@ -148,13 +148,15 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param ResourceDefinition $resourceDefinition
      * @param string $action
      * @param string $cardinality
-     * @return $this
+     * @return string
      */
     public function addResourceDefinition(
         ResourceDefinition $resourceDefinition,
         string $action,
         string $cardinality = Cardinality::ONE
     ) {
+        $this->checkResourceDefinitionType($resourceDefinition);
+
         $name = $this->getResourceDefinitionName($resourceDefinition) . '_' . $action;
         if (!array_key_exists($name, $this->schemas)) {
             $this->schemas[$name] = null; // Set key to avoid circular references
@@ -172,6 +174,14 @@ class SwaggerBuilder implements DescriptionBuilder
                 $action
             );
         }
+    }
+
+    /**
+     * @param ResourceDefinition $resourceDefinition
+     */
+    protected function checkResourceDefinitionType(ResourceDefinition $resourceDefinition)
+    {
+        // Nothing to do.
     }
 
     /**
@@ -204,7 +214,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param ResourceDefinition $resourceDefinition
      * @param string $action
      * @param string $cardinality
-     * @return $this
+     * @return array[]
      */
     public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
     {
@@ -341,7 +351,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param string $name
      * @param string $reference
      * @param string $action
-     * @return mixed|string
+     * @return mixed
      */
     protected function addItemListDefinition(string $name, string $reference, string $action) : string
     {

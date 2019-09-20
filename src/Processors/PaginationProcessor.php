@@ -15,6 +15,7 @@ use CatLab\Charon\Interfaces\RESTResource;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\HasRequestResolver;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -247,6 +248,9 @@ class PaginationProcessor implements Processor
          * @var PaginationBuilder $builder
          */
         $builder = new $cn();
+        if ($builder instanceof HasRequestResolver) {
+            $builder->setRequestResolver($transformer->getRequestResolver());
+        }
 
         $registeredFields = [];
 
@@ -327,7 +331,7 @@ class PaginationProcessor implements Processor
 
         // Set request
         if (isset($request)) {
-            $builder->setRequest($request);
+            $builder->setRequest($request, $transformer->getRequestResolver());
         }
 
         return $builder;

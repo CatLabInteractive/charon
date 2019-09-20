@@ -84,9 +84,9 @@ class RESTResource implements ResourceContract
      * @param Field $field
      * @return \CatLab\Charon\Models\Values\ChildrenValue
      */
-    public function touchChildrenProperty(Field $field, $url)
+    public function touchChildrenProperty(Field $field)
     {
-        return $this->properties->getChildren($field, $url);
+        return $this->properties->getChildren($field);
     }
 
     /**

@@ -24,6 +24,8 @@ use Request;
  */
 class JsonBodyInputParser extends AbstractInputParser implements InputParser
 {
+    protected $contentType = 'application/json';
+
     /**
      * Look for identifier input
      * @param ResourceTransformer $resourceTransformer
@@ -149,7 +151,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         $resource = null
     ): ParameterCollection
     {
-        $route->consumes('application/json');
+        $route->consumes($this->contentType);
 
         $parameterCollection = new ParameterCollection($route);
         $parameterCollection

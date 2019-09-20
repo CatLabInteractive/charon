@@ -11,6 +11,10 @@ use CatLab\Charon\Models\Properties\ResourceField;
  */
 class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
 {
+    const PAGE_PARAMETER = 'page';
+    const CURSOR_BEFORE_PARAMETER = 'before';
+    const CURSOR_AFTER_PARAMETER = 'after';
+
     /**
      * @param $request
      * @param ResourceField $field
@@ -50,5 +54,44 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
             return $request[$key];
         }
         return null;
+    }
+
+    /**
+     * @param $request
+     * @return string|null
+     */
+    public function getPage($request)
+    {
+        $page = $this->getParameter($request, self::PAGE_PARAMETER);
+        if (!is_string($page)) {
+            return null;
+        }
+        return $page;
+    }
+
+    /**
+     * @param $request
+     * @return string|null
+     */
+    public function getBeforeCursor($request)
+    {
+        $cursor = $this->getParameter($request, self::CURSOR_BEFORE_PARAMETER);
+        if (!is_string($cursor)) {
+            return null;
+        }
+        return $cursor;
+    }
+
+    /**
+     * @param $request
+     * @return string|null
+     */
+    public function getAfterCursor($request)
+    {
+        $cursor = $this->getParameter($request, self::CURSOR_AFTER_PARAMETER);
+        if (!is_string($cursor)) {
+            return null;
+        }
+        return $cursor;
     }
 }

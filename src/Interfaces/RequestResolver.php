@@ -35,4 +35,19 @@ interface RequestResolver
      * @return string|null
      */
     public function getParameter($request, $key);
+
+    /**
+     * @return string|null
+     */
+    public function getPage($request);
+
+    /**
+     * @return string|null
+     */
+    public function getBeforeCursor($request);
+
+    /**
+     * @return string|null
+     */
+    public function getAfterCursor($request);
 }

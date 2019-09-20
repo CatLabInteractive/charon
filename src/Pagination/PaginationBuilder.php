@@ -8,6 +8,8 @@ use CatLab\Base\Interfaces\Pagination\Navigation;
 use CatLab\Base\Models\Database\LimitParameter;
 use CatLab\Base\Models\Database\OrderParameter;
 use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Charon\Interfaces\HasRequestResolver;
+use CatLab\Charon\Interfaces\RequestResolver;
 use InvalidArgumentException;
 
 /**
@@ -17,7 +19,7 @@ use InvalidArgumentException;
  *
  * @package CatLab\Charon\Pagination
  */
-class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\PaginationBuilder
+class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\PaginationBuilder, HasRequestResolver
 {
     const REQUEST_PARAM_NEXT = 'next';
     const REQUEST_PARAM_PREVIOUS = 'previous';
@@ -46,6 +48,20 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
      * @var bool
      */
     private $hasPreviousPage = false;
+
+    /**
+     * @var RequestResolver
+     */
+    private $requestResolver;
+
+    /**
+     * @param RequestResolver $requestResolver
+     */
+    public function setRequestResolver(RequestResolver $requestResolver)
+    {
+        $this->requestResolver = $requestResolver;
+        return $this;
+    }
 
     /**
      * @param OrderParameter $order
@@ -117,9 +133,8 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
      */
     public function setRequest(array $properties)
     {
-        if (isset($properties['page']) && is_numeric($properties['page'])) {
-            $this->page = $properties['page'];
-        } else {
+        $this->page = $this->requestResolver->getPage($properties);
+        if (!$this->page) {
             $this->page = 1;
         }
         return $this;
