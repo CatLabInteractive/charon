@@ -95,10 +95,10 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
     }
 
     /**
-     * @param SelectQueryParameters $parameters
+     * @param SelectQueryParameters $queryBuilder
      * @return SelectQueryParameters
      */
-    public function build(SelectQueryParameters $parameters = null)
+    public function build(SelectQueryParameters $queryBuilder = null)
     {
         if (!isset($queryBuilder)) {
             $queryBuilder = new SelectQueryParameters();
@@ -109,6 +109,11 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
             $limit = $this->records;
 
             $queryBuilder->limit(new LimitParameter($offset, $limit));
+        }
+
+        foreach ($this->sort as $sort) {
+            $dir = $sort->getDirection();
+            $queryBuilder->orderBy(new OrderParameter($sort->getColumn(), $dir, $sort->getEntity()));
         }
 
         return $queryBuilder;

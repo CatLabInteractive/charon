@@ -264,7 +264,7 @@ class PaginationProcessor implements Processor
                 )
             ) {
                 $builder->registerPropertyName($field->getName(), $field->getDisplayName());
-                $registeredFields[$field->getName()] = $field;
+                $registeredFields[$field->getDisplayName()] = $field;
             }
         }
 
