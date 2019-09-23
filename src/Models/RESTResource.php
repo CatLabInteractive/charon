@@ -122,7 +122,10 @@ class RESTResource implements ResourceContract
     {
         $childProperty = $this->properties->getChild($field);
         $childProperty->setVisible($visible);
-        $childProperty->setUrl($url);
+
+        if ($url) {
+            $childProperty->setUrl($url);
+        }
 
         if ($child) {
             $childProperty->setChild($child);
