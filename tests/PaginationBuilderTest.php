@@ -74,21 +74,36 @@ class PaginationBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('{"someDate":"Wed, 02 Apr 86 10:00:00 +0000","pet-id":1}', base64_decode($cursors['before']));
         $this->assertEquals('{"someDate":"Fri, 04 Apr 86 10:00:00 +0000","pet-id":3}', base64_decode($cursors['after']));
 
+        /**
+         * Test after
+         */
         $cursors = $this->getCursorsToTest('someDate', $cursors['after']);
 
         /** @var SelectQueryParameters $filters */
         $filters = $cursors['filters'];
 
-        $whereQuery = '';
-        foreach ($filters->getWhere() as $where) {
-            $whereQuery .= $where->__toString() . ' AND ';
-        }
+        $whereQueries = $filters->getWhere();
+        $dateWhere = $whereQueries[0];
 
-        echo "\n\n";
-        echo $whereQuery . "\n";
+        $this->assertEquals('1986-04-04 10:00:00', $dateWhere->getComparison()->getValue()->format('Y-m-d H:i:s'));
+
+        /**
+         * Test before
+         */
+        $this->assertEquals('>=', $dateWhere->getComparison()->getOperator());
+        $cursors = $this->getCursorsToTest('someDate', null, $cursors['before']);
+
+        /** @var SelectQueryParameters $filters */
+        $filters = $cursors['filters'];
+
+        $whereQueries = $filters->getWhere();
+        $dateWhere = $whereQueries[0];
+
+        $this->assertEquals('<=', $dateWhere->getComparison()->getOperator());
+        $this->assertEquals('1986-04-02 10:00:00', $dateWhere->getComparison()->getValue()->format('Y-m-d H:i:s'));
     }
 
-    private function getCursorsToTest($sortOrder, $afterCursor = null)
+    private function getCursorsToTest($sortOrder, $afterCursor = null, $beforeCursor = null)
     {
         $petDefinition = new PetDefinitionWithDate();
 
@@ -148,7 +163,8 @@ class PaginationBuilderTest extends PHPUnit_Framework_TestCase
         $filters = $resourceTransformer->getFilters(
             [
                 'sort' => $sortOrder,
-                'after' => $afterCursor
+                'after' => $afterCursor,
+                'before' => $beforeCursor
             ],
             $petDefinition,
             $context,
