@@ -1,6 +1,5 @@
 <?php
 
-
 namespace CatLab\Charon\Pagination;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -56,6 +55,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
 
     /**
      * @param RequestResolver $requestResolver
+     * @return PaginationBuilder
      */
     public function setRequestResolver(RequestResolver $requestResolver)
     {
@@ -76,9 +76,10 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
     /**
      * @param string $column
      * @param string $publicName
+     * @param \closure|null $transformer
      * @return \CatLab\Base\Interfaces\Pagination\PaginationBuilder
      */
-    public function registerPropertyName(string $column, string $publicName)
+    public function registerPropertyName(string $column, string $publicName, \closure $transformer = null)
     {
         // not required
         return $this;

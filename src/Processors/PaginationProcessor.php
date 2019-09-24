@@ -12,6 +12,8 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
+use CatLab\Charon\Interfaces\Transformer;
+use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -34,6 +36,11 @@ class PaginationProcessor implements Processor
      */
     private $paginationClass;
 
+    /**
+     * @var string[]
+     */
+    private $qualifiedNameMap = [];
+
     const RANDOM = 'random';
     const RANDOM_SEED_QUERY = 'seed';
 
@@ -51,7 +58,7 @@ class PaginationProcessor implements Processor
 
     /**
      * @param ResourceTransformer $transformer
-     * @param SelectQueryParameters $parameters
+     * @param SelectQueryParameters $selectQuery
      * @param $request
      * @param ResourceDefinition $definition
      * @param Context $context
@@ -60,13 +67,13 @@ class PaginationProcessor implements Processor
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $parameters,
+        SelectQueryParameters $selectQuery,
         $request,
         ResourceDefinition $definition,
         Context $context,
         int $records = null
     ) {
-        $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $request);
+        $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, $request);
 
         if (isset($records)) {
             $builder->limit($records);
@@ -80,7 +87,7 @@ class PaginationProcessor implements Processor
         }
 
         // Build the filters
-        $builder->build($parameters);
+        $builder->build($selectQuery);
     }
 
     /**
@@ -99,7 +106,7 @@ class PaginationProcessor implements Processor
         RelationshipValue $parent = null,
         $parentEntity = null
     ) {
-        $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, null, null);
+        $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, null);
 
         if (
             count($collection) > 0 &&
@@ -114,23 +121,21 @@ class PaginationProcessor implements Processor
             // Register all identifiers if parent is present
             if ($parent) {
                 foreach ($definition->getFields()->getIdentifiers() as $field) {
-                    $builder->registerPropertyName(
-                        $field->getName(),
-                        $field->getDisplayName()
-                    );
+                    $this->registerPropertyName($builder, $field, $context);
+                    $registeredFields[$field->getDisplayName()] = $field;
                 }
             }
 
             /** @var RESTResource $first */
             $first = $collection->first();
             if ($first) {
-                $builder->setFirst($this->transformResource($builder, $first));
+                $builder->setFirst($this->transformResource($transformer, $builder, $context, $first));
             }
 
             /** @var RESTResource $first */
             $last = $collection->last();
             if ($last) {
-                $builder->setLast($this->transformResource($builder, $last));
+                $builder->setLast($this->transformResource($transformer, $builder, $context, $last));
             }
 
             $cursor = $builder->getNavigation();
@@ -163,8 +168,12 @@ class PaginationProcessor implements Processor
      * @param RESTResource $resource
      * @return mixed
      */
-    private function transformResource(PaginationBuilder $builder, RESTResource $resource)
-    {
+    private function transformResource(
+        ResourceTransformer $transformer,
+        PaginationBuilder $builder,
+        Context $context,
+        RESTResource $resource
+    ) {
         $sortOrder = $builder->getOrderBy();
         $properties = $resource->getProperties();
 
@@ -172,16 +181,18 @@ class PaginationProcessor implements Processor
 
         foreach ($sortOrder as $sort) {
 
+            // check if we have to tranlsate the fully qualified name to a display name
+
             $value = $properties->getFromName($sort->getColumn());
             if ($value) {
-                $out[$value->getField()->getName()] = $value->getValue();
+                $out[$sort->getColumn()] = $value->getValue();
             }
         }
 
         // Also add identifiers
         foreach ($resource->getProperties()->getIdentifiers()->getValues() as $identifier) {
             if (!isset($out[$identifier->getField()->getName()])) {
-                $out[$identifier->getField()->getName()] = $identifier->getValue();
+                $out[$transformer->getQualifiedName($identifier->getField())] = $identifier->getValue();
             }
         }
 
@@ -210,12 +221,14 @@ class PaginationProcessor implements Processor
     /**
      * @param ResourceTransformer $transformer
      * @param ResourceDefinition $definition
+     * @param Context $context
      * @param null $request
      * @return PaginationBuilder
      */
     private function getPaginationBuilderFromDefinition(
         ResourceTransformer $transformer,
         ResourceDefinition $definition,
+        Context $context,
         $request = null
     ) {
         $className = get_class($definition);
@@ -224,6 +237,7 @@ class PaginationProcessor implements Processor
             $this->paginationBuilders[$className] = $this->createPaginationBuilderFromDefinition(
                 $transformer,
                 $definition,
+                $context,
                 $request
             );
         }
@@ -234,12 +248,14 @@ class PaginationProcessor implements Processor
     /**
      * @param ResourceTransformer $transformer
      * @param ResourceDefinition $definition
+     * @param Context $context
      * @param null $request
      * @return PaginationBuilder
      */
     private function createPaginationBuilderFromDefinition(
         ResourceTransformer $transformer,
         ResourceDefinition $definition,
+        Context $context,
         $request = null
     ) {
         $cn = $this->paginationClass;
@@ -263,7 +279,7 @@ class PaginationProcessor implements Processor
                     $field->isSortable()
                 )
             ) {
-                $builder->registerPropertyName($field->getName(), $field->getDisplayName());
+                $this->registerPropertyName($builder, $field, $context);
                 $registeredFields[$field->getDisplayName()] = $field;
             }
         }
@@ -289,9 +305,10 @@ class PaginationProcessor implements Processor
                 if ($field) {
                     if ($field->isSortable()) {
                         $sortedOn[$field->getName()] = true;
+
                         $builder->orderBy(
                             new OrderParameter(
-                                $transformer->getQualifiedName($field),
+                                $field->getName(),
                                 $direction,
                                 $definition->getEntityClassName()
                             )
@@ -319,6 +336,7 @@ class PaginationProcessor implements Processor
         // Add all
         foreach ($definition->getFields() as $field) {
             if ($field instanceof IdentifierField && !isset($sortedOn[$field->getName()])) {
+
                 $builder->orderBy(
                     new OrderParameter(
                         $field->getName(),
@@ -335,6 +353,21 @@ class PaginationProcessor implements Processor
         }
 
         return $builder;
+    }
+
+    /**
+     * @param PaginationBuilder $builder
+     * @param Field $field
+     * @param Context $context
+     */
+    protected function registerPropertyName(PaginationBuilder $builder, Field $field, Context $context)
+    {
+        $builder->registerPropertyName(
+            $field->getName(),
+            $field->getDisplayName(),
+            function($value) use ($field, $context) {
+                return $field->getTransformer()->toEntityValue($value, $context);
+            });
     }
 
     /**

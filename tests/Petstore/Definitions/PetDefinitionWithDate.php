@@ -19,8 +19,9 @@ class PetDefinitionWithDate extends PetDefinition
         
         $this
             ->field('someDate')
-                ->datetime()
-                ->visible(true)
+            ->datetime()
+            ->visible(true)
+            ->sortable()
         ;
     }
 }

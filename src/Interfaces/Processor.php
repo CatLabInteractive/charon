@@ -14,7 +14,7 @@ interface Processor
 {
     /**
      * @param ResourceTransformer $transformer
-     * @param SelectQueryParameters $parameters
+     * @param SelectQueryParameters $selectQuery
      * @param $request
      * @param ResourceDefinition $definition
      * @param Context $context
@@ -23,7 +23,7 @@ interface Processor
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $parameters,
+        SelectQueryParameters $selectQuery,
         $request,
         ResourceDefinition $definition,
         Context $context,

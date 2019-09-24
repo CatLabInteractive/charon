@@ -19,7 +19,7 @@ class ProcessorCollection extends Collection implements Processor
 {
     /**
      * @param ResourceTransformer $transformer
-     * @param SelectQueryParameters $parameters
+     * @param SelectQueryParameters $selectQuery
      * @param $request
      * @param ResourceDefinition $definition
      * @param Context $context
@@ -28,7 +28,7 @@ class ProcessorCollection extends Collection implements Processor
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $parameters,
+        SelectQueryParameters $selectQuery,
         $request,
         ResourceDefinition $definition,
         Context $context,
@@ -36,7 +36,7 @@ class ProcessorCollection extends Collection implements Processor
     ) {
         foreach ($this as $processor) {
             /** @var Processor */
-            $processor->processFilters($transformer, $parameters, $request, $definition, $context, $records);
+            $processor->processFilters($transformer, $selectQuery, $request, $definition, $context, $records);
         }
     }
 
