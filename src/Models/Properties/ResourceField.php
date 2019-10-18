@@ -5,6 +5,8 @@ namespace CatLab\Charon\Models\Properties;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Swagger\SwaggerBuilder;
+use CatLab\Requirements\Exceptions\PropertyValidationException;
+use CatLab\Requirements\Exceptions\ValidationException;
 use CatLab\Requirements\InArray;
 
 /**
@@ -133,6 +135,27 @@ class ResourceField extends Field
     public function isArray()
     {
         return $this->isArray;
+    }
+
+    /**
+     * @param $value
+     * @param string $path
+     * @throws PropertyValidationException
+     * @throws ValidationException
+     */
+    public function validate($value, string $path)
+    {
+        if ($this->isArray()) {
+            if (!is_array($value)) {
+                throw new ValidationException($path . ' must be of type array.');
+            }
+
+            foreach ($value as $v) {
+                parent::validate($v, $path);
+            }
+        } else {
+            return parent::validate($value, $path);
+        }
     }
 
     /**
