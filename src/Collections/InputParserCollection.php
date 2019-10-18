@@ -3,6 +3,8 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
+use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Exceptions\NoInputParsersSet;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -81,17 +83,23 @@ class InputParserCollection extends Collection implements InputParser
      * @param Route $route
      * @param ResourceParameter $parameter
      * @param ResourceDefinition $resourceDefinition
+     * @param string $action (from Action::ENUM)
      * @param null $request
      * @return ParameterCollection
+     * @throws NoInputParsersSet
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
     public function getResourceRouteParameters(
         DescriptionBuilder $builder,
         Route $route,
         ResourceParameter $parameter,
         ResourceDefinition $resourceDefinition,
+        $action,
         $request = null
     ): ParameterCollection
     {
+        Action::checkValid($action);
+
         $this->checkExists();
 
         $out = new ParameterCollection($route);
@@ -99,7 +107,15 @@ class InputParserCollection extends Collection implements InputParser
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
 
-            $parameters = $inputParser->getResourceRouteParameters($builder, $route, $parameter, $resourceDefinition, $request);
+            $parameters = $inputParser->getResourceRouteParameters(
+                $builder,
+                $route,
+                $parameter,
+                $resourceDefinition,
+                $action,
+                $request
+            );
+
             $out->merge($parameters);
         }
 

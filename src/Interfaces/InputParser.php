@@ -46,6 +46,8 @@ interface InputParser
     );
 
     /**
+     * Addapt a Route so that it contains the parameters that this InputParser is
+     * looking for. This is then used for automated documentation.
      * @param DescriptionBuilder $builder
      * @param Route $route
      * @param ResourceParameter $parameter
@@ -58,6 +60,7 @@ interface InputParser
         Route $route,
         ResourceParameter $parameter,
         ResourceDefinition $resourceDefinition,
+        $action,
         $request = null
     ) : ParameterCollection;
 }

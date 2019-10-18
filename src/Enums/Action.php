@@ -42,6 +42,15 @@ class Action
     }
 
     /**
+     * @param $action
+     * @return bool
+     */
+    public static function isIdentifierContext($action)
+    {
+        return $action == self::IDENTIFIER;
+    }
+
+    /**
      * @param string $action
      * @throws InvalidContextAction
      */
@@ -49,6 +58,19 @@ class Action
     {
         if (!self::isReadContext($action) && !self::isWriteContext($action)) {
             throw new InvalidContextAction("Unknown context provided: " . $action);
+        }
+    }
+
+    /**
+     * @param string $cardinality
+     * @return string
+     */
+    public static function getReadAction(string $cardinality): string
+    {
+        if ($cardinality === Cardinality::MANY) {
+            return Action::INDEX;
+        } else {
+            return Action::VIEW;
         }
     }
 }

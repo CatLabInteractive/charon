@@ -3,6 +3,8 @@
 namespace CatLab\Charon\Models\Routing\Parameters;
 
 use CatLab\Base\Collections\Collection;
+use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Exceptions\SwaggerMultipleInputParsers;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -25,6 +27,11 @@ class ResourceParameter extends Parameter
      * @var string
      */
     private $cardinality = Cardinality::ONE;
+
+    /**
+     * @var Action
+     */
+    private $resourceAction = null;
     
     /**
      * PathParameter constructor.
@@ -63,6 +70,30 @@ class ResourceParameter extends Parameter
     }
 
     /**
+     * @param string $action
+     * @return $this
+     */
+    public function setAction($action)
+    {
+        Action::checkValid($action);
+
+        $this->resourceAction = $action;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction()
+    {
+        if ($this->resourceAction !== null) {
+            return $this->resourceAction;
+        }
+
+        return Method::toAction($this->route->getMethod(), $this->cardinality);
+    }
+
+    /**
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
@@ -79,11 +110,13 @@ class ResourceParameter extends Parameter
             throw SwaggerMultipleInputParsers::make();
         }
 
+        $action = $this->getAction();
         $parameters = $context->getInputParser()->getResourceRouteParameters(
             $builder,
             $this->route,
             $this,
-            $resourceDefinition
+            $resourceDefinition,
+            $this->getAction()
         );
 
         /** @var Parameter $v */

@@ -7,6 +7,7 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
+use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 
 /**
@@ -112,6 +113,20 @@ class ResourceFieldCollection extends Collection
             }
         }
 
+        return $out;
+    }
+
+    /**
+     * @return ResourceFieldCollection
+     */
+    public function getRelationships()
+    {
+        $out = new self();
+        foreach ($this as $v) {
+            if ($v instanceof RelationshipField) {
+                $out->add($v);
+            }
+        }
         return $out;
     }
 }

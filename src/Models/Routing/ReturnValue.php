@@ -148,7 +148,7 @@ class ReturnValue implements RouteMutator
             return $this->context;
         }
 
-        return Method::toAction($this->parent->getMethod(), $this->cardinality);
+        return Action::getReadAction($this->cardinality);
     }
 
     /**

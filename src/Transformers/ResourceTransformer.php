@@ -9,6 +9,7 @@ use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
+use CatLab\Charon\Exceptions\NoInputDataFound;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\IterableExpected;
 use CatLab\Charon\Interfaces\Context;
@@ -753,6 +754,7 @@ class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @param null $request
      * @return ResourceCollection
+     * @throws NoInputDataFound
      */
     public function fromInput(
         $resourceDefinition,
@@ -770,7 +772,7 @@ class ResourceTransformer implements ResourceTransformerContract
         );
 
         if (!$resources) {
-            throw new \InvalidArgumentException("No data found in body");
+            throw NoInputDataFound::make();
         }
 
         return $resources;

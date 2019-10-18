@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Routing\Parameters;
 
+use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Enums\Cardinality;
@@ -63,6 +64,28 @@ class BodyParameter extends Parameter
     }
 
     /**
+     * @param Action $action
+     * @return $this
+     */
+    public function setAction($action)
+    {
+        $this->resourceAction = $action;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction()
+    {
+        if ($this->resourceAction !== null) {
+            return $this->resourceAction;
+        }
+
+        return Method::toAction($this->route->getMethod(), $this->cardinality);
+    }
+
+    /**
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
@@ -73,10 +96,9 @@ class BodyParameter extends Parameter
         unset($out['type']);
 
         $resourceDefinition = ResourceDefinitionLibrary::make($this->resourceDefinition);
-        $context = Method::toAction($this->route->getMethod(), $this->cardinality);
 
         $out['schema'] = [
-            '$ref' => $builder->addResourceDefinition($resourceDefinition, $context, $this->cardinality)
+            '$ref' => $builder->addResourceDefinition($resourceDefinition, $this->getAction(), $this->cardinality)
         ];
 
         return $out;

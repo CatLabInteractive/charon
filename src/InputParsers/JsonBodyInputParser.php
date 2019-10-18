@@ -148,6 +148,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         Route $route,
         ResourceParameter $parameter,
         ResourceDefinition $resourceDefinition,
+        $action,
         $resource = null
     ): ParameterCollection
     {
@@ -156,6 +157,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         $parameterCollection = new ParameterCollection($route);
         $parameterCollection
             ->body($resourceDefinition)
+            ->setAction($action)
             ->merge($parameter);
 
         return $parameterCollection;

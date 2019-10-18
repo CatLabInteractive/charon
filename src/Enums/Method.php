@@ -21,16 +21,12 @@ class Method
      * @param string $cardinality
      * @return string
      */
-    public static function toAction(string $method, string $cardinality) : string
+    public static function toAction(string $method, string $cardinality): string
     {
         // Default value based on action
         switch ($method) {
             case self::GET:
-                if ($cardinality === Cardinality::MANY) {
-                    return Action::INDEX;
-                } else {
-                    return Action::VIEW;
-                }
+                return Action::getReadAction($cardinality);
 
             case self::LINK:
             case self::UNLINK:

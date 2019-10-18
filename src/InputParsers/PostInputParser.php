@@ -117,7 +117,8 @@ class PostInputParser extends AbstractInputParser implements InputParser
         Route $route,
         ResourceParameter $parameter,
         ResourceDefinition $resourceDefinition,
-        $request = null
+        $request = null,
+        $action = null
     ): ParameterCollection
     {
         $route->consumes('multipart/form-data');

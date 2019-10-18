@@ -181,9 +181,18 @@ class RelationshipField extends Field
     }
 
     /**
+     * @deprecated Use getChildResourceDefinition()
      * @return ResourceDefinitionContract
      */
     public function getChildResource()
+    {
+        return $this->getChildResourceDefinition();
+    }
+
+    /**
+     * @return ResourceDefinitionContract
+     */
+    public function getChildResourceDefinition()
     {
         return ResourceDefinitionLibrary::make($this->childResource);
     }
