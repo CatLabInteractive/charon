@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Values\Base;
 
+use CatLab\Charon\Exceptions\EntityNotFoundException;
 use CatLab\Charon\Models\Values\ChildrenValue;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -21,6 +22,7 @@ use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Base\Helpers\ObjectHelper;
 
 /**
  * Class RelationshipValue
@@ -38,6 +40,9 @@ abstract class RelationshipValue extends Value
      */
     abstract public function getChildren();
 
+    /**
+     * @return RESTResource[]
+     */
     abstract protected function getChildrenToProcess();
 
     /**
@@ -289,8 +294,9 @@ abstract class RelationshipValue extends Value
 
         // Is this a new child? We might not be able to add it...
         if (!$childEntity && !$field->canCreateNewChildren()) {
-            throw new InvalidPropertyException(
-                "Only existing items can be linked to " . get_class($parent) . "->" . $field->getName()
+            throw new EntityNotFoundException(
+                // The related resource does not exist.
+                "The related " . $child->getResourceDefinition()->getEntityName() . " at " . ObjectHelper::class_basename($parent) . "->" . $field->getName() . " does not exist"
             );
         }
 

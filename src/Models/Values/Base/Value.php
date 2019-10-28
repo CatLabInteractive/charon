@@ -145,6 +145,14 @@ abstract class Value
     }
 
     /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->getValue() === null;
+    }
+
+    /**
      * @param Context $context
      * @param string $path
      * @return
