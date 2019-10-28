@@ -229,6 +229,7 @@ class RESTResource implements ResourceContract
      * @return mixed
      * @throws ResourceValidationException
      * @throws RequirementValidationException
+     * @throws \CatLab\Requirements\Exceptions\ValidationException
      */
     public function validate(
         \CatLab\Charon\Interfaces\Context $context,
