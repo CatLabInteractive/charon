@@ -251,7 +251,7 @@
         "responses": {
           "200": {
             "schema": {
-              "$ref": "#\/definitions\/Pet_edit"
+              "$ref": "#\/definitions\/Pet_view"
             },
             "description": "Returns one Tests\\Petstore\\Models\\Pet"
           },
