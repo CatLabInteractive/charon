@@ -146,8 +146,12 @@ class ResourceField extends Field
     public function validate($value, string $path)
     {
         if ($this->isArray()) {
+            if ($value ===  null) {
+                $value = [];
+            }
+
             if (!is_array($value)) {
-                throw new ValidationException($path . ' must be of type array.');
+                throw new ValidationException(($path ? $path . '.' : '') . $this->getDisplayName() . ' must be of type array.');
             }
 
             foreach ($value as $v) {
