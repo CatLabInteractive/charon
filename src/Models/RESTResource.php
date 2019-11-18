@@ -14,6 +14,7 @@ use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Requirements\Exceptions\ValidationException;
 use CatLab\Requirements\Exceptions\ValidatorValidationException;
 
 /**
@@ -268,7 +269,11 @@ class RESTResource implements ResourceContract
                 }
                 $validator->validate($this);
             } catch(ValidatorValidationException $e) {
-                $messages->add($e->getValidator()->getErrorMessage($e));
+                $validator = $e->getValidator();
+                if (!$validator) {
+                    throw new ValidationException('ValidatorValidationException thrown without validator attached.', 400, $e);
+                }
+                $messages->add($validator->getErrorMessage($e));
             } catch(RequirementValidationException $e) {
                 throw $e;
             }

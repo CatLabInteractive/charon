@@ -293,7 +293,7 @@ abstract class RelationshipValue extends Value
         }
 
         // Is this a new child? We might not be able to add it...
-        if (!$childEntity && !$field->canCreateNewChildren()) {
+            if (!$childEntity && !$field->canCreateNewChildren()) {
             throw new EntityNotFoundException(
                 // The related resource does not exist.
                 "The related " . $child->getResourceDefinition()->getEntityName() . " at " . ObjectHelper::class_basename($parent) . "->" . $field->getName() . " does not exist"
