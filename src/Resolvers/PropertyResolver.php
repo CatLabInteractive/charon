@@ -2,6 +2,9 @@
 
 namespace CatLab\Charon\Resolvers;
 
+use CatLab\Base\Enum\Operator;
+use CatLab\Base\Interfaces\Database\SelectQueryParameters;
+use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\ValueUndefined;
@@ -357,30 +360,77 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      */
     public function eagerLoadRelationship(
         ResourceTransformer $transformer,
-        $entityCollection,
+        $queryBuilder,
         RelationshipField $field,
         Context $context
     ) {
-        $path = $this->splitPathParameters($field->getName());
+        $this->callEntitySpecificMethodIfExists(
+            $transformer,
+            $field,
+            $context,
+            self::EAGER_LOAD_METHOD_PREFIX,
+            [
+                $queryBuilder
+            ]
+        );
+    }
 
-        // Child field
-        $fieldName = array_shift($path);
-
-        try {
-            list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
-        } catch (VariableNotFoundInContext $e) {
+    /**
+     * Apply a filter to a query builder.
+     * (Used for filtering or searching entries on filterable/searchble fields)
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param Field $field
+     * @param SelectQueryParameters $queryBuilder
+     * @param $value
+     * @param string $operator
+     * @return void
+     */
+    public function applyPropertyFilter(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        Field $field,
+        SelectQueryParameters $queryBuilder,
+        $value,
+        $operator = Operator::EQ
+    ) {
+        // do we have a specific 'filter' method?
+        if ($this->callEntitySpecificMethodIfExists(
+                $transformer,
+                $field,
+                $context,
+                self::FILTER_METHOD_PREFIX,
+                [
+                    $queryBuilder,
+                    $value,
+                    $operator,
+                    $definition->getEntityClassName()
+                ]
+            )
+        ) {
             return;
         }
 
+        // nope? Too bad, use the regular filter method.
+        $queryBuilder->where(
+            new WhereParameter(
+                $field->getName(),
+                $operator,
+                $value,
+                $definition->getEntityClassName())
+        );
+    }
 
-        // Entity class name
-        $entityClassName = $field->getResourceDefinition()->getEntityClassName();
-        $method = self::EAGER_LOAD_METHOD_PREFIX . ucfirst($name);
-
-        // Check if method exist
-        if ($this->methodExists($entityClassName, $method)) {
-            $eagerLoadMethod = $entityClassName . '::' . $method;
-            call_user_func_array($eagerLoadMethod, array_merge([ $entityCollection ], $parameters));
-        }
+    /**
+     * @param $request
+     * @param string $key
+     * @param null $default
+     * @return mixed
+     */
+    public function getParameterFromRequest($request, string $key, $default = null)
+    {
+        return isset($request[$key]) ? $request[$key] : $default;
     }
 }

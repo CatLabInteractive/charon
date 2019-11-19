@@ -31,6 +31,7 @@ class ResolverBase
     const REGEX_REGULAR_PARAMETER = '[^{}.\s]+';
 
     const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
+    const FILTER_METHOD_PREFIX = 'filter';
 
     /**
      * @var array
@@ -380,6 +381,47 @@ class ResolverBase
                     'Getter parameter ' . $parameter . ' does not have a valid namespace. ' .
                     '\'' . self::NAMESPACE_MODEL . '\' or \'' . self::NAMESPACE_CONTEXT . '\' expected');
         }
+    }
+
+    /**
+     * Try to call a static method on the resource' entity.
+     * @param ResourceTransformer $transformer
+     * @param Field $field
+     * @param Context $context
+     * @param string $methodPrefix
+     * @param mixed[] $additionalParameters These parameters will be added after the route parameters
+     * @return mixed|null
+     */
+    protected function callEntitySpecificMethodIfExists(
+        ResourceTransformer $transformer,
+        Field $field,
+        Context $context,
+        $methodPrefix,
+        $additionalParameters = []
+    ) {
+        $path = $this->splitPathParameters($field->getName());
+
+        // Child field
+        $fieldName = array_shift($path);
+
+        try {
+            list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+        } catch (VariableNotFoundInContext $e) {
+            return false;
+        }
+
+        // Entity class name
+        $entityClassName = $field->getResourceDefinition()->getEntityClassName();
+        $method = $methodPrefix . ucfirst($name);
+
+        // Check if method exist
+        if ($this->methodExists($entityClassName, $method)) {
+            $eagerLoadMethod = $entityClassName . '::' . $method;
+            call_user_func_array($eagerLoadMethod, array_merge($parameters, $additionalParameters));
+            return true;
+        }
+
+        return false;
     }
 
     /**

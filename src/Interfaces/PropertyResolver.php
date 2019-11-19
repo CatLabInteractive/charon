@@ -2,6 +2,8 @@
 
 namespace CatLab\Charon\Interfaces;
 
+use CatLab\Base\Enum\Operator;
+use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\ValueUndefined;
@@ -193,5 +195,27 @@ interface PropertyResolver
         $entityCollection,
         RelationshipField $field,
         Context $context
+    );
+
+    /**
+     * Apply a filter to a query builder.
+     * (Used for filtering or searching entries on filterable/searchble fields)
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param Field $field
+     * @param SelectQueryParameters $queryBuilder
+     * @param $value
+     * @param string $operator
+     * @return void
+     */
+    public function applyPropertyFilter(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        Field $field,
+        SelectQueryParameters $queryBuilder,
+        $value,
+        $operator = Operator::EQ
     );
 }

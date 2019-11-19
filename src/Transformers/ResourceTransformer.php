@@ -453,6 +453,8 @@ class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
+     * Build select query parameters based on the filterable and searchable fields
+     * and input received from the RequestResolver.
      * @param $request
      * @param $resourceDefinition
      * @param ContextContract $context
@@ -475,26 +477,14 @@ class ResourceTransformer implements ResourceTransformerContract
 
                 // Filterable fields
                 if ($field->isFilterable()) {
-                    $parameter = $this->getRequestResolver()->getFilter($request, $field);
-                    if ($parameter !== null) {
-                        $queryBuilder->where(
-                            new WhereParameter(
-                                $field->getName(),
-                                Operator::EQ,
-                                $parameter,
-                                $definition->getEntityClassName())
-                        );
+                    $value = $this->getRequestResolver()->getFilter($request, $field);
+                    if ($value) {
+                        $this->propertyResolver->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
                     }
                 } elseif ($field->isSearchable()) {
-                    $parameter = $this->getRequestResolver()->getFilter($request, $field->getDisplayName());
-                    if ($parameter !== null) {
-                        $queryBuilder->where(
-                            new WhereParameter(
-                                $field->getName(),
-                                Operator::SEARCH,
-                                $parameter,
-                                $definition->getEntityClassName())
-                        );
+                    $value = $this->getRequestResolver()->getFilter($request, $field);
+                    if ($value) {
+                        $this->propertyResolver->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
                     }
                 }
 
