@@ -3,13 +3,12 @@
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Base\Enum\Operator;
-use CatLab\Base\Interfaces\Database\SelectQueryParameters;
+use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
-use CatLab\Charon\Interfaces\DynamicContext;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -17,11 +16,8 @@ use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
-use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
-use CatLab\Charon\Models\Values\PropertyValue;
-use ReflectionMethod;
 
 /**
  * Class PropertyResolver
@@ -415,13 +411,16 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         }
 
         // nope? Too bad, use the regular filter method.
-        $queryBuilder->where(
+        $catlabQueryBuilder = new SelectQueryParameters();
+        $catlabQueryBuilder->where(
             new WhereParameter(
                 $field->getName(),
                 $operator,
                 $value,
                 $definition->getEntityClassName())
         );
+
+        $transformer->applyProcessorFilters($queryBuilder, $catlabQueryBuilder);
     }
 
     /**

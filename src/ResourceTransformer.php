@@ -54,7 +54,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param SelectQueryParameters $parameters
      * @return void
      */
-    abstract protected function applyProcessorFilters($queryBuilder, SelectQueryParameters $parameters);
+    abstract public function applyProcessorFilters($queryBuilder, SelectQueryParameters $parameters);
     
     /**
      * @var PropertyResolver
