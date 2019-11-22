@@ -2,7 +2,7 @@
 
 namespace CatLab\RESTResource\Tests;
 
-use CatLab\Charon\Transformers\ResourceTransformer;
+use CatLab\Charon\ResourceTransformer;
 use MockEntityModel;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
@@ -25,7 +25,7 @@ require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthFour.php';
  *
  * @package CatLab\RESTResource\Tests
  */
-class MaxDepthTest extends PHPUnit_Framework_TestCase
+class MaxDepthTest extends BaseTest
 {
     /**
      * @return MockEntityModel
@@ -640,7 +640,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testOutputMaxDepthOne()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
         $resource = $transformer->toResource(\MockResourceDefinitionDepthOne::class, $mockEntity, new Context(Action::VIEW));
@@ -655,7 +655,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testOutputMaxDepthTwo()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
         $resource = $transformer->toResource(\MockResourceDefinitionDepthTwo::class, $mockEntity, new Context(Action::VIEW));
@@ -670,7 +670,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testOutputMaxDepthThree()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
         $resource = $transformer->toResource(\MockResourceDefinitionDepthThree::class, $mockEntity, new Context(Action::VIEW));
@@ -685,7 +685,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testOutputMaxDepthFour()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
         $resource = $transformer->toResource(MockResourceDefinitionDepthFour::class, $mockEntity, new Context(Action::VIEW));
@@ -700,7 +700,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testInputDepthOne()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $input = $this->getDeepArray();
 
@@ -718,7 +718,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testInputDepthTwo()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $input = $this->getDeepArray();
 
@@ -736,7 +736,7 @@ class MaxDepthTest extends PHPUnit_Framework_TestCase
      */
     public function testInputDepthThree()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         $input = $this->getDeepArray();
 

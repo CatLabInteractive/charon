@@ -9,7 +9,7 @@ use Tests\Petstore\Models\Pet;
 use Tests\Petstore\Models\Photo;
 use Tests\Petstore\Models\Tag;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Transformers\ResourceTransformer;
+use CatLab\Charon\ResourceTransformer;
 use CatLab\Charon\Models\Context;
 
 use PHPUnit_Framework_TestCase;
@@ -18,7 +18,7 @@ use PHPUnit_Framework_TestCase;
  * Class PetstoreTest
  * @package CatLab\RESTResource\Tests
  */
-class PetstoreTest extends PHPUnit_Framework_TestCase
+class PetstoreTest extends BaseTest
 {
     /**
      *
@@ -69,7 +69,7 @@ class PetstoreTest extends PHPUnit_Framework_TestCase
             'status'
         ]);
 
-        $resourceTransformer = new ResourceTransformer();
+        $resourceTransformer = $this->getResourceTransformer();
         $resource = $resourceTransformer->toResource($petDefinition, $pet, $context);
 
         $this->assertEquals([
@@ -155,7 +155,7 @@ class PetstoreTest extends PHPUnit_Framework_TestCase
             'tags'
         ]);
 
-        $resourceTransformer = new ResourceTransformer();
+        $resourceTransformer = $this->getResourceTransformer();
         $resource = $resourceTransformer->toResource($petDefinition, $pet, $context);
 
         $this->assertEquals([
@@ -226,7 +226,7 @@ class PetstoreTest extends PHPUnit_Framework_TestCase
             'tags'
         ]);
 
-        $resourceTransformer = new ResourceTransformer();
+        $resourceTransformer = $this->getResourceTransformer();
         $resource = $resourceTransformer->toResource($petDefinition, $pet, $context);
 
         $this->assertEquals([

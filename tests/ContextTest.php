@@ -12,7 +12,7 @@ use PHPUnit_Framework_TestCase;
  * Class ContextTest
  * @package CatLab\RESTResource\Tests
  */
-class ContextTest extends PHPUnit_Framework_TestCase
+class ContextTest extends BaseTest
 {
     /**
      *

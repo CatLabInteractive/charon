@@ -7,7 +7,7 @@ require_once 'Models/MockResourceDefinition.php';
 /**
  * Class PropertyResolverTest
  */
-class PropertyResolverTest extends PHPUnit_Framework_TestCase
+class PropertyResolverTest extends \CatLab\RESTResource\Tests\BaseTest
 {
     /**
      *
@@ -66,7 +66,7 @@ class PropertyResolverTest extends PHPUnit_Framework_TestCase
     public function testResolvePathParameters()
     {
         $propertyResolver = new \CatLab\Charon\Resolvers\PropertyResolver();
-        $transformer = new \CatLab\Charon\Transformers\ResourceTransformer($propertyResolver);
+        $transformer = $this->getResourceTransformer($propertyResolver);
 
         MockEntityModel::clearNextId();
         $model = new MockEntityModel();

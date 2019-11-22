@@ -2,8 +2,7 @@
 
 namespace CatLab\Charon\Interfaces;
 
-use CatLab\Base\Models\Database\SelectQueryParameters;
-use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -16,7 +15,7 @@ interface Processor
      * @param ResourceTransformer $transformer
      * @param SelectQueryParameters $selectQuery
      * @param $request
-     * @param ResourceDefinition $definition
+     * @param ResourceDefinition $definitionSelectQueryParameters
      * @param Context $context
      * @param int $records
      * @return void

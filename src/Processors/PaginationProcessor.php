@@ -2,17 +2,15 @@
 
 namespace CatLab\Charon\Processors;
 
+use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Base\Interfaces\Pagination\PaginationBuilder;
-use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\OrderParameter;
-use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Base\Models\Database\DB;
-use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Interfaces\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
-use CatLab\Charon\Interfaces\Transformer;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\ResourceField;
@@ -58,7 +56,7 @@ class PaginationProcessor implements Processor
 
     /**
      * @param ResourceTransformer $transformer
-     * @param SelectQueryParameters $selectQuery
+     * @param $queryBuilder
      * @param $request
      * @param ResourceDefinition $definition
      * @param Context $context
@@ -67,7 +65,7 @@ class PaginationProcessor implements Processor
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $selectQuery,
+        SelectQueryParameters $queryBuilder,
         $request,
         ResourceDefinition $definition,
         Context $context,
@@ -87,7 +85,7 @@ class PaginationProcessor implements Processor
         }
 
         // Build the filters
-        $builder->build($selectQuery);
+        $builder->build($queryBuilder);
     }
 
     /**

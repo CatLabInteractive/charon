@@ -89,10 +89,16 @@ interface ResourceTransformer
      * @param $request
      * @param $resourceDefinition
      * @param Context $context
+     * @param null $queryBuilder
      * @param int $records
-     * @return SelectQueryParameters
+     * @return $queryBuilder
      */
-    public function getFilters($request, $resourceDefinition, Context $context, int $records = null);
+    public function getFilters(
+        $request, $resourceDefinition,
+        Context $context,
+        $queryBuilder = null,
+        int $records = null
+    );
 
     /**
      * @return PropertyResolver

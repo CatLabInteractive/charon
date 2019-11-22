@@ -3,12 +3,13 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
-use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
+use CatLab\Charon\Interfaces\ResourceCollection;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**

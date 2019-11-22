@@ -4,7 +4,7 @@ namespace CatLab\RESTResource\Tests;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
-use CatLab\Charon\Transformers\ResourceTransformer;
+use CatLab\Charon\ResourceTransformer;
 
 use MockEntityModel;
 use MockResourceDefinitionExtraAttributes;
@@ -16,7 +16,7 @@ require_once 'ResourceDefinitionDepths/MockResourceDefinitionExtraAttributes.php
  * Class FieldSelectionTest
  * @package CatLab\RESTResource\Tests
  */
-class FieldSelectionTest extends PHPUnit_Framework_TestCase
+class FieldSelectionTest extends BaseTest
 {
     /**
      * Default case, no fields and no expand.
@@ -25,7 +25,7 @@ class FieldSelectionTest extends PHPUnit_Framework_TestCase
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         // Default mode
         $context = new Context(Action::INDEX);
@@ -49,7 +49,7 @@ class FieldSelectionTest extends PHPUnit_Framework_TestCase
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         // Default mode
         $context = new Context(Action::INDEX);
@@ -71,7 +71,7 @@ class FieldSelectionTest extends PHPUnit_Framework_TestCase
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         // Default mode
         $context = new Context(Action::INDEX);
@@ -110,7 +110,7 @@ class FieldSelectionTest extends PHPUnit_Framework_TestCase
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         // Default mode
         $context = new Context(Action::INDEX);
@@ -149,7 +149,7 @@ class FieldSelectionTest extends PHPUnit_Framework_TestCase
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         // Default mode
         $context = new Context(Action::INDEX);
@@ -185,7 +185,7 @@ class FieldSelectionTest extends PHPUnit_Framework_TestCase
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
 
         // Default mode
         $context = new Context(Action::INDEX);

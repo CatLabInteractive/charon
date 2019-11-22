@@ -2,7 +2,7 @@
 
 namespace CatLab\RESTResource\Tests;
 
-use CatLab\Charon\Transformers\ResourceTransformer;
+use CatLab\Charon\ResourceTransformer;
 use Tests\Petstore\Definitions\PetDefinition;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
@@ -13,14 +13,14 @@ use PHPUnit_Framework_TestCase;
  * Class ValidatorTest
  * @package CatLab\RESTResource\Tests
  */
-class ValidatorTest extends PHPUnit_Framework_TestCase
+class ValidatorTest extends BaseTest
 {
     /**
      *
      */
     public function testPetInput()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
         $context = new Context(Action::CREATE);
 
         $resource = $transformer->fromArray(
@@ -49,7 +49,7 @@ class ValidatorTest extends PHPUnit_Framework_TestCase
      */
     public function testPetNotEnoughPhotos()
     {
-        $transformer = new ResourceTransformer();
+        $transformer = $this->getResourceTransformer();
         $context = new Context(Action::CREATE);
 
         $resource = $transformer->fromArray(

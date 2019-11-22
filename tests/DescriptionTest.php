@@ -14,7 +14,7 @@ use PHPUnit_Framework_TestCase;
  * Class ValidatorTest
  * @package CatLab\RESTResource\Tests
  */
-class DescriptionTest extends PHPUnit_Framework_TestCase
+class DescriptionTest extends BaseTest
 {
     /**
      *

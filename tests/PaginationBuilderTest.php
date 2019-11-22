@@ -4,7 +4,7 @@ namespace CatLab\RESTResource\Tests;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\Processors\PaginationProcessor;
-use CatLab\Charon\Transformers\ResourceTransformer;
+use CatLab\Charon\ResourceTransformer;
 use CatLab\CursorPagination\CursorPaginationBuilder;
 use MockEntityModel;
 use CatLab\Charon\Enums\Action;
@@ -32,7 +32,7 @@ require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthFour.php';
  *
  * @package CatLab\RESTResource\Tests
  */
-class PaginationBuilderTest extends PHPUnit_Framework_TestCase
+class PaginationBuilderTest extends BaseTest
 {
     /**
      *
@@ -158,7 +158,9 @@ class PaginationBuilderTest extends PHPUnit_Framework_TestCase
             'tags'
         ]);
 
-        $resourceTransformer = new \CatLab\Charon\Transformers\ResourceTransformer();
+        $resourceTransformer = $this->getResourceTransformer();
+
+        $queryBuilder = new SelectQueryParameters();
 
         $filters = $resourceTransformer->getFilters(
             [
@@ -168,6 +170,7 @@ class PaginationBuilderTest extends PHPUnit_Framework_TestCase
             ],
             $petDefinition,
             $context,
+            $queryBuilder,
             10
         );
 
@@ -193,7 +196,7 @@ class PaginationBuilderTest extends PHPUnit_Framework_TestCase
         return [
             'before' => $cursors['before'],
             'after' => $cursors['after'] ,
-            'filters' => $filters
+            'filters' => $filters->getQueryBuilder()
         ];
     }
 }

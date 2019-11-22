@@ -1,5 +1,7 @@
 <?php
 
+use CatLab\RESTResource\Tests\BaseTest;
+
 require_once 'Models/MockEntityModel.php';
 require_once 'Models/MockPropertyResolver.php';
 require_once 'Models/MockResourceDefinition.php';
@@ -7,7 +9,7 @@ require_once 'Models/MockResourceDefinition.php';
 /**
  * Class ResourceTransformerTest
  */
-class ResourceTransformerTest extends PHPUnit_Framework_TestCase
+class ResourceTransformerTest extends BaseTest
 {
     /**
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
@@ -22,7 +24,7 @@ class ResourceTransformerTest extends PHPUnit_Framework_TestCase
 
         $definition = MockResourceDefinition::class;
 
-        $transformer = new \CatLab\Charon\Transformers\ResourceTransformer(
+        $transformer = $this->getResourceTransformer(
             new \CatLab\Charon\Resolvers\PropertyResolver()
         );
 

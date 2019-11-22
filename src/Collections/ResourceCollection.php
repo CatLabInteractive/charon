@@ -4,7 +4,7 @@ namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
 use CatLab\Charon\Models\RESTResource;
-use CatLab\Charon\Transformers\ResourceTransformer;
+use CatLab\Charon\ResourceTransformer;
 
 /**
  * Class RESTResourceCollection
