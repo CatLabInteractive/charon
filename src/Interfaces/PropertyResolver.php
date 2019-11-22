@@ -214,7 +214,7 @@ interface PropertyResolver
         ResourceDefinition $definition,
         Context $context,
         Field $field,
-        SelectQueryParameters $queryBuilder,
+        $queryBuilder,
         $value,
         $operator = Operator::EQ
     );

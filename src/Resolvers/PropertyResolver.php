@@ -382,7 +382,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
      * @param ResourceDefinition $definition
      * @param Context $context
      * @param Field $field
-     * @param SelectQueryParameters $queryBuilder
+     * @param $queryBuilder
      * @param $value
      * @param string $operator
      * @return void
@@ -392,7 +392,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         ResourceDefinition $definition,
         Context $context,
         Field $field,
-        SelectQueryParameters $queryBuilder,
+        $queryBuilder,
         $value,
         $operator = Operator::EQ
     ) {
@@ -406,6 +406,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
                     $queryBuilder,
                     $value,
                     $operator,
+                    $context,
                     $definition->getEntityClassName()
                 ]
             )

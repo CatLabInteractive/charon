@@ -537,7 +537,8 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             }
         }
 
-        // Processors
+        // Processors (are applied in catlab query parameters since the processors need to work for every framework)
+        // and then translated & applied to the framework specific query builder.
         $processorFilters = $this->getProcessorFilters($request, $resourceDefinition, $context, $records);
         $this->applyProcessorFilters($queryBuilder, $processorFilters);
 
