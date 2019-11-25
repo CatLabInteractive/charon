@@ -5,11 +5,10 @@ namespace CatLab\Charon;
 use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Models\Database\SelectQueryParameters;
-use CatLab\Base\Models\Database\WhereParameter;
-use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
 use CatLab\Charon\Exceptions\NoInputDataFound;
+use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\IterableExpected;
 use CatLab\Charon\Interfaces\Context;
@@ -54,7 +53,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param SelectQueryParameters $parameters
      * @return void
      */
-    abstract public function applyProcessorFilters($queryBuilder, SelectQueryParameters $parameters);
+    abstract public function applyCatLabFilters($queryBuilder, SelectQueryParameters $parameters);
     
     /**
      * @var PropertyResolver
@@ -502,6 +501,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param null $queryBuilder
      * @param int $records
      * @return FilterResults
+     * @throws NotImplementedException
      */
     public function getFilters($request, $resourceDefinition, Context $context, $queryBuilder = null, int $records = null)
     {
@@ -540,7 +540,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         // Processors (are applied in catlab query parameters since the processors need to work for every framework)
         // and then translated & applied to the framework specific query builder.
         $processorFilters = $this->getProcessorFilters($request, $resourceDefinition, $context, $records);
-        $this->applyProcessorFilters($queryBuilder, $processorFilters);
+        $this->processProcessorFilters($context, $resourceDefinition, $processorFilters, $queryBuilder);
 
         // prepare output.
         $filterResults->setRecords($records);
@@ -548,6 +548,47 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $filterResults->setQueryBuilder($queryBuilder);
 
         return $filterResults;
+    }
+
+    /**
+     * @param ContextContract $context
+     * @param ResourceDefinition $resourceDefinition
+     * @param SelectQueryParameters $filter
+     * @param null $queryBuilder
+     * @throws NotImplementedException
+     */
+    protected function processProcessorFilters(
+        Context $context,
+        ResourceDefinition $resourceDefinition,
+        SelectQueryParameters $filter,
+        $queryBuilder = null
+    ) {
+        $where = $filter->getWhere();
+        if (count($where) > 0) {
+            throw new NotImplementedException('NOT IMPLEMENTED YET!');
+        }
+
+        // now we need to translate these to our own system
+        foreach ($filter->getSort() as $sort) {
+            $entity = $sort->getEntity();
+            if ($entity instanceof Field) {
+                $this->getPropertyResolver()->applyPropertySorting($this, $entity->getResourceDefinition(), $context, $entity, $queryBuilder, $sort->getDirection());
+            }
+        }
+
+        $limit = $filter->getLimit();
+        if ($limit) {
+            $this->getPropertyResolver()->applyLimit(
+                $this,
+                $resourceDefinition,
+                $context,
+                $queryBuilder,
+                $limit->getAmount(),
+                $limit->getOffset()
+            );
+        }
+
+        //$this->applyCatLabFilters($queryBuilder, $processorFilters);
     }
 
     /**

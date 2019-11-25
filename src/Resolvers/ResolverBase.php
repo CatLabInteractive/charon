@@ -32,6 +32,7 @@ class ResolverBase
 
     const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
     const FILTER_METHOD_PREFIX = 'filter';
+    const SORT_METHOD_PREFIX = 'sort';
 
     /**
      * @var array

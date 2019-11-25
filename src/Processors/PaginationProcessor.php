@@ -308,7 +308,7 @@ class PaginationProcessor implements Processor
                             new OrderParameter(
                                 $field->getName(),
                                 $direction,
-                                $definition->getEntityClassName()
+                                $field
                             )
                         );
                     }
@@ -339,7 +339,7 @@ class PaginationProcessor implements Processor
                     new OrderParameter(
                         $field->getName(),
                         OrderParameter::ASC,
-                        $definition->getEntityClassName()
+                        $field
                     )
                 );
             }
@@ -381,7 +381,6 @@ class PaginationProcessor implements Processor
         } else {
             $random = mt_rand(0, self::MAX_INT);
         }
-
 
         $builder->orderBy(
             new OrderParameter(

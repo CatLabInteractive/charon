@@ -33,7 +33,7 @@ interface Context
      * @param mixed $entity
      * @return mixed[]
      */
-    public function getParameter(string $name, $entity);
+    public function getParameter(string $name, $entity = null);
 
     /**
      * @return string

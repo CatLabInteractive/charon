@@ -218,4 +218,39 @@ interface PropertyResolver
         $value,
         $operator = Operator::EQ
     );
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param Field $field
+     * @param $queryBuilder
+     * @param string $direction
+     */
+    public function applyPropertySorting(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        Field $field,
+        $queryBuilder,
+        $direction = 'asc'
+    );
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @param $records
+     * @param $skip
+     * @return void
+     */
+    public function applyLimit(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder,
+        $records,
+        $skip
+    );
 }

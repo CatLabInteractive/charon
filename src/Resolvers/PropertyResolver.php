@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Base\Enum\Operator;
+use CatLab\Base\Models\Database\OrderParameter;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\PropertyValueCollection;
@@ -420,7 +421,72 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
                 $definition->getEntityClassName())
         );
 
-        $transformer->applyProcessorFilters($queryBuilder, $catlabQueryBuilder);
+        $transformer->applyCatLabFilters($queryBuilder, $catlabQueryBuilder);
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param Field $field
+     * @param $queryBuilder
+     * @param string $direction
+     */
+    public function applyPropertySorting(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        Field $field,
+        $queryBuilder,
+        $direction = 'asc'
+    ) {
+        // do we have a specific 'filter' method?
+        if ($this->callEntitySpecificMethodIfExists(
+                $transformer,
+                $field,
+                $context,
+                self::SORT_METHOD_PREFIX,
+                [
+                    $queryBuilder,
+                    $direction,
+                    $context,
+                    $definition->getEntityClassName()
+                ]
+            )
+        ) {
+            return;
+        }
+
+        // nope? Too bad, use the regular orderBy method.
+        $catlabQueryBuilder = new SelectQueryParameters();
+        $catlabQueryBuilder->orderBy(
+            new OrderParameter($field->getName(), $direction, $field->getResourceDefinition()->getEntityClassName())
+        );
+
+        $transformer->applyCatLabFilters($queryBuilder, $catlabQueryBuilder);
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @param $records
+     * @param $skip
+     */
+    public function applyLimit(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder,
+        $records,
+        $skip
+    ) {
+        $queryBuilder->take($records);
+
+        if ($skip) {
+            $queryBuilder->skip($skip);
+        }
     }
 
     /**
