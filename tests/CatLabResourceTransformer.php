@@ -17,7 +17,7 @@ class CatLabResourceTransformer extends \CatLab\Charon\ResourceTransformer
      * @param SelectQueryParameters $parameters
      * @return void
      */
-    protected function applyCatLabFilters($queryBuilder, SelectQueryParameters $parameters)
+    public function applyCatLabFilters($queryBuilder, SelectQueryParameters $parameters)
     {
         if (! ($queryBuilder instanceof SelectQueryParameters)) {
             throw new \InvalidArgumentException(SelectQueryParameters::class . ' expected');
