@@ -16,7 +16,7 @@ class FilterResults
     /**
      * @var boolean
      */
-    protected $reverted = false;
+    protected $reversed = false;
 
     /**
      * @var int
@@ -49,18 +49,18 @@ class FilterResults
     /**
      * @return bool
      */
-    public function isReverted(): bool
+    public function isReversed(): bool
     {
-        return $this->reverted;
+        return $this->reversed;
     }
 
     /**
      * @param bool $reverted
      * @return FilterResults
      */
-    public function setReverted(bool $reverted): FilterResults
+    public function setReversed(bool $reverted): FilterResults
     {
-        $this->reverted = $reverted;
+        $this->reversed = $reverted;
         return $this;
     }
 

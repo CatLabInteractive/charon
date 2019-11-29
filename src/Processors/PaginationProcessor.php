@@ -285,6 +285,7 @@ class PaginationProcessor implements Processor
         $sorting = $transformer->getRequestResolver()->getSorting($request);
 
         $sortedOn = [];
+        $sortDirections = [];
 
         if ($sorting) {
             $sortFields = explode(',', $sorting);
@@ -303,6 +304,7 @@ class PaginationProcessor implements Processor
                 if ($field) {
                     if ($field->isSortable()) {
                         $sortedOn[$field->getName()] = true;
+                        $sortDirections[] = $direction;
 
                         $builder->orderBy(
                             new OrderParameter(
@@ -331,14 +333,16 @@ class PaginationProcessor implements Processor
             }
         }
 
-        // Add all
+        // Add all identifiers (and check the direction of the first parameter so we can switch that around)
         foreach ($definition->getFields() as $field) {
             if ($field instanceof IdentifierField && !isset($sortedOn[$field->getName()])) {
+
+                $defaultSortDirection = isset($sortDirections[0]) ? $sortDirections[0] : OrderParameter::ASC;
 
                 $builder->orderBy(
                     new OrderParameter(
                         $field->getName(),
-                        OrderParameter::ASC,
+                        $defaultSortDirection,
                         $field
                     )
                 );
