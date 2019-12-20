@@ -112,9 +112,11 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
             $queryBuilder->limit(new LimitParameter($offset, $limit));
         }
 
-        foreach ($this->sort as $sort) {
-            $dir = $sort->getDirection();
-            $queryBuilder->orderBy(new OrderParameter($sort->getColumn(), $dir, $sort->getEntity()));
+        if (isset($this->sort)) {
+            foreach ($this->sort as $sort) {
+                $dir = $sort->getDirection();
+                $queryBuilder->orderBy(new OrderParameter($sort->getColumn(), $dir, $sort->getEntity()));
+            }
         }
 
         return $queryBuilder;
