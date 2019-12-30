@@ -6,6 +6,8 @@ use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Base\Interfaces\Pagination\PaginationBuilder;
 use CatLab\Base\Models\Database\OrderParameter;
 use CatLab\Base\Models\Database\DB;
+use CatLab\Charon\Exceptions\NotImplementedException;
+use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
@@ -63,6 +65,7 @@ abstract class PaginationProcessor implements Processor
      * @param Context $context
      * @param FilterResults $filterResults
      * @return mixed|void
+     * @throws NotImplementedException
      */
     public function processFilters(
         ResourceTransformer $transformer,
@@ -89,7 +92,55 @@ abstract class PaginationProcessor implements Processor
         $catlabQueryBuilder = new \CatLab\Base\Models\Database\SelectQueryParameters();
         $builder->build($catlabQueryBuilder);
 
-        $transformer->applyCatLabFilters($queryBuilder, $catlabQueryBuilder);
+        $this->processProcessorFilters($transformer, $context, $definition, $catlabQueryBuilder, $queryBuilder);
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param Context $context
+     * @param ResourceDefinition $resourceDefinition
+     * @param SelectQueryParameters $filter
+     * @param null $queryBuilder
+     * @throws NotImplementedException
+     */
+    protected function processProcessorFilters(
+        ResourceTransformer $transformer,
+        Context $context,
+        ResourceDefinition $resourceDefinition,
+        SelectQueryParameters $filter,
+        $queryBuilder = null
+    ) {
+        $where = $filter->getWhere();
+        if (count($where) > 0) {
+            throw new NotImplementedException('NOT IMPLEMENTED YET!');
+        }
+
+        // now we need to translate these to our own system
+        foreach ($filter->getSort() as $sort) {
+            $entity = $sort->getEntity();
+            if ($entity instanceof Field) {
+                $transformer->getQueryAdapter()->applyPropertySorting(
+                    $transformer,
+                    $entity->getResourceDefinition(),
+                    $context,
+                    $entity,
+                    $queryBuilder,
+                    $sort->getDirection()
+                );
+            }
+        }
+
+        $limit = $filter->getLimit();
+        if ($limit) {
+            $transformer->getQueryAdapter()->applyLimit(
+                $transformer,
+                $resourceDefinition,
+                $context,
+                $queryBuilder,
+                $limit->getAmount(),
+                $limit->getOffset()
+            );
+        }
     }
 
     /**
@@ -110,7 +161,15 @@ abstract class PaginationProcessor implements Processor
         RelationshipValue $parent = null,
         $parentEntity = null
     ) {
-        list ($url, $cursor) = $this->prepareCursor($transformer, $collection, $definition, $context, $filterResults, $parent, $parentEntity);
+        list ($url, $cursor) = $this->prepareCursor(
+            $transformer,
+            $collection,
+            $definition,
+            $context,
+            $filterResults,
+            $parent,
+            $parentEntity
+        );
 
         $collection->addMeta('pagination', [
             'next' => $cursor->getNext() ? $url . '?' . http_build_query($cursor->getNext()) : null,

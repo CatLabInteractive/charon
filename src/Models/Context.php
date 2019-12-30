@@ -101,7 +101,7 @@ class Context implements ContextContract
     /**
      * @param string $name
      * @param string $parameter
-     * @return ContextContract
+     * @return Context
      */
     public function setParameter(string $name, $parameter) : ContextContract
     {
@@ -122,7 +122,7 @@ class Context implements ContextContract
     /**
      * @param Field $field
      * @param string $action
-     * @return ContextContract
+     * @return Context
      */
     public function getChildContext(Field $field, $action = Action::INDEX) : ContextContract
     {

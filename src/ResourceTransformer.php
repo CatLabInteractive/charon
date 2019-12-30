@@ -4,11 +4,9 @@ namespace CatLab\Charon;
 
 use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
-use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;
 use CatLab\Charon\Exceptions\NoInputDataFound;
-use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\IterableExpected;
 use CatLab\Charon\Interfaces\Context;
@@ -16,12 +14,12 @@ use CatLab\Charon\Interfaces\DynamicContext;
 use CatLab\Charon\Interfaces\IdentifierCollection;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
+use CatLab\Charon\Interfaces\QueryAdapter;
 use CatLab\Charon\Interfaces\RequestResolver;
 use CatLab\Charon\Interfaces\ResourceCollection;
 use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
 use CatLab\Charon\Interfaces\ResourceDefinition;
-use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\EntityFactory as EntityFactoryContract;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
@@ -47,15 +45,6 @@ use CatLab\Charon\Interfaces\ResourceFactory;
 abstract class ResourceTransformer implements ResourceTransformerContract
 {
     /**
-     * Apply processor filters (= filters that are created by processors) and translate them to the system specific
-     * query builder.
-     * @param $queryBuilder
-     * @param SelectQueryParameters $parameters
-     * @return void
-     */
-    abstract public function applyCatLabFilters($queryBuilder, SelectQueryParameters $parameters);
-
-    /**
      * @var PropertyResolver
      */
     protected $propertyResolver;
@@ -69,6 +58,11 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @var RequestResolver
      */
     protected $requestResolver;
+
+    /**
+     * @var QueryAdapter
+     */
+    protected $queryAdapter;
 
     /**
      * @var ResourceFactoryInterface
@@ -97,37 +91,24 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
     /**
      * ResourceTransformer constructor.
-     * @param PropertyResolver|null $propertyResolver
-     * @param PropertySetter|null $propertySetter
-     * @param RequestResolver|null $requestResolver
-     * @param ResourceFactoryInterface|null $resourceFactory
+     * @param PropertyResolver $propertyResolver
+     * @param PropertySetter $propertySetter
+     * @param RequestResolver $requestResolver
+     * @param QueryAdapter $queryAdapter
+     * @param ResourceFactory $resourceFactory
      */
     public function __construct(
-        PropertyResolver $propertyResolver = null,
-        PropertySetter $propertySetter = null,
-        RequestResolver $requestResolver = null,
-        ResourceFactoryInterface $resourceFactory = null
+        PropertyResolver $propertyResolver,
+        PropertySetter $propertySetter,
+        RequestResolver $requestResolver,
+        QueryAdapter $queryAdapter,
+        ResourceFactoryInterface $resourceFactory
     ) {
-        if (!isset($propertyResolver)) {
-            $propertyResolver = new \CatLab\Charon\Resolvers\PropertyResolver();
-        }
-
-        if (!isset($propertySetter)) {
-            $propertySetter = new \CatLab\Charon\Resolvers\PropertySetter();
-        }
-
-        if (!isset($resourceFactory)) {
-            $resourceFactory = new \CatLab\Charon\Factories\ResourceFactory();
-        }
-
-        if (!isset($requestResolver)) {
-            $requestResolver = new \CatLab\Charon\Resolvers\RequestResolver();
-        }
-
         $this->propertyResolver = $propertyResolver;
         $this->propertySetter = $propertySetter;
         $this->resourceFactory = $resourceFactory;
         $this->requestResolver = $requestResolver;
+        $this->queryAdapter = $queryAdapter;
 
         $this->currentPath = new CurrentPath();
         $this->parents = new ParentEntityCollection();
@@ -145,7 +126,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     /**
      * @param ResourceDefinition|string $resourceDefinition
      * @param mixed $entities
-     * @param ContextContract $context
+     * @param Context $context
      * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
      * @param null $parentEntity
@@ -160,7 +141,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     public function toResources(
         $resourceDefinition,
         $entities,
-        ContextContract $context,
+        Context $context,
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
@@ -194,7 +175,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     /**
      * @param ResourceDefinition|string $resourceDefinition
      * @param mixed $entity
-     * @param ContextContract $context
+     * @param Context $context
      * @param RelationshipValue $parent
      * @param null $parentEntity
      * @return ResourceContract
@@ -202,13 +183,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
      * @throws IterableExpected
-     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
-     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
+     * @throws Exceptions\InvalidTransformer
      */
     public function toResource(
         $resourceDefinition,
         $entity,
-        ContextContract $context,
+        Context $context,
         RelationshipValue $parent = null,
         $parentEntity = null
     ) : ResourceContract {
@@ -255,7 +235,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                         $this->linkRelationship($field, $entity, $resource, $context, $visible);
                     }
                 } elseif ($field instanceof ResourceField) {
-                    $value = $this->propertyResolver->resolveProperty($this, $entity, $field, $context);
+                    $value = $this->getPropertyResolver()->resolveProperty($this, $entity, $field, $context);
 
                     if ($field->isArray()) {
                         // Null values = emtpy arrays.
@@ -318,7 +298,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param $resourceDefinition
      * @param EntityFactoryContract $factory
      * @param mixed|null $entity
-     * @param ContextContract $context
+     * @param Context $context
      * @return mixed $entity
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
@@ -326,7 +306,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         ResourceContract $resource,
         $resourceDefinition,
         EntityFactoryContract $factory,
-        ContextContract $context,
+        Context $context,
         $entity = null
     ) {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
@@ -339,7 +319,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
         $values = $resource->getProperties()->getValues();
         foreach ($values as $property) {
-            $property->toEntity($entity, $this, $this->propertyResolver, $this->propertySetter, $factory, $context);
+            $property->toEntity($entity, $this, $this->getPropertyResolver(), $this->getPropertySetter(), $factory, $context);
         }
 
         $this->parents->pop();
@@ -351,12 +331,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * Create a resource from a data array
      * @param $resourceDefinition
      * @param array $body
-     * @param ContextContract $context
+     * @param Context $context
      * @return ResourceContract
      * @throws InvalidPropertyException
      * @throws InvalidContextAction
      */
-    public function fromArray($resourceDefinition, array $body, ContextContract $context) : ResourceContract
+    public function fromArray($resourceDefinition, array $body, Context $context) : ResourceContract
     {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
         if (!Action::isWriteContext($context->getAction())) {
@@ -376,7 +356,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                     $this->relationshipFromArray($field, $body, $resource, $context);
                 } else {
                     try {
-                        $value = $this->propertyResolver->resolvePropertyInput(
+                        $value = $this->getPropertyResolver()->resolvePropertyInput(
                             $this,
                             $body,
                             $field,
@@ -399,7 +379,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param $resourceDefinition
      * @param $content
      * @param EntityFactoryContract $factory
-     * @param ContextContract $context
+     * @param Context $context
      * @return array
      * @throws InvalidContextAction
      */
@@ -407,7 +387,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $resourceDefinition,
         $content,
         EntityFactoryContract $factory,
-        ContextContract $context
+        Context $context
     ) {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
         if (!Action::isWriteContext($context->getAction())) {
@@ -444,14 +424,14 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ResourceDefinition $resourceDefinition
      * @param $identifier
      * @param EntityFactoryContract $factory
-     * @param ContextContract $context
+     * @param Context $context
      * @return mixed
      */
     private function fromIdentifier(
         ResourceDefinition $resourceDefinition,
         $identifier,
         EntityFactoryContract $factory,
-        ContextContract $context
+        Context $context
     ) {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
 
@@ -472,9 +452,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * to be loaded.
      * @param $entities
      * @param $resourceDefinition
-     * @param ContextContract $context
+     * @param Context $context
      */
-    public function processEagerLoading($entities, $resourceDefinition, ContextContract $context)
+    public function processEagerLoading($entities, $resourceDefinition, Context $context)
     {
         $definition = ResourceDefinitionLibrary::make($resourceDefinition);
 
@@ -488,7 +468,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 $this->shouldInclude($field, $context) &&
                 $this->shouldExpand($field, $context)
             ) {
-                $this->propertyResolver->eagerLoadRelationship($this, $entities, $field, $context);
+                $this->getQueryAdapter()->eagerLoadRelationship($this, $entities, $field, $context);
             }
 
             $this->currentPath->pop();
@@ -499,7 +479,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * Apply any filterable/searchable fields
      * @param $request
      * @param string|ResourceDefinition $resourceDefinition
-     * @param ContextContract $context
+     * @param Context $context
      * @param $queryBuilder
      * @return FilterResults
      */
@@ -522,12 +502,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 if ($field->isFilterable()) {
                     $value = $this->getRequestResolver()->getFilter($request, $field);
                     if ($value) {
-                        $this->getPropertyResolver()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
+                        $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
                     }
                 } elseif ($field->isSearchable()) {
                     $value = $this->getRequestResolver()->getFilter($request, $field);
                     if ($value) {
-                        $this->getPropertyResolver()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
+                        $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
                     }
                 }
 
@@ -554,7 +534,6 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param Context $context
      * @param bool $visible
      * @throws InvalidPropertyException
-     * @throws Exceptions\VariableNotFoundInContext
      */
     private function expandRelationship(
         RelationshipField $field,
@@ -568,10 +547,10 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             return;
         }
 
-        $url = $this->propertyResolver->resolvePathParameters($this, $entity, $field->getUrl(), $context);
+        $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         switch ($field->getCardinality()) {
             case Cardinality::MANY:
-                $children = $this->propertyResolver->resolveManyRelationship(
+                $children = $this->getPropertyResolver()->resolveManyRelationship(
                     $this,
                     $entity,
                     $resource->touchChildrenProperty($field),
@@ -582,7 +561,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 break;
 
             case Cardinality::ONE:
-                $child = $this->propertyResolver->resolveOneRelationship(
+                $child = $this->getPropertyResolver()->resolveOneRelationship(
                     $this,
                     $entity,
                     $resource->touchChildProperty($field),
@@ -605,19 +584,19 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param RelationshipField $field
      * @param &$body
      * @param RESTResource $resource
-     * @param ContextContract $context
+     * @param Context $context
      * @throws InvalidPropertyException
      */
-    private function relationshipFromArray(RelationshipField $field, &$body, RESTResource $resource, ContextContract $context)
+    private function relationshipFromArray(RelationshipField $field, &$body, RESTResource $resource, Context $context)
     {
         // If no data is provided, don't set the property.
-        if (!$this->propertyResolver->hasRelationshipInput($this, $body, $field, $context)) {
+        if (!$this->getPropertyResolver()->hasRelationshipInput($this, $body, $field, $context)) {
             return;
         }
 
         switch ($field->getCardinality()) {
             case Cardinality::MANY:
-                $children = $this->propertyResolver->resolveManyRelationshipInput(
+                $children = $this->getPropertyResolver()->resolveManyRelationshipInput(
                     $this,
                     $body,
                     $field,
@@ -628,7 +607,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 break;
 
             case Cardinality::ONE:
-                $child = $this->propertyResolver->resolveOneRelationshipInput($this, $body, $field, $context);
+                $child = $this->getPropertyResolver()->resolveOneRelationshipInput($this, $body, $field, $context);
                 if ($child) {
                     $resource->setChildProperty($field, null, $child, true);
                 } else {
@@ -645,19 +624,17 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param RelationshipField $field
      * @param $entity
      * @param RESTResource $resource
-     * @param ContextContract $context
+     * @param Context $context
      * @param bool $visible
-     * @return array
-     * @throws InvalidPropertyException
      */
     private function linkRelationship(
         RelationshipField $field,
         $entity,
         RESTResource $resource,
-        ContextContract $context,
+        Context $context,
         $visible
     ) {
-        $url = $this->propertyResolver->resolvePathParameters($this, $entity, $field->getUrl(), $context);
+        $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         $resource->setLink($field, $url, $visible);
     }
 
@@ -691,30 +668,30 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
     /**
      * @param Field $field
-     * @param ContextContract $context
+     * @param Context $context
      * @return bool
      */
-    private function shouldInclude(Field $field, ContextContract $context)
+    private function shouldInclude(Field $field, Context $context)
     {
         return $field->shouldInclude($context, $this->currentPath);
     }
 
     /**
      * @param Field $field
-     * @param ContextContract $context
+     * @param Context $context
      * @return bool
      */
-    private function isWritable(Field $field, ContextContract $context)
+    private function isWritable(Field $field, Context $context)
     {
         return $field->shouldInclude($context, $this->currentPath);
     }
 
     /**
      * @param RelationshipField $field
-     * @param ContextContract $context
+     * @param Context $context
      * @return bool
      */
-    private function shouldExpand(RelationshipField $field, ContextContract $context)
+    private function shouldExpand(RelationshipField $field, Context $context)
     {
         return $field->shouldExpand($context, $this->currentPath);
     }
@@ -744,6 +721,14 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
+     * @return QueryAdapter
+     */
+    public function getQueryAdapter(): QueryAdapter
+    {
+        return $this->queryAdapter;
+    }
+
+    /**
      * @return ResourceFactoryInterface
      */
     public function getResourceFactory(): ResourceFactoryInterface
@@ -757,20 +742,20 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      */
     public function getQualifiedName(Field $field) : string
     {
-        return $this->getPropertyResolver()->getQualifiedName($field);
+        return $this->getQueryAdapter()->getQualifiedName($field);
     }
 
     /**
      * Create resources from whatever is in the inputs defined from the input parsers.
      * @param $resourceDefinition
-     * @param ContextContract $context
+     * @param Context $context
      * @param null $request
      * @return ResourceCollection
      * @throws NoInputDataFound
      */
     public function fromInput(
         $resourceDefinition,
-        ContextContract $context,
+        Context $context,
         $request = null
     ): ResourceCollection
     {
@@ -793,13 +778,13 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     /**
      * Create resource identifiers from whatever is in the inputs defined from the input parsers
      * @param $resourceDefinition
-     * @param ContextContract $context
+     * @param Context $context
      * @param null $request
      * @return IdentifierCollection
      */
     public function identifiersFromInput(
         $resourceDefinition,
-        ContextContract $context,
+        Context $context,
         $request = null
     ) : IdentifierCollection {
         $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
@@ -816,36 +801,5 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         }
 
         return $identifiers;
-    }
-
-    /**
-     * Return filters that were created by processors. These are always in the (old) catlab base framework,
-     * since this is platform independent. The resourcetransformer then needs to translate these queries and
-     * apply them to the provided querybuilder.
-     *
-     * @param $request
-     * @param ResourceDefinition $resourceDefinition
-     * @param Context $context
-     * @param int|null $records
-     * @return SelectQueryParameters
-     */
-    protected function getProcessorFilters(
-        $request,
-        ResourceDefinition $resourceDefinition,
-        Context $context,
-        int $records = null
-    ) {
-        $selectQueryParameters = new SelectQueryParameters();
-
-        $context->getProcessors()->processFilters(
-            $this,
-            $selectQueryParameters,
-            $request,
-            $resourceDefinition,
-            $context,
-            $records
-        );
-
-        return $selectQueryParameters;
     }
 }

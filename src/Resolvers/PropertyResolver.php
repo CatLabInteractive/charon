@@ -8,6 +8,7 @@ use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -24,7 +25,7 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  * Class PropertyResolver
  * @package CatLab\RESTResource\Resolvers
  */
-class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces\PropertyResolver
+abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces\PropertyResolver
 {
     /**
      * @param ResourceTransformer $transformer
@@ -346,163 +347,6 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
             return $children[ResourceTransformer::RELATIONSHIP_ITEMS];
         }
         return null;
-    }
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param $entityCollection
-     * @param RelationshipField $field
-     * @param Context $context
-     * @return void
-     */
-    public function eagerLoadRelationship(
-        ResourceTransformer $transformer,
-        $queryBuilder,
-        RelationshipField $field,
-        Context $context
-    ) {
-        $this->callEntitySpecificMethodIfExists(
-            $transformer,
-            $field,
-            $context,
-            self::EAGER_LOAD_METHOD_PREFIX,
-            [
-                $queryBuilder
-            ]
-        );
-    }
-
-    /**
-     * Apply a filter to a query builder.
-     * (Used for filtering or searching entries on filterable/searchble fields)
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param Field $field
-     * @param $queryBuilder
-     * @param $value
-     * @param string $operator
-     * @return void
-     */
-    public function applyPropertyFilter(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        Field $field,
-        $queryBuilder,
-        $value,
-        $operator = Operator::EQ
-    ) {
-        // do we have a specific 'filter' method?
-        if ($this->callEntitySpecificMethodIfExists(
-                $transformer,
-                $field,
-                $context,
-                self::FILTER_METHOD_PREFIX,
-                [
-                    $queryBuilder,
-                    $value,
-                    $operator,
-                    $context,
-                    $definition->getEntityClassName()
-                ]
-            )
-        ) {
-            return;
-        }
-
-        // nope? Too bad, use the regular filter method.
-        $catlabQueryBuilder = new SelectQueryParameters();
-        $catlabQueryBuilder->where(
-            new WhereParameter(
-                $field->getName(),
-                $operator,
-                $value,
-                $definition->getEntityClassName())
-        );
-
-        $transformer->applyCatLabFilters($queryBuilder, $catlabQueryBuilder);
-    }
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param Field $field
-     * @param $queryBuilder
-     * @param string $direction
-     */
-    public function applyPropertySorting(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        Field $field,
-        $queryBuilder,
-        $direction = 'asc'
-    ) {
-        // do we have a specific 'filter' method?
-        if ($this->callEntitySpecificMethodIfExists(
-                $transformer,
-                $field,
-                $context,
-                self::SORT_METHOD_PREFIX,
-                [
-                    $queryBuilder,
-                    $direction,
-                    $context,
-                    $definition->getEntityClassName()
-                ]
-            )
-        ) {
-            return;
-        }
-
-        // nope? Too bad, use the regular orderBy method.
-        $catlabQueryBuilder = new SelectQueryParameters();
-        $catlabQueryBuilder->orderBy(
-            new OrderParameter($field->getName(), $direction, $field->getResourceDefinition()->getEntityClassName())
-        );
-
-        $transformer->applyCatLabFilters($queryBuilder, $catlabQueryBuilder);
-    }
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param $queryBuilder
-     * @param $records
-     * @param $skip
-     */
-    public function applyLimit(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        $queryBuilder,
-        $records,
-        $skip
-    ) {
-        $queryBuilder->take($records);
-
-        if ($skip) {
-            $queryBuilder->skip($skip);
-        }
-    }
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param $queryBuilder
-     * @return
-     */
-    public function countRecords(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        $queryBuilder
-    ) {
-        return $queryBuilder->count();
     }
 
     /**

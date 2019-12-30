@@ -149,22 +149,6 @@ interface PropertyResolver
 
     /**
      * @param ResourceTransformer $transformer
-     * @param RelationshipField $field
-     * @param mixed $parentEntity
-     * @param PropertyValueCollection $identifiers
-     * @param Context $context
-     * @return mixed
-     */
-    public function getChildByIdentifiers(
-        ResourceTransformer $transformer,
-        RelationshipField $field,
-        $parentEntity,
-        PropertyValueCollection $identifiers,
-        Context $context
-    );
-
-    /**
-     * @param ResourceTransformer $transformer
      * @param $entity
      * @param RESTResource $resource
      * @param Context $context
@@ -176,81 +160,4 @@ interface PropertyResolver
         RESTResource $resource,
         Context $context
     ) : bool;
-
-    /**
-     * @param Field $field
-     * @return mixed
-     */
-    public function getQualifiedName(Field $field);
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param $entityCollection
-     * @param RelationshipField $field
-     * @param Context $context
-     * @return void
-     */
-    public function eagerLoadRelationship(
-        ResourceTransformer $transformer,
-        $entityCollection,
-        RelationshipField $field,
-        Context $context
-    );
-
-    /**
-     * Apply a filter to a query builder.
-     * (Used for filtering or searching entries on filterable/searchble fields)
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param Field $field
-     * @param SelectQueryParameters $queryBuilder
-     * @param $value
-     * @param string $operator
-     * @return void
-     */
-    public function applyPropertyFilter(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        Field $field,
-        $queryBuilder,
-        $value,
-        $operator = Operator::EQ
-    );
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param Field $field
-     * @param $queryBuilder
-     * @param string $direction
-     */
-    public function applyPropertySorting(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        Field $field,
-        $queryBuilder,
-        $direction = 'asc'
-    );
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param $queryBuilder
-     * @param $records
-     * @param $skip
-     * @return void
-     */
-    public function applyLimit(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        $queryBuilder,
-        $records,
-        $skip
-    );
 }
