@@ -154,6 +154,7 @@ abstract class RelationshipValue extends Value
      * @param EntityFactory $factory
      * @param Context $context
      * @throws InvalidPropertyException
+     * @throws EntityNotFoundException
      */
     public function toEntity(
         $parent,
@@ -234,7 +235,10 @@ abstract class RelationshipValue extends Value
      * @param PropertyResolver $propertyResolver
      * @param EntityFactory $factory
      * @param Context $context
-     * @throws InvalidPropertyException
+     * @param $childrenToAdd
+     * @param $childrenToEdit
+     * @param $identifiersToKeep
+     * @throws EntityNotFoundException
      */
     private function childResourceToEntity(
         $parent,
@@ -321,6 +325,7 @@ abstract class RelationshipValue extends Value
      * @throws PropertyValidationException
      * @throws ResourceException
      * @throws RequirementValidationException
+     * @throws \CatLab\Requirements\Exceptions\ValidationException
      */
     public function validate(Context $context, string $path)
     {
