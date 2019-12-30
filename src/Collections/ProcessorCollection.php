@@ -10,6 +10,7 @@ use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
 use CatLab\Charon\Interfaces\ResourceCollection;
+use CatLab\Charon\Models\FilterResults;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -19,57 +20,42 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
 class ProcessorCollection extends Collection implements Processor
 {
     /**
-     * @param ResourceTransformer $transformer
-     * @param SelectQueryParameters $selectQuery
-     * @param $request
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param int $records
-     * @return void
+     * @inheritDoc
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $selectQuery,
+        $queryBuilder,
         $request,
         ResourceDefinition $definition,
         Context $context,
-        int $records = 10
+        FilterResults $filterResults
     ) {
         foreach ($this as $processor) {
             /** @var Processor */
-            $processor->processFilters($transformer, $selectQuery, $request, $definition, $context, $records);
+            $processor->processFilters($transformer, $queryBuilder, $request, $definition, $context, $filterResults);
         }
     }
 
     /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceCollection $collection
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param RelationshipValue $parent
-     * @param null $parentEntity
+     * @inheritDoc
      */
     public function processCollection(
         ResourceTransformer $transformer,
         ResourceCollection $collection,
         ResourceDefinition $definition,
         Context $context,
+        FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
     ) {
         foreach ($this as $processor) {
-            /** @var Processor $processor */
-            $processor->processCollection($transformer, $collection, $definition, $context, $parent, $parentEntity);
+            /** @var Processor */
+            $processor->processCollection($transformer, $collection, $definition, $context, $filterResults, $parent, $parentEntity);
         }
     }
 
     /**
-     * @param ResourceTransformer $transformer
-     * @param RESTResource $resource
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param RelationshipValue $parent
-     * @param mixed $parentEntity
+     * @inheritDoc
      */
     public function processResource(
         ResourceTransformer $transformer,
@@ -80,8 +66,8 @@ class ProcessorCollection extends Collection implements Processor
         $parentEntity = null
     ) {
         foreach ($this as $processor) {
-            /** @var Processor $processor */
-            $processor->processResource($transformer, $resource, $definition, $context, $parent);
+            /** @var Processor */
+            $processor->processResource($transformer, $resource, $definition, $context, $parent, $parentEntity);
         }
     }
 }

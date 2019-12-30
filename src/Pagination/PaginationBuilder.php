@@ -9,6 +9,7 @@ use CatLab\Base\Models\Database\OrderParameter;
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\Interfaces\HasRequestResolver;
 use CatLab\Charon\Interfaces\RequestResolver;
+use CatLab\Charon\Models\FilterResults;
 use InvalidArgumentException;
 
 /**
@@ -172,8 +173,24 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
             $results = ArrayHelper::reverse($results);
         }
 
+        $this->processCollection($results);
+
+        return $results;
+    }
+
+    /**
+     * @param $results
+     * @param FilterResults|null $filterResults
+     * @return mixed[]
+     */
+    public function processCollection($results, FilterResults $filterResults = null)
+    {
         $this->hasPreviousPage = $this->page > 1;
         $this->hasNextPage = count($results) >= $this->records;
+
+        if ($filterResults) {
+            $filterResults->setCurrentPage($this->page);
+        }
 
         return $results;
     }

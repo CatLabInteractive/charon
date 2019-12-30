@@ -4,6 +4,7 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\CharonConfig;
+use CatLab\Charon\Models\FilterResults;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
@@ -29,6 +30,7 @@ interface ResourceTransformer
      * @param ResourceDefinition|string $resourceDefinition
      * @param $entities
      * @param Context $context
+     * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
      * @param null $parentEntity
      * @return ResourceCollection
@@ -37,6 +39,7 @@ interface ResourceTransformer
         $resourceDefinition,
         $entities,
         Context $context,
+        FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
     ) : ResourceCollection;
@@ -83,21 +86,6 @@ interface ResourceTransformer
         EntityFactory $factory,
         Context $context,
         $entity = null
-    );
-
-    /**
-     * @param $request
-     * @param $resourceDefinition
-     * @param Context $context
-     * @param null $queryBuilder
-     * @param int $records
-     * @return $queryBuilder
-     */
-    public function getFilters(
-        $request, $resourceDefinition,
-        Context $context,
-        $queryBuilder = null,
-        int $records = null
     );
 
     /**

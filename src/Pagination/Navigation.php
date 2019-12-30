@@ -41,7 +41,7 @@ class Navigation implements \CatLab\Base\Interfaces\Pagination\Navigation
      */
     public function getNext()
     {
-        if (isset($this->hasNextPage)) {
+        if ($this->hasNextPage) {
             return [
                 'page' => $this->currentPage + 1,
                 'records' => $this->records
@@ -55,7 +55,7 @@ class Navigation implements \CatLab\Base\Interfaces\Pagination\Navigation
      */
     public function getPrevious()
     {
-        if (isset($this->hasPreviousPage)) {
+        if ($this->hasPreviousPage) {
             return [
                 'page' => $this->currentPage - 1,
                 'records' => $this->records

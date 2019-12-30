@@ -2,7 +2,7 @@
 
 namespace CatLab\Charon\Interfaces;
 
-use CatLab\Base\Interfaces\Database\SelectQueryParameters;
+use CatLab\Charon\Models\FilterResults;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -13,20 +13,20 @@ interface Processor
 {
     /**
      * @param ResourceTransformer $transformer
-     * @param SelectQueryParameters $selectQuery
+     * @param $queryBuilder
      * @param $request
-     * @param ResourceDefinition $definitionSelectQueryParameters
+     * @param ResourceDefinition $definition
      * @param Context $context
-     * @param int $records
-     * @return void
+     * @param FilterResults $filterResults
+     * @return mixed
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $selectQuery,
+        $queryBuilder,
         $request,
         ResourceDefinition $definition,
         Context $context,
-        int $records = 10
+        FilterResults $filterResults
     );
 
     /**
@@ -34,6 +34,7 @@ interface Processor
      * @param ResourceCollection $collection
      * @param ResourceDefinition $definition
      * @param Context $context
+     * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
      * @param null $parentEntity
      * @return
@@ -43,6 +44,7 @@ interface Processor
         ResourceCollection $collection,
         ResourceDefinition $definition,
         Context $context,
+        FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
     );

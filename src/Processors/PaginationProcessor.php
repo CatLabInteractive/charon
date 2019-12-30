@@ -11,6 +11,7 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
+use CatLab\Charon\Models\FilterResults;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\ResourceField;
@@ -22,7 +23,7 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  * Class PaginationProcessor
  * @package CatLab\RESTResource\Processors
  */
-class PaginationProcessor implements Processor
+abstract class PaginationProcessor implements Processor
 {
     /**
      * @var PaginationBuilder
@@ -60,16 +61,16 @@ class PaginationProcessor implements Processor
      * @param $request
      * @param ResourceDefinition $definition
      * @param Context $context
-     * @param int $records
-     * @return void
+     * @param FilterResults $filterResults
+     * @return mixed|void
      */
     public function processFilters(
         ResourceTransformer $transformer,
-        SelectQueryParameters $queryBuilder,
+        $queryBuilder,
         $request,
         ResourceDefinition $definition,
         Context $context,
-        int $records = null
+        FilterResults $filterResults
     ) {
         $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, $request);
 
@@ -85,7 +86,10 @@ class PaginationProcessor implements Processor
         }
 
         // Build the filters
-        $builder->build($queryBuilder);
+        $catlabQueryBuilder = new \CatLab\Base\Models\Database\SelectQueryParameters();
+        $builder->build($catlabQueryBuilder);
+
+        $transformer->applyCatLabFilters($queryBuilder, $catlabQueryBuilder);
     }
 
     /**
@@ -93,6 +97,7 @@ class PaginationProcessor implements Processor
      * @param ResourceCollection $collection
      * @param ResourceDefinition $definition
      * @param Context $context
+     * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
      * @param null $parentEntity
      */
@@ -101,68 +106,98 @@ class PaginationProcessor implements Processor
         ResourceCollection $collection,
         ResourceDefinition $definition,
         Context $context,
+        FilterResults $filterResults = null,
+        RelationshipValue $parent = null,
+        $parentEntity = null
+    ) {
+        list ($url, $cursor) = $this->prepareCursor($transformer, $collection, $definition, $context, $filterResults, $parent, $parentEntity);
+
+        $collection->addMeta('pagination', [
+            'next' => $cursor->getNext() ? $url . '?' . http_build_query($cursor->getNext()) : null,
+            'previous' => $cursor->getPrevious() ? $url . '?' . http_build_query($cursor->getPrevious()) : null,
+            'cursors' => $cursor->toArray()
+        ]);
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceCollection $collection
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param FilterResults|null $filterResults
+     * @param RelationshipValue|null $parent
+     * @param null $parentEntity
+     * @return array|null
+     */
+    protected function prepareCursor(
+        ResourceTransformer $transformer,
+        ResourceCollection $collection,
+        ResourceDefinition $definition,
+        Context $context,
+        FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
     ) {
         $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, null);
 
         if (
-            count($collection) > 0 &&
+            count($collection) === 0 ||
             (
                 // If records is null, ALL records are returned.
                 // And if all records are returned, we don't need no (dum dum dum) pagi-na-tion
-                !isset($parent) ||
-                $parent->getField()->getRecords() > 0
+                isset($parent) &&
+                $parent->getField()->getRecords() === 0
             )
         ) {
-
-            // Register all identifiers if parent is present
-            if ($parent) {
-                foreach ($definition->getFields()->getIdentifiers() as $field) {
-                    $this->registerPropertyName($builder, $field, $context);
-                    $registeredFields[$field->getDisplayName()] = $field;
-                }
-            }
-
-            /** @var RESTResource $first */
-            $first = $collection->first();
-            if ($first) {
-                $builder->setFirst($this->transformResource($transformer, $builder, $context, $first));
-            }
-
-            /** @var RESTResource $first */
-            $last = $collection->last();
-            if ($last) {
-                $builder->setLast($this->transformResource($transformer, $builder, $context, $last));
-            }
-
-            $cursor = $builder->getNavigation();
-
-            if ($parent) {
-                $url = $parent->getField()->getUrl();
-            } elseif($context->getUrl()) {
-                $url = $context->getUrl();
-            } else {
-                $url = $definition->getUrl();
-            }
-
-            $url = $transformer->getPropertyResolver()->resolvePathParameters(
-                $transformer,
-                $parentEntity,
-                $url,
-                $context
-            );
-
-            $collection->addMeta('pagination', [
-                'next' => $cursor->getNext() ? $url . '?' . http_build_query($cursor->getNext()) : null,
-                'previous' => $cursor->getPrevious() ? $url . '?' . http_build_query($cursor->getPrevious()) : null,
-                'cursors' => $cursor->toArray()
-            ]);
+            return null;
         }
+
+        // Register all identifiers if parent is present
+        if ($parent) {
+            foreach ($definition->getFields()->getIdentifiers() as $field) {
+                $this->registerPropertyName($builder, $field, $context);
+                $registeredFields[$field->getDisplayName()] = $field;
+            }
+        }
+
+        $builder->processCollection($collection, $filterResults);
+
+        /** @var RESTResource $first */
+        $first = $collection->first();
+        if ($first) {
+            $builder->setFirst($this->transformResource($transformer, $builder, $context, $first));
+        }
+
+        /** @var RESTResource $first */
+        $last = $collection->last();
+        if ($last) {
+            $builder->setLast($this->transformResource($transformer, $builder, $context, $last));
+        }
+
+        $cursor = $builder->getNavigation();
+
+        if ($parent) {
+            $url = $parent->getField()->getUrl();
+        } elseif($context->getUrl()) {
+            $url = $context->getUrl();
+        } else {
+            $url = $definition->getUrl();
+        }
+
+        $url = $transformer->getPropertyResolver()->resolvePathParameters(
+            $transformer,
+            $parentEntity,
+            $url,
+            $context
+        );
+
+        return [ $url, $cursor ];
     }
 
     /**
+     * @param ResourceTransformer $transformer
      * @param PaginationBuilder $builder
+     * @param Context $context
      * @param RESTResource $resource
      * @return mixed
      */

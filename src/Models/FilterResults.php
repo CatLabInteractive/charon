@@ -29,6 +29,16 @@ class FilterResults
     protected $context;
 
     /**
+     * @var int
+     */
+    protected $totalRecords;
+
+    /**
+     * @var string
+     */
+    protected $currentPage;
+
+    /**
      * @return mixed
      */
     public function getQueryBuilder()
@@ -83,6 +93,24 @@ class FilterResults
     }
 
     /**
+     * @return int
+     */
+    public function getTotalRecords()
+    {
+        return $this->totalRecords;
+    }
+
+    /**
+     * @param int $totalRecords
+     * @return FilterResults
+     */
+    public function setTotalRecords($totalRecords): FilterResults
+    {
+        $this->totalRecords = $totalRecords;
+        return $this;
+    }
+
+    /**
      * @return \CatLab\Charon\Interfaces\Context
      */
     public function getContext(): \CatLab\Charon\Interfaces\Context
@@ -97,6 +125,24 @@ class FilterResults
     public function setContext(\CatLab\Charon\Interfaces\Context $context): FilterResults
     {
         $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentPage()
+    {
+        return $this->currentPage;
+    }
+
+    /**
+     * @param string $currentPage
+     * @return FilterResults
+     */
+    public function setCurrentPage($currentPage)
+    {
+        $this->currentPage = $currentPage;
         return $this;
     }
 }

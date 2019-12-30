@@ -63,7 +63,7 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         $childContext = $context->getChildContext($field, $field->getExpandContext());
 
         $children = $this->resolveProperty($transformer, $entity, $field, $childContext);
-        return $transformer->toResources($childResource, $children, $context, $value, $entity);
+        return $transformer->toResources($childResource, $children, $context, null, $value, $entity);
 
     }
 
@@ -487,6 +487,22 @@ class PropertyResolver extends ResolverBase implements \CatLab\Charon\Interfaces
         if ($skip) {
             $queryBuilder->skip($skip);
         }
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @return
+     */
+    public function countRecords(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder
+    ) {
+        return $queryBuilder->count();
     }
 
     /**

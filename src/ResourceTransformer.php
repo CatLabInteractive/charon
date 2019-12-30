@@ -54,7 +54,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @return void
      */
     abstract public function applyCatLabFilters($queryBuilder, SelectQueryParameters $parameters);
-    
+
     /**
      * @var PropertyResolver
      */
@@ -146,20 +146,22 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ResourceDefinition|string $resourceDefinition
      * @param mixed $entities
      * @param ContextContract $context
+     * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
      * @param null $parentEntity
      * @return ResourceCollection
+     * @throws Exceptions\InvalidTransformer
+     * @throws Exceptions\VariableNotFoundInContext
      * @throws InvalidContextAction
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
      * @throws IterableExpected
-     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
-     * @throws Exceptions\VariableNotFoundInContext
      */
     public function toResources(
         $resourceDefinition,
         $entities,
         ContextContract $context,
+        FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
     ) : \CatLab\Charon\Interfaces\ResourceCollection {
@@ -181,6 +183,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             $out,
             $resourceDefinition,
             $context,
+            $filterResults,
             $parent,
             $parentEntity
         );
@@ -493,31 +496,25 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
-     * Build select query parameters based on the filterable and searchable fields
-     * and input received from the RequestResolver.
+     * Apply any filterable/searchable fields
      * @param $request
-     * @param $resourceDefinition
-     * @param Context $context
-     * @param null $queryBuilder
-     * @param int $records
+     * @param string|ResourceDefinition $resourceDefinition
+     * @param ContextContract $context
+     * @param $queryBuilder
      * @return FilterResults
-     * @throws NotImplementedException
      */
-    public function getFilters($request, $resourceDefinition, Context $context, $queryBuilder = null, int $records = null)
-    {
+    public function applyFilters(
+        $request,
+        $resourceDefinition,
+        Context $context,
+        $queryBuilder
+    ) {
         $filterResults = new FilterResults();
-
-        if ($records === null) {
-            $records = 10;
-        }
+        $filterResults->setQueryBuilder($queryBuilder);
 
         $definition = ResourceDefinitionLibrary::make($resourceDefinition);
 
-        if (!isset($queryBuilder)) {
-            $queryBuilder = new SelectQueryParameters();
-        }
-
-        // Now check for query parameters
+        // First process all filtersable and searchable fields.
         foreach ($definition->getFields() as $field) {
             if ($field instanceof ResourceField) {
 
@@ -525,70 +522,29 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 if ($field->isFilterable()) {
                     $value = $this->getRequestResolver()->getFilter($request, $field);
                     if ($value) {
-                        $this->propertyResolver->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
+                        $this->getPropertyResolver()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
                     }
                 } elseif ($field->isSearchable()) {
                     $value = $this->getRequestResolver()->getFilter($request, $field);
                     if ($value) {
-                        $this->propertyResolver->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
+                        $this->getPropertyResolver()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
                     }
                 }
 
             }
         }
 
-        // Processors (are applied in catlab query parameters since the processors need to work for every framework)
-        // and then translated & applied to the framework specific query builder.
-        $processorFilters = $this->getProcessorFilters($request, $resourceDefinition, $context, $records);
-        $this->processProcessorFilters($context, $resourceDefinition, $processorFilters, $queryBuilder);
-
-        // prepare output.
-        $filterResults->setRecords($records);
-        $filterResults->setContext($context);
-        $filterResults->setQueryBuilder($queryBuilder);
+        // Now go through all processors and apply any filters or parameters they might want to set.
+        $context->getProcessors()->processFilters(
+            $this,
+            $queryBuilder,
+            $request,
+            $resourceDefinition,
+            $context,
+            $filterResults
+        );
 
         return $filterResults;
-    }
-
-    /**
-     * @param ContextContract $context
-     * @param ResourceDefinition $resourceDefinition
-     * @param SelectQueryParameters $filter
-     * @param null $queryBuilder
-     * @throws NotImplementedException
-     */
-    protected function processProcessorFilters(
-        Context $context,
-        ResourceDefinition $resourceDefinition,
-        SelectQueryParameters $filter,
-        $queryBuilder = null
-    ) {
-        $where = $filter->getWhere();
-        if (count($where) > 0) {
-            throw new NotImplementedException('NOT IMPLEMENTED YET!');
-        }
-
-        // now we need to translate these to our own system
-        foreach ($filter->getSort() as $sort) {
-            $entity = $sort->getEntity();
-            if ($entity instanceof Field) {
-                $this->getPropertyResolver()->applyPropertySorting($this, $entity->getResourceDefinition(), $context, $entity, $queryBuilder, $sort->getDirection());
-            }
-        }
-
-        $limit = $filter->getLimit();
-        if ($limit) {
-            $this->getPropertyResolver()->applyLimit(
-                $this,
-                $resourceDefinition,
-                $context,
-                $queryBuilder,
-                $limit->getAmount(),
-                $limit->getOffset()
-            );
-        }
-
-        //$this->applyCatLabFilters($queryBuilder, $processorFilters);
     }
 
     /**
