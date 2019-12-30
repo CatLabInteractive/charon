@@ -1,5 +1,9 @@
 <?php
 
+namespace Tests\ResourceDefinitionDepths;
+
+use Tests\Models\MockEntityModel;
+
 class MockResourceDefinitionExtraAttributes extends \CatLab\Charon\Models\ResourceDefinition
 {
     public function __construct()

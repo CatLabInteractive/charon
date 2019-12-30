@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
 use CatLab\Charon\ResourceTransformer;
 use Tests\Petstore\Definitions\PetDefinition;

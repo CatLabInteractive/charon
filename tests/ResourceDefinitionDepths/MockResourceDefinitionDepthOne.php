@@ -1,4 +1,9 @@
 <?php
+
+namespace Tests\ResourceDefinitionDepths;
+
+use Tests\Models\MockEntityModel;
+
 /**
  * Class MockResourceDefinitionDepthOne
  */

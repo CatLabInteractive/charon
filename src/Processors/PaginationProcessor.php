@@ -25,7 +25,7 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  * Class PaginationProcessor
  * @package CatLab\RESTResource\Processors
  */
-abstract class PaginationProcessor implements Processor
+class PaginationProcessor implements Processor
 {
     /**
      * @var PaginationBuilder
@@ -36,11 +36,6 @@ abstract class PaginationProcessor implements Processor
      * @var string
      */
     private $paginationClass;
-
-    /**
-     * @var string[]
-     */
-    private $qualifiedNameMap = [];
 
     const RANDOM = 'random';
     const RANDOM_SEED_QUERY = 'seed';
@@ -172,9 +167,9 @@ abstract class PaginationProcessor implements Processor
         );
 
         $collection->addMeta('pagination', [
-            'next' => $cursor->getNext() ? $url . '?' . http_build_query($cursor->getNext()) : null,
-            'previous' => $cursor->getPrevious() ? $url . '?' . http_build_query($cursor->getPrevious()) : null,
-            'cursors' => $cursor->toArray()
+            'next' => $cursor && $cursor->getNext() ? $url . '?' . http_build_query($cursor->getNext()) : null,
+            'previous' => $cursor && $cursor->getPrevious() ? $url . '?' . http_build_query($cursor->getPrevious()) : null,
+            'cursors' => $cursor ? $cursor->toArray() : null
         ]);
     }
 

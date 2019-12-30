@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\InputParsers\JsonBodyInputParser;

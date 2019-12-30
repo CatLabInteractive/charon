@@ -1,14 +1,28 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
-use CatLab\Charon\Interfaces\PropertyResolver;
+use CatLab\Charon\Factories\ResourceFactory;
+use CatLab\Charon\Interfaces\PropertyResolver as PropertyResolverContract;
+use CatLab\Charon\Resolvers\PropertySetter;
+use CatLab\Charon\Resolvers\RequestResolver;
+use Tests\Models\MockPropertyResolver;
+use Tests\Models\MockQueryAdapter;
 
 abstract class BaseTest extends \PHPUnit_Framework_TestCase
 {
-    public function getResourceTransformer(PropertyResolver $propertyResolver = null)
+    public function getResourceTransformer(PropertyResolverContract $propertyResolver = null)
     {
-        require_once 'CatLabResourceTransformer.php';
-        return new CatLabResourceTransformer($propertyResolver);
+        if ($propertyResolver === null) {
+            $propertyResolver = new MockPropertyResolver();
+        }
+
+        return new CatLabResourceTransformer(
+            $propertyResolver,
+            new PropertySetter(),
+            new RequestResolver(),
+            new MockQueryAdapter(),
+            new ResourceFactory()
+        );
     }
 }

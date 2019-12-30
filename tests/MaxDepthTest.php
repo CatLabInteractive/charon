@@ -1,22 +1,18 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
 use CatLab\Charon\ResourceTransformer;
-use MockEntityModel;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
 
-use MockResourceDefinitionDepthFour;
-use MockResourceDefinitionDepthOne;
-use MockResourceDefinitionDepthThree;
-use MockResourceDefinitionDepthTwo;
 use PHPUnit_Framework_TestCase;
+use Tests\Models\MockEntityModel;
+use Tests\ResourceDefinitionDepths\MockResourceDefinitionDepthFour;
+use Tests\ResourceDefinitionDepths\MockResourceDefinitionDepthOne;
+use Tests\ResourceDefinitionDepths\MockResourceDefinitionDepthThree;
+use Tests\ResourceDefinitionDepths\MockResourceDefinitionDepthTwo;
 
-require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthOne.php';
-require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthTwo.php';
-require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthThree.php';
-require_once 'ResourceDefinitionDepths/MockResourceDefinitionDepthFour.php';
 
 /**
  * Class MaxDepthTest
@@ -643,7 +639,7 @@ class MaxDepthTest extends BaseTest
         $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(\MockResourceDefinitionDepthOne::class, $mockEntity, new Context(Action::VIEW));
+        $resource = $transformer->toResource(MockResourceDefinitionDepthOne::class, $mockEntity, new Context(Action::VIEW));
 
         $expected = $this->getDeepData1();
 
@@ -658,7 +654,7 @@ class MaxDepthTest extends BaseTest
         $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(\MockResourceDefinitionDepthTwo::class, $mockEntity, new Context(Action::VIEW));
+        $resource = $transformer->toResource(MockResourceDefinitionDepthTwo::class, $mockEntity, new Context(Action::VIEW));
 
         $expected = $this->getDeepData2();
 
@@ -673,7 +669,7 @@ class MaxDepthTest extends BaseTest
         $transformer = $this->getResourceTransformer();
 
         $mockEntity = $this->getDeepChildren();
-        $resource = $transformer->toResource(\MockResourceDefinitionDepthThree::class, $mockEntity, new Context(Action::VIEW));
+        $resource = $transformer->toResource(MockResourceDefinitionDepthThree::class, $mockEntity, new Context(Action::VIEW));
 
         $expected = $this->getDeepData3();
 

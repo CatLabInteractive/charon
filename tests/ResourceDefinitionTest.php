@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
 class ResourceDefinitionTest extends BaseTest
 {

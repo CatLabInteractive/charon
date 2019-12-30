@@ -1,12 +1,12 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Models\Context;
 
 use CatLab\Charon\Models\CurrentPath;
-use PHPUnit_Framework_TestCase;
+use Tests\BaseTest;
 
 /**
  * Class ContextTest

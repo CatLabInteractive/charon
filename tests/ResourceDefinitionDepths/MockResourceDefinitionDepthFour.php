@@ -1,5 +1,13 @@
 <?php
 
+namespace Tests\ResourceDefinitionDepths;
+
+use Tests\Models\MockEntityModel;
+
+/**
+ * Class MockResourceDefinitionDepthFour
+ * @package Tests\ResourceDefinitionDepths
+ */
 class MockResourceDefinitionDepthFour extends \CatLab\Charon\Models\ResourceDefinition
 {
     public function __construct()

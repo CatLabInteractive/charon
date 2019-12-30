@@ -93,7 +93,6 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
      * @param $value
      * @param string $operator
      * @return void
-     * @throws NotImplementedException
      */
     public function applyPropertyFilter(
         ResourceTransformer $transformer,
@@ -132,7 +131,6 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
      * @param Field $field
      * @param $queryBuilder
      * @param string $direction
-     * @throws NotImplementedException
      */
     public function applyPropertySorting(
         ResourceTransformer $transformer,

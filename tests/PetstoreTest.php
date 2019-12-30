@@ -1,18 +1,17 @@
 <?php
 
-namespace CatLab\RESTResource\Tests;
+namespace Tests;
 
+
+
+use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Models\Context;
 use Tests\Petstore\Definitions\PetDefinition;
 use Tests\Petstore\Definitions\PetDefinitionWithDate;
 use Tests\Petstore\Models\Category;
 use Tests\Petstore\Models\Pet;
 use Tests\Petstore\Models\Photo;
 use Tests\Petstore\Models\Tag;
-use CatLab\Charon\Enums\Action;
-use CatLab\Charon\ResourceTransformer;
-use CatLab\Charon\Models\Context;
-
-use PHPUnit_Framework_TestCase;
 
 /**
  * Class PetstoreTest
@@ -183,7 +182,7 @@ class PetstoreTest extends BaseTest
      */
     public function testTransformer()
     {
-        $petDefinition = new PetDefinitionWithDate(Pet::class);
+        $petDefinition = new PetDefinitionWithDate();
 
         $category = new Category();
         $category

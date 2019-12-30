@@ -173,9 +173,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
             $results = ArrayHelper::reverse($results);
         }
 
-        $this->processCollection($results);
-
-        return $results;
+        return $this->processCollection($results);
     }
 
     /**

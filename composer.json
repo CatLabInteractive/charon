@@ -24,7 +24,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Tests\\Petstore\\": "tests/Petstore",
+      "Tests\\": "tests/",
       "App\\":"example/"
     }
   },
