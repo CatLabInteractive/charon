@@ -196,6 +196,6 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         Context $context,
         $queryBuilder
     ) {
-        return $queryBuilder->count();
+        return count($queryBuilder);
     }
 }

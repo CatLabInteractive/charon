@@ -11,9 +11,8 @@ use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 
-class MockQueryAdapter implements QueryAdapter
+class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
 {
-
     /**
      * @inheritDoc
      */
@@ -33,32 +32,16 @@ class MockQueryAdapter implements QueryAdapter
     /**
      * @inheritDoc
      */
-    public function eagerLoadRelationship(ResourceTransformer $transformer, $entityCollection, RelationshipField $field, Context $context)
+    protected function applySimpleWhere(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, Field $field, $queryBuilder, $value, $operator = Operator::EQ)
     {
-        // TODO: Implement eagerLoadRelationship() method.
+        // TODO: Implement applySimpleWhere() method.
     }
 
     /**
      * @inheritDoc
      */
-    public function applyPropertyFilter(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, Field $field, $queryBuilder, $value, $operator = Operator::EQ)
+    protected function applySimpleSorting(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, Field $field, $queryBuilder, $direction = 'asc')
     {
-        // TODO: Implement applyPropertyFilter() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function applyPropertySorting(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, Field $field, $queryBuilder, $direction = 'asc')
-    {
-        // TODO: Implement applyPropertySorting() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function applyLimit(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder, $records, $skip)
-    {
-        // TODO: Implement applyLimit() method.
+        // TODO: Implement applySimpleSorting() method.
     }
 }

@@ -105,4 +105,18 @@ interface QueryAdapter
         $records,
         $skip
     );
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @return
+     */
+    public function countRecords(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder
+    );
 }

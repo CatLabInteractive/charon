@@ -109,6 +109,11 @@ interface ResourceTransformer
     public function getResourceFactory(): ResourceFactory;
 
     /**
+     * @return QueryAdapter
+     */
+    public function getQueryAdapter(): QueryAdapter;
+
+    /**
      * @param Field $field
      * @return string
      */

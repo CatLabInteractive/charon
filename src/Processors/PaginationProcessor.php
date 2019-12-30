@@ -72,16 +72,22 @@ class PaginationProcessor implements Processor
     ) {
         $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, $request);
 
-        if (isset($records)) {
-            $builder->limit($records);
-        } else {
-            $limit = $transformer->getRequestResolver()->getRecords($request);
-            if ($limit === null) {
-                $limit = 10;
-            }
-
-            $builder->limit($limit);
+        // the amount of records we want.
+        $records = $transformer->getRequestResolver()->getRecords($request);
+        if ($records < 1) {
+            $records = 10;
         }
+        $builder->limit($records);
+
+        // First count the total amount of records
+        $totalAmountOfRecords = $transformer->getQueryAdapter()->countRecords(
+            $transformer,
+            $definition,
+            $context,
+            $queryBuilder
+        );
+
+        $filterResults->setTotalRecords($totalAmountOfRecords);
 
         // Build the filters
         $catlabQueryBuilder = new \CatLab\Base\Models\Database\SelectQueryParameters();
