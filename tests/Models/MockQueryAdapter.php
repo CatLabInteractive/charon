@@ -3,9 +3,12 @@
 namespace Tests\Models;
 
 use CatLab\Base\Enum\Operator;
+use CatLab\Base\Models\Database\LimitParameter;
+use CatLab\Base\Models\Database\OrderParameter;
+use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
-use CatLab\Charon\Interfaces\QueryAdapter;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -26,22 +29,82 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
      */
     public function getQualifiedName(Field $field)
     {
-        // TODO: Implement getQualifiedName() method.
+        return $field->getResourceDefinition()->getEntityClassName() . '.' . $field->getName();
     }
 
     /**
      * @inheritDoc
      */
-    protected function applySimpleWhere(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, Field $field, $queryBuilder, $value, $operator = Operator::EQ)
-    {
-        // TODO: Implement applySimpleWhere() method.
+    protected function applySimpleWhere(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        Field $field,
+        $queryBuilder,
+        $value,
+        $operator = Operator::EQ
+    ) {
+        /** @var SelectQueryParameters $queryBuilder */
+        $queryBuilder->where(new WhereParameter($this->getQualifiedName($field), '=', $value));
     }
 
     /**
      * @inheritDoc
      */
-    protected function applySimpleSorting(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, Field $field, $queryBuilder, $direction = 'asc')
-    {
-        // TODO: Implement applySimpleSorting() method.
+    protected function applySimpleSorting(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        Field $field,
+        $queryBuilder,
+        $direction = 'asc'
+    ) {
+        /** @var SelectQueryParameters $queryBuilder */
+        $queryBuilder->orderBy(new OrderParameter($this->getQualifiedName($field), $direction));
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @param $records
+     * @param $skip
+     */
+    public function applyLimit(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder,
+        $records,
+        $skip
+    ) {
+        /** @var SelectQueryParameters $queryBuilder */
+        if ($skip) {
+            $queryBuilder->limit(new LimitParameter($records));
+        } else {
+            $queryBuilder->limit(new LimitParameter($skip, $records));
+        }
+    }
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @return
+     */
+    public function countRecords(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder
+    ) {
+        if (is_countable($queryBuilder)) {
+            return count($queryBuilder);
+        } else {
+            //throw new \InvalidArgumentException('countRecords doesn\'t know how to handle ' . get_class($queryBuilder));
+            return 10;
+        }
     }
 }

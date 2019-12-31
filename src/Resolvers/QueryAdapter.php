@@ -3,6 +3,8 @@
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Base\Enum\Operator;
+use CatLab\Base\Models\Database\LimitParameter;
+use CatLab\Base\Models\Database\SelectQueryParameters;
 use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -16,6 +18,23 @@ use CatLab\Charon\Models\Properties\RelationshipField;
  */
 abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Interfaces\QueryAdapter
 {
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @param $records
+     * @param $skip
+     */
+    abstract public function applyLimit(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder,
+        $records,
+        $skip
+    );
+
     /**
      * Apply a simple 'where' filter on the query builder, called in cases there are no
      * model specific filters (which is in most cases).
@@ -56,6 +75,20 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         Field $field,
         $queryBuilder,
         $direction = 'asc'
+    );
+
+    /**
+     * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @return
+     */
+    abstract public function countRecords(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder
     );
 
     /**
@@ -158,44 +191,5 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         }
 
         $this->applySimpleSorting($transformer, $definition, $context, $field, $queryBuilder, $direction);
-    }
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param $queryBuilder
-     * @param $records
-     * @param $skip
-     */
-    public function applyLimit(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        $queryBuilder,
-        $records,
-        $skip
-    ) {
-        $queryBuilder->take($records);
-
-        if ($skip) {
-            $queryBuilder->skip($skip);
-        }
-    }
-
-    /**
-     * @param ResourceTransformer $transformer
-     * @param ResourceDefinition $definition
-     * @param Context $context
-     * @param $queryBuilder
-     * @return
-     */
-    public function countRecords(
-        ResourceTransformer $transformer,
-        ResourceDefinition $definition,
-        Context $context,
-        $queryBuilder
-    ) {
-        return count($queryBuilder);
     }
 }
