@@ -13,7 +13,18 @@ use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
+use Countable;
 
+if (!function_exists('is_countable')) {
+    function is_countable($var) {
+        return (is_array($var) || $var instanceof Countable);
+    }
+}
+
+/**
+ * Class MockQueryAdapter
+ * @package Tests\Models
+ */
 class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
 {
     /**
