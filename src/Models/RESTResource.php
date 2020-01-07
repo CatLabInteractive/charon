@@ -102,11 +102,12 @@ class RESTResource implements ResourceContract
 
     /**
      * @param Field $field
-     * @param ResourceCollection $children
+     * @param $url
+     * @param \CatLab\Charon\Interfaces\ResourceCollection $children
      * @param bool $visible
      * @return $this
      */
-    public function setChildrenProperty(Field $field, $url, ResourceCollection $children, $visible)
+    public function setChildrenProperty(Field $field, $url, \CatLab\Charon\Interfaces\ResourceCollection $children, $visible)
     {
         $this->properties->getChildren($field, $url)->setChildren($children)->setVisible($visible);
         return $this;
@@ -115,11 +116,12 @@ class RESTResource implements ResourceContract
 
     /**
      * @param Field $field
-     * @param RESTResource $child
+     * @param $url
+     * @param ResourceContract $child
      * @param bool $visible
      * @return $this
      */
-    public function setChildProperty(Field $field, $url, RESTResource $child = null, $visible)
+    public function setChildProperty(Field $field, $url, \CatLab\Charon\Interfaces\RESTResource $child = null, $visible = true)
     {
         $childProperty = $this->properties->getChild($field);
         $childProperty->setVisible($visible);

@@ -2,15 +2,11 @@
 
 namespace CatLab\Charon\Interfaces;
 
-use CatLab\Base\Enum\Operator;
-use CatLab\Base\Interfaces\Database\SelectQueryParameters;
-use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\RESTResource;
-use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
  * Interface PropertyResolver
@@ -35,28 +31,27 @@ interface PropertyResolver
     /**
      * @param ResourceTransformer $transformer
      * @param mixed $entity
-     * @param RelationshipValue $field
+     * @param RelationshipField $field
      * @param Context $context
-     * @return ResourceCollection
      */
     public function resolveManyRelationship(
         ResourceTransformer $transformer,
         $entity,
-        RelationshipValue $field,
+        RelationshipField $field,
         Context $context
-    ) : ResourceCollection;
+    );
 
     /**
      * @param ResourceTransformer $transformer
      * @param mixed $entity
-     * @param RelationshipValue $field
+     * @param RelationshipField $field
      * @param Context $context
      * @return RESTResource
      */
     public function resolveOneRelationship(
         ResourceTransformer $transformer,
         $entity,
-        RelationshipValue $field,
+        RelationshipField $field,
         Context $context
     );
 

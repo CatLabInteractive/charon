@@ -351,10 +351,13 @@ class SwaggerBuilder implements DescriptionBuilder
     /**
      * @param Route $route
      * @param Context $context
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     protected function buildRoute(Route $route, Context $context)
     {
-        $path = str_replace('?', '', $route->getPath());
+        list ($path, $staticRouteParameters) = $route->getPathWithStaticRouteParameters();
+
+        $path = str_replace('?', '', $path);
         $method = $route->getHttpMethod();
 
         $this->paths[$path][$method] = $route->toSwagger($this, $context);

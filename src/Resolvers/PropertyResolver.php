@@ -45,27 +45,20 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
     /**
      * @param ResourceTransformer $transformer
      * @param mixed $entity
-     * @param RelationshipValue $value
+     * @param RelationshipField $field
      * @param Context $context
-     * @return \CatLab\Charon\Interfaces\ResourceCollection
+     * @return ResourceCollection
      * @throws InvalidPropertyException
      * @throws VariableNotFoundInContext
      */
     public function resolveManyRelationship(
         ResourceTransformer $transformer,
         $entity,
-        RelationshipValue $value,
+        RelationshipField $field,
         Context $context
-    ) : ResourceCollection {
-
-        $field = $value->getField();
-
-        $childResource = $field->getChildResource();
+    ) {
         $childContext = $context->getChildContext($field, $field->getExpandContext());
-
-        $children = $this->resolveProperty($transformer, $entity, $field, $childContext);
-        return $transformer->toResources($childResource, $children, $context, null, $value, $entity);
-
+        return $this->resolveProperty($transformer, $entity, $field, $childContext);
     }
 
     /**
@@ -79,11 +72,9 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
     public function resolveOneRelationship(
         ResourceTransformer $transformer,
         $entity,
-        RelationshipValue $value,
+        RelationshipField $field,
         Context $context
     ) {
-        $field = $value->getField();
-
         $child = null;
         try {
             $child = $this->resolveProperty($transformer, $entity, $field, $context);
@@ -91,15 +82,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
             return null;
         }
 
-        if ($child) {
-            return $transformer->toResource(
-                $field->getChildResource(),
-                $child,
-                $context->getChildContext($field, $field->getExpandContext()),
-                $value,
-                $entity
-            );
-        }
+        return $child;
     }
 
     /**

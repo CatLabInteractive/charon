@@ -93,6 +93,20 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
 
     /**
      * @param ResourceTransformer $transformer
+     * @param ResourceDefinition $definition
+     * @param Context $context
+     * @param $queryBuilder
+     * @return
+     */
+    abstract public function getRecords(
+        ResourceTransformer $transformer,
+        ResourceDefinition $definition,
+        Context $context,
+        $queryBuilder
+    );
+
+    /**
+     * @param ResourceTransformer $transformer
      * @param $entityCollection
      * @param RelationshipField $field
      * @param Context $context

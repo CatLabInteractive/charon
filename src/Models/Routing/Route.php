@@ -103,6 +103,7 @@ class Route extends RouteProperties implements RouteMutator
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     public function toSwagger(DescriptionBuilder $builder, Context $context)
     {
@@ -212,8 +213,33 @@ class Route extends RouteProperties implements RouteMutator
     }
 
     /**
+     * We support using 'static parameters', which are path parameters that have been defined already
+     * by using a json-like syntax: /my-path/{"static-parameter"}/fubar will create a path parameter
+     * that has a static value of 'static-parameter'.
+     * @return array
+     */
+    public function getPathWithStaticRouteParameters()
+    {
+        $path = $this->getPath();
+
+        // look for our own 'static' parameters (which we solve by using laravels 'default')
+        $staticRouteParameters = [];
+        preg_match_all('/\{"(.*)"\}/', $path, $out);
+        foreach ($out[1] as $k => $staticVariable) {
+            $path = str_replace($out[0][$k], $staticVariable, $path);
+            $staticRouteParameters[$staticVariable] = $staticVariable;
+        }
+
+        return [
+            $path,
+            $staticRouteParameters
+        ];
+    }
+
+    /**
      * @param bool TRUE if at least one return value consists of multiple models.
      * @return Parameter[]
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     protected function getExtraParameters($hasCardinalityMany)
     {
@@ -323,6 +349,7 @@ class Route extends RouteProperties implements RouteMutator
     /**
      * @param Field $field
      * @return Parameter
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     protected function getFilterField(Field $field)
     {
@@ -343,6 +370,7 @@ class Route extends RouteProperties implements RouteMutator
     /**
      * @param Field $field
      * @return Parameter
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     protected function getSearchField(Field $field)
     {

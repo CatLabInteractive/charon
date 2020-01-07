@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon;
 
+use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\DynamicContext as DynamicContextContract;
 use CatLab\Charon\Interfaces\IdentifierCollection as IdentifierCollectionContract;
@@ -536,7 +537,11 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param RESTResource $resource
      * @param ContextContract $context
      * @param bool $visible
+     * @throws Exceptions\InvalidTransformer
+     * @throws InvalidContextAction
+     * @throws InvalidEntityException
      * @throws InvalidPropertyException
+     * @throws IterableExpected
      */
     private function expandRelationship(
         RelationshipField $field,
@@ -550,36 +555,119 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             return;
         }
 
-        $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         switch ($field->getCardinality()) {
             case Cardinality::MANY:
-                $children = $this->getPropertyResolver()->resolveManyRelationship(
-                    $this,
-                    $entity,
-                    $resource->touchChildrenProperty($field),
-                    $context
-                );
-
-                $resource->setChildrenProperty($field, $url, $children, $visible);
+                $this->expandManyRelationship($field, $entity, $resource, $context, $visible);
                 break;
 
             case Cardinality::ONE:
-                $child = $this->getPropertyResolver()->resolveOneRelationship(
-                    $this,
-                    $entity,
-                    $resource->touchChildProperty($field),
-                    $context
-                );
-
-                if ($child) {
-                    $resource->setChildProperty($field, $url, $child, $visible);
-                } else {
-                    $resource->clearProperty($field, $url);
-                }
+                $this->expandOneRelationship($field, $entity, $resource, $context, $visible);
                 break;
 
             default:
                 throw new InvalidPropertyException("Relationship has invalid type.");
+        }
+    }
+
+    /**
+     * @param RelationshipField $field
+     * @param $entity
+     * @param RESTResource $resource
+     * @param ContextContract $context
+     * @param bool $visible
+     * @throws Exceptions\InvalidTransformer
+     * @throws InvalidContextAction
+     * @throws InvalidEntityException
+     * @throws InvalidPropertyException
+     * @throws IterableExpected
+     */
+    private function expandManyRelationship(
+        RelationshipField $field,
+        $entity,
+        RESTResource $resource,
+        ContextContract $context,
+        $visible = true
+    ) {
+        $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
+        $childrenValue = $resource->touchChildrenProperty($field);
+
+        $childrenQueryBuilder = $this->getPropertyResolver()->resolveManyRelationship(
+            $this,
+            $entity,
+            $field,
+            $context
+        );
+
+        if (!$childrenQueryBuilder) {
+            $resource->setChildrenProperty($field, $url, new ResourceCollection(), $visible);
+            return;
+        }
+
+        $childResource = $field->getChildResourceDefinition();
+
+        // fetch the records
+        $children = $this->getQueryAdapter()->getRecords(
+            $this,
+            $childResource,
+            $context,
+            $childrenQueryBuilder
+        );
+
+        // transform to resources
+        $resources = $this->toResources(
+            $childResource,
+            $children,
+            $context,
+            null,
+            $childrenValue,
+            $entity
+        );
+
+        $resource->setChildrenProperty($field, $url, $resources, $visible);
+    }
+
+    /**
+     * @param RelationshipField $field
+     * @param $entity
+     * @param RESTResource $resource
+     * @param ContextContract $context
+     * @param bool $visible
+     * @throws Exceptions\InvalidTransformer
+     * @throws InvalidContextAction
+     * @throws InvalidEntityException
+     * @throws InvalidPropertyException
+     * @throws IterableExpected
+     */
+    private function expandOneRelationship(
+        RelationshipField $field,
+        $entity,
+        RESTResource $resource,
+        ContextContract $context,
+        $visible = true
+    ) {
+        $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
+
+        $child = $this->getPropertyResolver()->resolveOneRelationship(
+            $this,
+            $entity,
+            $field,
+            $context
+        );
+
+        $childValue = $resource->touchChildProperty($field);
+
+        if ($child) {
+            $childResource = $this->toResource(
+                $field->getChildResourceDefinition(),
+                $child,
+                $context->getChildContext($field, $field->getExpandContext()),
+                $childValue,
+                $entity
+            );
+
+            $resource->setChildProperty($field, $url, $childResource, $visible);
+        } else {
+            $resource->clearProperty($field, $url);
         }
     }
 
