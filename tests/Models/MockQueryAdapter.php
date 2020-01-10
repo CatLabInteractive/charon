@@ -118,4 +118,12 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
             return 10;
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRecords(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder)
+    {
+        return $queryBuilder;
+    }
 }
