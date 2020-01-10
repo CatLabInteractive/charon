@@ -33,7 +33,7 @@ class RelationshipField extends Field
     /**
      * @var bool
      */
-    private $isExpandable;
+    private $expandable;
 
     /**
      * @var bool
@@ -54,6 +54,11 @@ class RelationshipField extends Field
      * @var string
      */
     private $expandContext;
+
+    /**
+     * @var string
+     */
+    private $defaultExpandContext = Action::IDENTIFIER;
 
     /**
      * @var int
@@ -90,7 +95,7 @@ class RelationshipField extends Field
 
         $this->childResource = $childResource;
         $this->cardinality = Cardinality::MANY;
-        $this->isExpandable = false;
+        $this->expandable = false;
         $this->expanded = false;
         $this->meta = [];
     }
@@ -132,34 +137,49 @@ class RelationshipField extends Field
     }
 
     /**
-     * @param bool $expandByDefault
-     * @param string $expandChildContext
+     * Mark this field as expandable.
+     * If a second argument is provided, the relationship will
+     * be expanded by default using the provided context.
+     * @param string $expandContextAction
+     * @param string|null $defaultExpandContext
      * @return $this
      */
-    public function expandable($expandByDefault = false, $expandChildContext = Action::INDEX)
-    {
-        $this->isExpandable = true;
-        $this->expanded = $expandByDefault;
-        $this->expandContext = $expandChildContext;
+    public function expandable(
+        $expandContextAction = Action::INDEX,
+        $defaultExpandContext = null
+    ) {
+        if (isset($defaultExpandContext)) {
+            $this->expanded($defaultExpandContext, $expandContextAction);
+            return $this;
+        }
 
+        $this->expandable = true;
+        $this->expandContext = $expandContextAction;
         return $this;
     }
 
     /**
-     * @param string $expandChildContext
+     * Mark this field as expanded.
+     * @param string $expandContextAction
+     * @param null $explicitExpandContextAction
      * @return $this
      */
-    public function expanded($expandChildContext = Action::INDEX)
-    {
-        return $this->expandable(true, $expandChildContext);
-    }
+    public function expanded(
+        $expandContextAction = Action::INDEX,
+        $explicitExpandContextAction = null
+    ) {
+        if ($explicitExpandContextAction === null) {
+            if (!isset($this->expandContext)) {
+                $explicitExpandContextAction = $expandContextAction;
+            } else {
+                $explicitExpandContextAction = $this->expandContext;
+            }
+        }
 
-    /**
-     * @return string
-     */
-    public function getExpandContext()
-    {
-        return $this->expandContext;
+        $this->expandable($explicitExpandContextAction);
+        $this->expanded = true;
+
+        return $this;
     }
 
     /**
@@ -210,7 +230,7 @@ class RelationshipField extends Field
      */
     public function isExpandable()
     {
-        return $this->isExpandable;
+        return $this->expandable;
     }
 
     /**
@@ -241,7 +261,31 @@ class RelationshipField extends Field
      */
     public function shouldExpand(Context $context, CurrentPath $currentPath)
     {
-        return $this->isExpanded() || ($context->shouldExpandField($currentPath) && $this->isExpandable());
+        return $this->getExpandContext($context, $currentPath) !== false;
+    }
+
+    /**
+     * @param Context|null $context
+     * @param CurrentPath|null $path
+     * @return string
+     */
+    public function getExpandContext(Context $context, CurrentPath $path)
+    {
+        // is requested by the context?
+        if (
+            $context &&
+            $path &&
+            $this->isExpandable() && $context->shouldExpandField($path)
+        ) {
+            return $this->expandContext;
+        }
+
+        // is expanded by default?
+        if ($this->isExpanded()) {
+            return $this->defaultExpandContext;
+        }
+
+        return false;
     }
 
     /**
@@ -345,7 +389,7 @@ class RelationshipField extends Field
 
             $schema = $builder->getRelationshipSchema(
                 ResourceDefinitionLibrary::make($this->childResource),
-                $this->getExpandContext(),
+                $this->expandContext,
                 $this->cardinality
             );
 

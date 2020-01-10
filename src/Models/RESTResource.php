@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models;
 
+use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
@@ -61,14 +62,19 @@ class RESTResource implements ResourceContract
     }
 
     /**
+     * @param Context $context
      * @param Field $field
      * @param string $link
      * @param bool $visible
      * @return $this;
      */
-    public function setLink(Field $field, $link, $visible)
+    public function setLink(Context $context, Field $field, $link, $visible)
     {
-        $this->properties->getLink($field)->setLink($link)->setVisible($visible);
+        $this->properties
+            ->getLink($field)
+            ->setLink($link)
+            ->setVisible($visible);
+
         return $this;
     }
 
@@ -103,28 +109,49 @@ class RESTResource implements ResourceContract
     /**
      * @param Field $field
      * @param $url
-     * @param \CatLab\Charon\Interfaces\ResourceCollection $children
+     * @param ResourceCollection $children
      * @param bool $visible
+     * @param ContextContract $context
      * @return $this
      */
-    public function setChildrenProperty(Field $field, $url, \CatLab\Charon\Interfaces\ResourceCollection $children, $visible)
-    {
-        $this->properties->getChildren($field, $url)->setChildren($children)->setVisible($visible);
+    public function setChildrenProperty(
+        ContextContract $context,
+        Field $field,
+        $url,
+        ResourceCollection $children,
+        $visible
+    ) {
+        $childProperty = $this->properties->getChildren($field);
+
+        if ($url) {
+            $childProperty->setUrl($url);
+        }
+
+        $childProperty->setChildren($children);
+        $childProperty->setVisible($visible);
+        $childProperty->setContext($context);
+
         return $this;
     }
-
 
     /**
      * @param Field $field
      * @param $url
      * @param ResourceContract $child
      * @param bool $visible
+     * @param ContextContract $context
      * @return $this
      */
-    public function setChildProperty(Field $field, $url, \CatLab\Charon\Interfaces\RESTResource $child = null, $visible = true)
-    {
+    public function setChildProperty(
+        ContextContract $context,
+        Field $field,
+        $url,
+        ResourceContract $child = null,
+        $visible = true
+    ) {
         $childProperty = $this->properties->getChild($field);
         $childProperty->setVisible($visible);
+        $childProperty->setContext($context);
 
         if ($url) {
             $childProperty->setUrl($url);
@@ -226,7 +253,7 @@ class RESTResource implements ResourceContract
     }
 
     /**
-     * @param \CatLab\Charon\Interfaces\Context $context
+     * @param ContextContract $context
      * @param string $path
      * @param null $original
      * @return mixed
@@ -235,7 +262,7 @@ class RESTResource implements ResourceContract
      * @throws \CatLab\Requirements\Exceptions\ValidationException
      */
     public function validate(
-        \CatLab\Charon\Interfaces\Context $context,
+        ContextContract $context,
         $original = null,
         string $path = ''
     ) {

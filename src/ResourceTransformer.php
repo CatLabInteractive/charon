@@ -591,27 +591,27 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         $childrenValue = $resource->touchChildrenProperty($field);
 
-        $childrenQueryBuilder = $this->getPropertyResolver()->resolveManyRelationship(
-            $this,
-            $entity,
-            $field,
-            $context
-        );
+        $childAction = $field->getExpandContext($context, $this->currentPath);
+        $childContext = $context->getChildContext($field, $childAction);
+
+        $childrenQueryBuilder = $this->getPropertyResolver()
+            ->resolveManyRelationship($this, $entity, $field, $childContext);
 
         if (!$childrenQueryBuilder) {
-            $resource->setChildrenProperty($field, $url, new ResourceCollection(), $visible);
+            $resource->setChildrenProperty($childContext, $field, $url, new ResourceCollection(), $visible);
             return;
         }
 
         $childResource = $field->getChildResourceDefinition();
 
         // fetch the records
-        $children = $this->getQueryAdapter()->getRecords(
-            $this,
-            $childResource,
-            $context,
-            $childrenQueryBuilder
-        );
+        $children = $this->getQueryAdapter()
+            ->getRecords(
+                $this,
+                $childResource,
+                $context,
+                $childrenQueryBuilder
+            );
 
         // transform to resources
         $resources = $this->toResources(
@@ -623,7 +623,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             $entity
         );
 
-        $resource->setChildrenProperty($field, $url, $resources, $visible);
+        $resource->setChildrenProperty($childContext, $field, $url, $resources, $visible);
     }
 
     /**
@@ -645,14 +645,14 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         ContextContract $context,
         $visible = true
     ) {
-        $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
+        $url = $this->getPropertyResolver()
+            ->resolvePathParameters($this, $entity, $field->getUrl(), $context);
 
-        $child = $this->getPropertyResolver()->resolveOneRelationship(
-            $this,
-            $entity,
-            $field,
-            $context
-        );
+        $childAction = $field->getExpandContext($context, $this->currentPath);
+        $childContext = $context->getChildContext($field, $childAction);
+
+        $child = $this->getPropertyResolver()
+            ->resolveOneRelationship($this, $entity, $field, $childContext);
 
         $childValue = $resource->touchChildProperty($field);
 
@@ -660,12 +660,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             $childResource = $this->toResource(
                 $field->getChildResourceDefinition(),
                 $child,
-                $context->getChildContext($field, $field->getExpandContext()),
+                $childContext,
                 $childValue,
                 $entity
             );
 
-            $resource->setChildProperty($field, $url, $childResource, $visible);
+            $resource->setChildProperty($childContext, $field, $url, $childResource, $visible);
         } else {
             $resource->clearProperty($field, $url);
         }
@@ -694,15 +694,15 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                     $context
                 );
 
-                $resource->setChildrenProperty($field, null, $children, true);
+                $resource->setChildrenProperty($context, $field, null, $children, true);
                 break;
 
             case Cardinality::ONE:
                 $child = $this->getPropertyResolver()->resolveOneRelationshipInput($this, $body, $field, $context);
                 if ($child) {
-                    $resource->setChildProperty($field, null, $child, true);
+                    $resource->setChildProperty($context, $field, null, $child, true);
                 } else {
-                    $resource->setChildProperty($field, null, null, true);
+                    $resource->setChildProperty($context, $field, null, null, true);
                 }
                 break;
 
@@ -726,7 +726,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $visible
     ) {
         $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
-        $resource->setLink($field, $url, $visible);
+        $resource->setLink($context, $field, $url, $visible);
     }
 
     /**

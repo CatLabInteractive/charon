@@ -37,7 +37,12 @@ class PropertyValueCollection extends Collection
      */
     public function touchProperty(Field $resourceField)
     {
-        return $this->touchPropertyValue($resourceField, PropertyValue::class);
+        $value = $this->touchPropertyValue($resourceField, PropertyValue::class);
+        if (!$value instanceof PropertyValue) {
+            throw new \InvalidArgumentException('touchProperty must return a ' . LinkValue::class . ' model.');
+        }
+
+        return $value;
     }
 
     /**
@@ -60,7 +65,12 @@ class PropertyValueCollection extends Collection
      */
     public function getLink(Field $resourceField)
     {
-        return $this->touchPropertyValue($resourceField, LinkValue::class);
+        $value = $this->touchPropertyValue($resourceField, LinkValue::class);
+        if (!$value instanceof LinkValue) {
+            throw new \InvalidArgumentException('getLink must return a ' . LinkValue::class . ' model.');
+        }
+
+        return $value;
     }
 
     /**
@@ -69,7 +79,12 @@ class PropertyValueCollection extends Collection
      */
     public function getChildren(Field $resourceField)
     {
-        return $this->touchPropertyValue($resourceField, ChildrenValue::class);
+        $value = $this->touchPropertyValue($resourceField, ChildrenValue::class);
+        if (!$value instanceof ChildrenValue) {
+            throw new \InvalidArgumentException('getChildren must return a ' . ChildrenValue::class . ' model.');
+        }
+
+        return $value;
     }
 
     /**
@@ -78,7 +93,12 @@ class PropertyValueCollection extends Collection
      */
     public function getChild(Field $resourceField)
     {
-        return $this->touchPropertyValue($resourceField, ChildValue::class);
+        $value = $this->touchPropertyValue($resourceField, ChildValue::class);
+        if (!$value instanceof ChildValue) {
+            throw new \InvalidArgumentException('getChildren must return a ' . ChildValue::class . ' model.');
+        }
+
+        return $value;
     }
 
     /**
@@ -105,7 +125,7 @@ class PropertyValueCollection extends Collection
     /**
      * @param Field $resourceField
      * @param $propertyValueClass
-     * @return PropertyValue
+     * @return Value
      */
     private function touchPropertyValue(Field $resourceField, $propertyValueClass)
     {

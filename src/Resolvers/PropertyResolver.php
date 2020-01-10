@@ -57,8 +57,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         RelationshipField $field,
         Context $context
     ) {
-        $childContext = $context->getChildContext($field, $field->getExpandContext());
-        return $this->resolveProperty($transformer, $entity, $field, $childContext);
+        return $this->resolveProperty($transformer, $entity, $field, $context);
     }
 
     /**

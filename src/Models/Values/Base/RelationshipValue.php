@@ -36,6 +36,11 @@ abstract class RelationshipValue extends Value
     private $url;
 
     /**
+     * @var Context
+     */
+    private $context;
+
+    /**
      * @return RESTResource[]
      */
     abstract public function getChildren();
@@ -138,11 +143,34 @@ abstract class RelationshipValue extends Value
     }
 
     /**
+     * @param Context $context
+     * @return $this
+     */
+    public function setContext(Context $context)
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return Context
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
      * @return RelationshipField
      */
     public function getField()
     {
-        return parent::getField();
+        $field = parent::getField();
+        if (!$field instanceof RelationshipField) {
+            throw new \InvalidArgumentException(self::class . '::getField() must return an ' . RelationshipField::class);
+        }
+
+        return $field;
     }
 
     /**
