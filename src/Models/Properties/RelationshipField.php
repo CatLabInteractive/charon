@@ -13,6 +13,7 @@ use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Swagger\SwaggerBuilder;
+use CatLab\Charon\Validation\RelationshipExists;
 
 /**
  * Class RelationshipField
@@ -377,6 +378,15 @@ class RelationshipField extends Field
     public function getOrderBy()
     {
         return $this->sortBy;
+    }
+
+    /**
+     * @return Field|void
+     */
+    public function required()
+    {
+        $this->addRequirement(new RelationshipExists());
+        return $this;
     }
 
     /**
