@@ -55,6 +55,14 @@ class CurrentPath implements Countable
     }
 
     /**
+     * @return Field
+     */
+    public function getTopField()
+    {
+        return $this->fields[count($this->fields) - 1];
+    }
+
+    /**
      * Count elements of an object
      * @link http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.

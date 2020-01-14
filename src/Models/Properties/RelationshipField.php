@@ -176,7 +176,6 @@ class RelationshipField extends Field
             }
         }
 
-        $this->defaultExpandContext = $expandContextAction;
         $this->expandable($explicitExpandContextAction);
         $this->expanded = true;
 

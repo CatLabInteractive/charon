@@ -37,10 +37,14 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
     }
 
     /**
+     * @param null $key
      * @return array|string
      */
-    public function getMeta()
+    public function getMeta($key = null)
     {
+        if ($key !== null) {
+            return isset($this->meta[$key]) ? $this->meta[$key] : null;
+        }
         return $this->meta;
     }
 
