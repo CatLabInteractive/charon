@@ -130,6 +130,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
     {
         $nav = new \CatLab\Charon\Pagination\Navigation();
 
+        $nav->setCurrentPage($this->page);
         $nav->setHasNextPage($this->hasNextPage);
         $nav->setHasPreviousPage($this->hasPreviousPage);
 
