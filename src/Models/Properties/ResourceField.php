@@ -140,10 +140,12 @@ class ResourceField extends Field
     /**
      * @param $value
      * @param string $path
+     * @param bool $validateNonProvidedFields
+     * @return void
      * @throws PropertyValidationException
      * @throws ValidationException
      */
-    public function validate($value, string $path)
+    public function validate($value, string $path, $validateNonProvidedFields = true)
     {
         if ($this->isArray()) {
             if ($value ===  null) {
@@ -155,10 +157,10 @@ class ResourceField extends Field
             }
 
             foreach ($value as $v) {
-                parent::validate($v, $path);
+                parent::validate($v, $path, $validateNonProvidedFields);
             }
         } else {
-            return parent::validate($value, $path);
+            return parent::validate($value, $path, $validateNonProvidedFields);
         }
     }
 

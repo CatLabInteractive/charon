@@ -155,7 +155,8 @@ abstract class Value
     /**
      * @param Context $context
      * @param string $path
+     * @param bool $validateNonProvidedFields
      * @return
      */
-    abstract public function validate(Context $context, string $path);
+    abstract public function validate(Context $context, string $path, $validateNonProvidedFields = true);
 }

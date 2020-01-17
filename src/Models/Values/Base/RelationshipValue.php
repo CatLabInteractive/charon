@@ -350,12 +350,13 @@ abstract class RelationshipValue extends Value
     /**
      * @param Context $context
      * @param string $path
+     * @param bool $validateNonProvidedFields
      * @throws PropertyValidationException
-     * @throws ResourceException
      * @throws RequirementValidationException
+     * @throws ResourceException
      * @throws \CatLab\Requirements\Exceptions\ValidationException
      */
-    public function validate(Context $context, string $path)
+    public function validate(Context $context, string $path, $validateNonProvidedFields = true)
     {
         $messages = new MessageCollection();
 
@@ -372,12 +373,12 @@ abstract class RelationshipValue extends Value
                 /** @var RESTResource $child */
                 if ($child) {
                     try {
-                        $child->validate($context, null, $this->appendToPath($path, $field));
+                        $child->validate($context, null, $this->appendToPath($path, $field), $validateNonProvidedFields);
                     } catch (ResourceValidationException $e) {
                         $messages->merge($e->getMessages());
                     }
                 } else {
-                    $this->getField()->validate(null, $this->appendToPath($path, $field));
+                    $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
                 }
             }
         } elseif ($field->canLinkExistingEntities()) {
@@ -402,7 +403,7 @@ abstract class RelationshipValue extends Value
                     }
                 } else {
                     try {
-                        $this->getField()->validate(null, $this->appendToPath($path, $field));
+                        $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
                     } catch (ResourceValidationException $e) {
                         $messages->merge($e->getMessages());
                     }

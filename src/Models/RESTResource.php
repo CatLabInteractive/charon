@@ -254,17 +254,19 @@ class RESTResource implements ResourceContract
 
     /**
      * @param ContextContract $context
-     * @param string $path
      * @param null $original
+     * @param string $path
+     * @param bool $validateNonProvidedFields
      * @return mixed
-     * @throws ResourceValidationException
      * @throws RequirementValidationException
-     * @throws \CatLab\Requirements\Exceptions\ValidationException
+     * @throws ResourceValidationException
+     * @throws ValidationException
      */
     public function validate(
         ContextContract $context,
         $original = null,
-        string $path = ''
+        string $path = '',
+        bool $validateNonProvidedFields = true
     ) {
         $messages = new MessageCollection();
 
@@ -281,9 +283,11 @@ class RESTResource implements ResourceContract
 
             try {
                 if (!isset($value)) {
-                    $field->validate(null, $path);
+                    if ($validateNonProvidedFields) {
+                        $field->validate(null, $path, $validateNonProvidedFields);
+                    }
                 } else {
-                    $value->validate($context, $path);
+                    $value->validate($context, $path, $validateNonProvidedFields);
                 }
             } catch(PropertyValidationException $e) {
                 $messages->merge($e->getMessages());

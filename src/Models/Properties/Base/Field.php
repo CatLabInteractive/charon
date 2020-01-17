@@ -320,9 +320,10 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @param $value
      * @param string $path
+     * @param bool $validateNonProvidedFields
      * @throws PropertyValidationException
      */
-    public function validate($value, string $path)
+    public function validate($value, string $path, $validateNonProvidedFields)
     {
         $this->setPath($path);
         $this->getRequirements()->validate($this, $value);

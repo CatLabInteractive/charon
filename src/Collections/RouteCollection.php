@@ -218,12 +218,12 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('patch', $only)) {
-            $group->patch($path . '/{' . $id . '}', $controller . '@edit')
+            $group->patch($path . '/{' . $id . '}', $controller . '@patch')
                 ->summary(function () use ($resourceDefinition) {
                     $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
                         ->getEntityName(false);
 
-                    return 'Update an existing ' . $entityName;
+                    return 'Patch an existing ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
                 ->parameters()->resource($resourceDefinition)->required()
