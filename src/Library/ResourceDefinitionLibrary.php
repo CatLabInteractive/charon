@@ -36,11 +36,11 @@ class ResourceDefinitionLibrary
     /**
      * @param string $classname
      * @return ResourceDefinition
+     * @throws InvalidResourceDefinition
      */
     public static function make($classname)
     {
         if ($classname instanceof ResourceDefinition) {
-            self::instance()->descriptions[get_class($classname)] = $classname;
             return $classname;
         } else {
             return self::instance()->makeResourceDescription($classname);

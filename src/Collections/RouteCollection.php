@@ -7,6 +7,7 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Routing\MatchedRoute;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Models\Routing\RouteProperties;
+use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 
 /**
  * Class RouteCollection
@@ -163,9 +164,12 @@ class RouteCollection extends RouteProperties
      * @param $options
      * @return RouteCollection
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function resource($resourceDefinition, $path, $controller, $options)
     {
+        $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
+
         $id = $options['id'] ?? 'id';
         $only = $options['only'] ?? [ 'index', 'view', 'store', 'edit', 'destroy' ];
 
@@ -173,68 +177,63 @@ class RouteCollection extends RouteProperties
 
         if (in_array('index', $only)) {
             $group->get($path, $controller . '@index')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
-                ->returns()->statusCode(200)->many($resourceDefinition);
+                ->returns()->statusCode(200)->many($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('view', $only)) {
             $group->get($path . '/{' . $id . '}', $controller . '@view')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'View a single ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('store', $only)) {
             $group->post($path, $controller . '@store')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Create a new ' . $entityName;
                 })
-                ->parameters()->resource($resourceDefinition)->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('edit', $only)) {
             $group->put($path . '/{' . $id . '}', $controller . '@edit')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Update an existing ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
-                ->parameters()->resource($resourceDefinition)->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->parameters()->resource($resourceDefinitionFactory)->required()
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('patch', $only)) {
             $group->patch($path . '/{' . $id . '}', $controller . '@patch')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Patch an existing ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
-                ->parameters()->resource($resourceDefinition)->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('destroy', $only)) {
             $group->delete($path . '/{' . $id . '}', $controller . '@destroy')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Delete a ' . $entityName;
                 })
@@ -258,6 +257,8 @@ class RouteCollection extends RouteProperties
      */
     public function childResource($resourceDefinition, $parentPath, $childPath, $controller, $options)
     {
+        $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
+
         $id = $options['id'] ?? 'id';
         $parentId = $options['parentId'] ?? 'parentId';
 
@@ -267,8 +268,8 @@ class RouteCollection extends RouteProperties
 
         if (in_array('index', $only)) {
             $group->get($parentPath, $controller . '@index')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)->getEntityName(true);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
                 ->parameters()->path($parentId)->string()->required()
@@ -277,9 +278,8 @@ class RouteCollection extends RouteProperties
 
         if (in_array('view', $only)) {
             $group->get($childPath . '/{' . $id . '}', $controller . '@view')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'View a single ' . $entityName;
                 })
@@ -289,9 +289,8 @@ class RouteCollection extends RouteProperties
 
         if (in_array('store', $only)) {
             $group->post($parentPath, $controller . '@store')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Create a new ' . $entityName;
                 })
@@ -302,9 +301,8 @@ class RouteCollection extends RouteProperties
 
         if (in_array('edit', $only)) {
             $group->put($childPath . '/{' . $id . '}', $controller . '@edit')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Update an existing ' . $entityName;
                 })
@@ -315,9 +313,8 @@ class RouteCollection extends RouteProperties
 
         if (in_array('destroy', $only)) {
             $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy')
-                ->summary(function () use ($resourceDefinition) {
-                    $entityName = ResourceDefinitionLibrary::make($resourceDefinition)
-                        ->getEntityName(false);
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Delete a ' . $entityName;
                 })

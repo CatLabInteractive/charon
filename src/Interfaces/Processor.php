@@ -32,7 +32,7 @@ interface Processor
     /**
      * @param ResourceTransformer $transformer
      * @param ResourceCollection $collection
-     * @param ResourceDefinition $definition
+     * @param ResourceDefinitionFactory $definition
      * @param Context $context
      * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
@@ -42,7 +42,7 @@ interface Processor
     public function processCollection(
         ResourceTransformer $transformer,
         ResourceCollection $collection,
-        ResourceDefinition $definition,
+        ResourceDefinitionFactory $definition,
         Context $context,
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,

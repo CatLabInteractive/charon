@@ -9,6 +9,7 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 
 use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
@@ -29,14 +30,14 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
     /**
      * Look for identifier input
      * @param ResourceTransformer $resourceTransformer
-     * @param ResourceDefinition $resourceDefinition
+     * @param ResourceDefinitionFactory $resourceDefinition
      * @param Context $context
      * @param null $resource
      * @return IdentifierCollection|null
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $resource = null
     ) {
@@ -74,14 +75,14 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
     /**
      * Look for
      * @param ResourceTransformer $resourceTransformer
-     * @param ResourceDefinition $resourceDefinition
+     * @param ResourceDefinitionFactory $resourceDefinition
      * @param Context $context
      * @param null $request
      * @return ResourceCollection|null
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     ) {

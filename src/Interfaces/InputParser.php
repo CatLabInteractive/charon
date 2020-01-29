@@ -18,14 +18,14 @@ interface InputParser
     /**
      * Look for identifier input
      * @param ResourceTransformer $resourceTransformer
-     * @param ResourceDefinition $resourceDefinition
+     * @param ResourceDefinitionFactory $resourceDefinition
      * @param Context $context
      * @param mixed $request
      * @return IdentifierCollection|null
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     );
@@ -33,14 +33,14 @@ interface InputParser
     /**
      * Look for resources
      * @param ResourceTransformer $resourceTransformer
-     * @param ResourceDefinition $resourceDefinition
+     * @param ResourceDefinitionFactory $resourceDefinition
      * @param Context $context
      * @param mixed $request
      * @return ResourceCollection|null
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     );
@@ -52,6 +52,7 @@ interface InputParser
      * @param Route $route
      * @param ResourceParameter $parameter
      * @param ResourceDefinition $resourceDefinition
+     * @param $action
      * @param mixed $request
      * @return ParameterCollection
      */

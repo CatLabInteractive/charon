@@ -74,7 +74,6 @@ interface ResourceTransformer
 
     /**
      * @param RESTResource $resource
-     * @param $resourceDefinition
      * @param EntityFactory $factory
      * @param Context $context
      * @param mixed|null $entity
@@ -82,7 +81,6 @@ interface ResourceTransformer
      */
     public function toEntity(
         RESTResource $resource,
-        $resourceDefinition,
         EntityFactory $factory,
         Context $context,
         $entity = null
@@ -125,7 +123,7 @@ interface ResourceTransformer
      * @param Context $context
      * @return void
      */
-    public function processEagerLoading($entities, $resourceDefinition, Context $context);
+    public function processEagerLoading($entities, $resourceDefinition = null, Context $context = null);
 
     /**
      * Create resources from whatever is in the inputs defined from the input parsers.

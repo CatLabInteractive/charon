@@ -10,6 +10,7 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Library\InputParserLibrary;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
@@ -28,10 +29,11 @@ class InputParserCollection extends Collection implements InputParser
      * @param Context $context
      * @param null $request
      * @return IdentifierCollection|null
+     * @throws NoInputParsersSet
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     ) {
@@ -57,10 +59,11 @@ class InputParserCollection extends Collection implements InputParser
      * @param Context $context
      * @param null $request
      * @return ResourceCollection|null
+     * @throws NoInputParsersSet
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     ) {

@@ -11,6 +11,7 @@ use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\ResourceCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
 use CatLab\Charon\Models\FilterResults;
@@ -148,16 +149,17 @@ class PaginationProcessor implements Processor
     /**
      * @param ResourceTransformer $transformer
      * @param ResourceCollection $collection
-     * @param ResourceDefinition $definition
+     * @param ResourceDefinition|ResourceDefinition[] $definition
      * @param Context $context
      * @param FilterResults|null $filterResults
      * @param RelationshipValue $parent
      * @param null $parentEntity
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function processCollection(
         ResourceTransformer $transformer,
         ResourceCollection $collection,
-        ResourceDefinition $definition,
+        ResourceDefinitionFactory $definition,
         Context $context,
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,
@@ -166,7 +168,7 @@ class PaginationProcessor implements Processor
         list ($url, $cursor) = $this->prepareCursor(
             $transformer,
             $collection,
-            $definition,
+            $definition->getDefault(),
             $context,
             $filterResults,
             $parent,

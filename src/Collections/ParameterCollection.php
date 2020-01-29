@@ -88,10 +88,18 @@ class ParameterCollection
      */
     public function resource($resourceDefinition)
     {
+        if ($resourceDefinition instanceof ResourceDefinition) {
+            $parameterKey = get_class($resourceDefinition);
+        } elseif (is_string($resourceDefinition)) {
+            $parameterKey = $resourceDefinition;
+        } else {
+            throw new \InvalidArgumentException('Resource parameter must either be a classname or a class object, ' . get_class($resourceDefinition) . ' provided.');
+        }
+
         $parameter = new ResourceParameter($resourceDefinition);
         $parameter->setRoute($this->route);
 
-        $this->parameters[$resourceDefinition] = $parameter;
+        $this->parameters[$parameterKey] = $parameter;
 
         return $parameter;
     }

@@ -334,7 +334,6 @@ abstract class RelationshipValue extends Value
 
         $entity = $resourceTransformer->toEntity(
             $child,
-            $child->getResourceDefinition(),
             $factory,
             $context,
             $childEntity

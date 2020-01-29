@@ -3,10 +3,10 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
-use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RESTResource;
 use CatLab\Charon\Interfaces\ResourceCollection;
@@ -42,7 +42,7 @@ class ProcessorCollection extends Collection implements Processor
     public function processCollection(
         ResourceTransformer $transformer,
         ResourceCollection $collection,
-        ResourceDefinition $definition,
+        ResourceDefinitionFactory $definition,
         Context $context,
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,

@@ -3,6 +3,7 @@
 namespace CatLab\Charon;
 
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\InvalidResourceDefinition;
 use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\DynamicContext as DynamicContextContract;
 use CatLab\Charon\Interfaces\IdentifierCollection as IdentifierCollectionContract;
@@ -11,6 +12,7 @@ use CatLab\Charon\Interfaces\PropertySetter as PropertySetterContract;
 use CatLab\Charon\Interfaces\QueryAdapter as QueryAdapterContract;
 use CatLab\Charon\Interfaces\RequestResolver as RequestResolverContract;
 use CatLab\Charon\Interfaces\ResourceCollection as ResourceCollectionContract;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryContract;
 use CatLab\Charon\Interfaces\RESTResource as ResourceContract;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
@@ -41,6 +43,7 @@ use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -141,6 +144,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
      * @throws IterableExpected
+     * @throws Exceptions\InvalidResourceDefinition
      */
     public function toResources(
         $resourceDefinition,
@@ -155,18 +159,23 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities at ' . $this->currentPath);
         }
 
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
 
         $out = $this->getResourceFactory()->createResourceCollection();
 
+        $index = 0;
         foreach ($entities as $entity) {
-            $out->add($this->toResource($resourceDefinition, $entity, $context, $parent, $parentEntity));
+            $entityResDef = $resourceDefinitionFactory->fromEntity($entity);
+            $resource = $this->toResource($entityResDef, $entity, $context, $parent, $parentEntity);
+
+            $out->add($resource);
+            $index ++;
         }
 
         $context->getProcessors()->processCollection(
             $this,
             $out,
-            $resourceDefinition,
+            $resourceDefinitionFactory,
             $context,
             $filterResults,
             $parent,
@@ -188,6 +197,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidPropertyException
      * @throws IterableExpected
      * @throws Exceptions\InvalidTransformer
+     * @throws Exceptions\InvalidResourceDefinition
      */
     public function toResource(
         $resourceDefinition,
@@ -196,7 +206,10 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RelationshipValue $parent = null,
         $parentEntity = null
     ) : ResourceContract {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+
+        $resourceDefinition = $resourceDefinitionFactory->fromEntity($entity);
         $this->checkEntityType($resourceDefinition, $entity);
 
         if (!Action::isReadContext($context->getAction())) {
@@ -299,21 +312,25 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
     /**
      * @param ResourceContract $resource
-     * @param $resourceDefinition
      * @param EntityFactoryContract $factory
      * @param mixed|null $entity
      * @param ContextContract $context
      * @return mixed $entity
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     * @throws InvalidResourceDefinition
      */
     public function toEntity(
         ResourceContract $resource,
-        $resourceDefinition,
         EntityFactoryContract $factory,
         ContextContract $context,
         $entity = null
     ) {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        /*
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $resourceDefinition = $resourceDefinitionFactory->fromResource($resource);
+        */
+
+        $resourceDefinition = $resource->getResourceDefinition();
 
         if ($entity === null) {
             $entity = $factory->createEntity($resourceDefinition->getEntityClassName(), $context);
@@ -339,10 +356,17 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @return ResourceContract
      * @throws InvalidPropertyException
      * @throws InvalidContextAction
+     * @throws InvalidResourceDefinition
      */
-    public function fromArray($resourceDefinition, array $body, ContextContract $context) : ResourceContract
-    {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+    public function fromArray(
+        $resourceDefinition,
+        array $body,
+        ContextContract $context
+    ) : ResourceContract {
+
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $resourceDefinition = $resourceDefinitionFactory->fromRawInput($body);
+
         if (!Action::isWriteContext($context->getAction())) {
             throw InvalidContextAction::expectedWriteable($context->getAction());
         }
@@ -386,6 +410,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @return array
      * @throws InvalidContextAction
+     * @throws InvalidResourceDefinition
      */
     public function entitiesFromIdentifiers(
         $resourceDefinition,
@@ -393,7 +418,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         EntityFactoryContract $factory,
         ContextContract $context
     ) {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $resourceDefinition = $resourceDefinitionFactory->fromIdentifiers($content);
+
         if (!Action::isWriteContext($context->getAction())) {
             throw InvalidContextAction::expectedWriteable($context->getAction());
         }
@@ -430,6 +457,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param EntityFactoryContract $factory
      * @param ContextContract $context
      * @return mixed
+     * @throws InvalidResourceDefinition
      */
     private function fromIdentifier(
         ResourceDefinitionContract $resourceDefinition,
@@ -437,7 +465,8 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         EntityFactoryContract $factory,
         ContextContract $context
     ) {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $resourceDefinition = $resourceDefinitionFactory->fromIdentifiers([ $identifier ]);
 
         if (! ($identifier instanceof Identifier)) {
             $identifier = Identifier::fromArray($resourceDefinition, $identifier);
@@ -457,10 +486,16 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param $entities
      * @param $resourceDefinition
      * @param ContextContract $context
+     * @throws Exceptions\InvalidResourceDefinition
      */
-    public function processEagerLoading($entities, $resourceDefinition, ContextContract $context)
+    public function processEagerLoading($entities, $resourceDefinition = null, ContextContract $context = null)
     {
-        $definition = ResourceDefinitionLibrary::make($resourceDefinition);
+        if (!$resourceDefinition) {
+            return;
+        }
+
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $definition = $resourceDefinitionFactory->getDefault();
 
         // Now check for query parameters
         foreach ($definition->getFields() as $field) {
@@ -486,6 +521,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @param $queryBuilder
      * @return FilterResults
+     * @throws Exceptions\InvalidResourceDefinition
      */
     public function applyFilters(
         $request,
@@ -496,7 +532,8 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $filterResults = new FilterResults();
         $filterResults->setQueryBuilder($queryBuilder);
 
-        $definition = ResourceDefinitionLibrary::make($resourceDefinition);
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $definition = $resourceDefinitionFactory->getDefault();
 
         // First process all filtersable and searchable fields.
         foreach ($definition->getFields() as $field) {
@@ -532,6 +569,15 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
+     * @param $resourceDefinition
+     * @return ResourceDefinitionFactory
+     */
+    protected function getResourceDefinitionFactory($resourceDefinition)
+    {
+        return StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
+    }
+
+    /**
      * @param RelationshipField $field
      * @param mixed $entity
      * @param RESTResource $resource
@@ -542,6 +588,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
      * @throws IterableExpected
+     * @throws InvalidResourceDefinition
      */
     private function expandRelationship(
         RelationshipField $field,
@@ -580,6 +627,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
      * @throws IterableExpected
+     * @throws InvalidResourceDefinition
      */
     private function expandManyRelationship(
         RelationshipField $field,
@@ -637,6 +685,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @throws InvalidEntityException
      * @throws InvalidPropertyException
      * @throws IterableExpected
+     * @throws InvalidResourceDefinition
      */
     private function expandOneRelationship(
         RelationshipField $field,
@@ -843,6 +892,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param null $request
      * @return ResourceCollectionContract
      * @throws NoInputDataFound
+     * @throws InvalidResourceDefinition
      */
     public function fromInput(
         $resourceDefinition,
@@ -850,14 +900,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $request = null
     ): ResourceCollectionContract
     {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
 
-        $resources = $context->getInputParser()->getResources(
-            $this,
-            $resourceDefinition,
-            $context,
-            $request
-        );
+        $resources = $context->getInputParser()->getResources($this, $resourceDefinitionFactory, $context, $request);
 
         if (!$resources) {
             throw NoInputDataFound::make();
@@ -872,6 +917,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @param null $request
      * @return IdentifierCollectionContract
+     * @throws InvalidResourceDefinition
      */
     public function identifiersFromInput(
         $resourceDefinition,
@@ -879,14 +925,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $request = null
     ) : IdentifierCollectionContract
     {
-        $resourceDefinition = ResourceDefinitionLibrary::make($resourceDefinition);
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
 
-        $identifiers = $context->getInputParser()->getIdentifiers(
-            $this,
-            $resourceDefinition,
-            $context,
-            $request
-        );
+        $identifiers = $context->getInputParser()->getIdentifiers($this, $resourceDefinitionFactory, $context, $request);
 
         if (!$identifiers) {
             throw new \InvalidArgumentException("No data found in body");

@@ -255,8 +255,7 @@ class Route extends RouteProperties implements RouteMutator
         foreach ($returnValues as $returnValue) {
 
             // Look for sortable fields
-            $resourceDefinition = $returnValue->getResourceDefinition();
-            if ($resourceDefinition) {
+            foreach ($returnValue->getResourceDefinitions() as $resourceDefinition) {
 
                 foreach ($resourceDefinition->getFields() as $field) {
 

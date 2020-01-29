@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Routing;
 
+use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\HeaderCollection;
 use CatLab\Charon\Collections\ParameterCollection;
@@ -28,6 +29,11 @@ class ReturnValue implements RouteMutator
      * @var string
      */
     private $type;
+
+    /**
+     * @var array
+     */
+    private $types;
 
     /**
      * @var string
@@ -116,6 +122,30 @@ class ReturnValue implements RouteMutator
     }
 
     /**
+     * @param array $types
+     * @return $this
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     */
+    public function oneOf(array $types)
+    {
+        $this->one();
+        $this->types = $types;
+        return $this;
+    }
+
+    /**
+     * @param array $types
+     * @return $this
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     */
+    public function anyOf(array $types)
+    {
+        $this->many();
+        $this->types = $types;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getCardinality() : string
@@ -126,13 +156,25 @@ class ReturnValue implements RouteMutator
     /**
      * @return null|string
      */
-    public function getType() : string
+    public function getType()
     {
         if (isset($this->type)) {
             return $this->type;
         } else {
             return PropertyType::STRING;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        if (isset($this->types)) {
+            return $this->type;
+        }
+
+        return [ $this->getType() ];
     }
 
     /**
@@ -155,8 +197,9 @@ class ReturnValue implements RouteMutator
      * @param string $type
      * @param string $action
      * @return ReturnValue
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function returns(string $type = null, string $action = null) : ReturnValue
+    public function returns($type = null, string $action = null) : ReturnValue
     {
         return $this->parent->returns($type, $action);
     }
@@ -225,19 +268,44 @@ class ReturnValue implements RouteMutator
 
     /**
      * @return \CatLab\Charon\Interfaces\ResourceDefinition|null
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function getResourceDefinition()
     {
-        if (PropertyType::isNative($this->getType())) {
-            return null;
-        } else {
-            return ResourceDefinitionLibrary::make($this->getType());
+        $definition = $this->getResourceDefinitions();
+        if (count($definition) > 0) {
+            return $definition[0];
         }
+        return null;
+    }
+
+    /**
+     * @return \CatLab\Charon\Interfaces\ResourceDefinition[]
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     */
+    public function getResourceDefinitions()
+    {
+        $types = $this->getType();
+        if (!is_array($types)) {
+            $types = [ $types ];
+        }
+
+        $out = [];
+        foreach ($types as $v) {
+            if (!PropertyType::isNative($v)) {
+                $r = ResourceDefinitionLibrary::make($v);
+                if ($r) {
+                    $out[] = $r;
+                }
+            }
+        }
+        return $out;
     }
 
     /**
      * @param DescriptionBuilder $builder
      * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function toSwagger(DescriptionBuilder $builder)
     {
@@ -247,15 +315,41 @@ class ReturnValue implements RouteMutator
         if (PropertyType::isNative($this->getType())) {
             // Do nothing.
         } else {
-            $schema = $builder->getRelationshipSchema(
-                ResourceDefinitionLibrary::make($this->getType()),
-                $this->getContext(),
-                $this->getCardinality()
-            );
 
-            $response = [
-                'schema' => $schema
-            ];
+            /*
+             * not supported yet.
+            // is oneOf or manyOf?
+            if (is_array($this->getType())) {
+                $schemas = [];
+                foreach ($this->getType() as $type) {
+                    $schemas = $builder->getRelationshipSchema(
+                        ResourceDefinitionLibrary::make($type),
+                        $this->getContext(),
+                        $this->getCardinality()
+                    );
+                }
+
+                $key = $this->getCardinality() === Cardinality::ONE ? 'oneOf' : 'anyOf';
+
+                $response = [
+                    'schema' => [
+                        $key => $schemas
+                    ]
+                ];
+
+            } else {
+            */
+                $schema = $builder->getRelationshipSchema(
+                    ResourceDefinitionLibrary::make($this->getType()),
+                    $this->getContext(),
+                    $this->getCardinality()
+                );
+
+                $response = [
+                    'schema' => $schema
+                ];
+            //}
+
         }
 
         if (isset($this->description)) {
@@ -283,8 +377,15 @@ class ReturnValue implements RouteMutator
         if (PropertyType::isNative($this->getType())) {
             return 'Returns ' . $this->getType();
         } else {
-            $type = ResourceDefinitionLibrary::make($this->getType());
-            return 'Returns ' . $this->getCardinality() . ' ' . $type->getEntityClassName();
+
+            $types = $this->getTypes();
+
+            $classNames = array_map(function($type) {
+                $type = ResourceDefinitionLibrary::make($type);
+                return $type->getEntityClassName();
+            }, $types);
+
+            return 'Returns ' . $this->getCardinality() . ' ' . implode(', ', $classNames);
         }
     }
 

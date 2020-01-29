@@ -17,7 +17,7 @@ interface RouteMutator
      * @param string $action
      * @return ReturnValue
      */
-    public function returns(string $type = null, string $action = null) : ReturnValue;
+    public function returns($type = null, string $action = null) : ReturnValue;
 
     /**
      * @param string $tag
