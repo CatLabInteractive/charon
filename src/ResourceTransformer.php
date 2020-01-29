@@ -560,7 +560,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             $this,
             $queryBuilder,
             $request,
-            $resourceDefinition,
+            $resourceDefinitionFactory->getDefault(),
             $context,
             $filterResults
         );
