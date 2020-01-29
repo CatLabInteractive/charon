@@ -3,6 +3,7 @@
 namespace CatLab\Charon\InputParsers;
 
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Models\Identifier;
 use CatLab\Requirements\Enums\PropertyType;
 use \Request;
@@ -53,11 +54,11 @@ abstract class AbstractInputParser
     }
 
     /**
-     * @param ResourceDefinition $resourceDefinition
+     * @param ResourceDefinitionFactory $resourceDefinition
      * @param array $data
      * @return Identifier
      */
-    protected function arrayToIdentifier(ResourceDefinition $resourceDefinition, array $data)
+    protected function arrayToIdentifier(ResourceDefinitionFactory $resourceDefinition, array $data)
     {
         return Identifier::fromArray($resourceDefinition, $data);
     }
