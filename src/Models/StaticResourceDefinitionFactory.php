@@ -19,10 +19,28 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
 class StaticResourceDefinitionFactory implements \CatLab\Charon\Interfaces\ResourceDefinitionFactory
 {
     /**
+     * @var array
+     */
+    private static $staticLibrary = [];
+
+    /**
      * @param $resourceDefinition
      * @return \CatLab\Charon\Interfaces\ResourceDefinitionFactory
      */
     public static function getFactoryOrDefaultFactory($resourceDefinition)
+    {
+        $objectHash = is_string($resourceDefinition) ? $resourceDefinition : spl_object_hash($resourceDefinition);
+        if (!isset(self::$staticLibrary[$objectHash])) {
+            self::$staticLibrary[$objectHash] = self::createFactoryOrDefaultFactory($resourceDefinition);
+        }
+        return self::$staticLibrary[$objectHash];
+    }
+
+    /**
+     * @param $resourceDefinition
+     * @return StaticResourceDefinitionFactory
+     */
+    private static function createFactoryOrDefaultFactory($resourceDefinition)
     {
         if (!is_subclass_of($resourceDefinition, ResourceDefinitionFactory::class)) {
             return new StaticResourceDefinitionFactory($resourceDefinition);
