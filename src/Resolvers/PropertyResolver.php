@@ -98,10 +98,22 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         Field $field,
         Context $context
     ) {
-        if (!array_key_exists($field->getDisplayName(), $input)) {
-            throw ValueUndefined::make($field->getDisplayName());
+        // resolve the dot notation.
+        $displayNamePath = explode('.', $field->getDisplayName());
+        $displayName = array_pop($displayNamePath);
+
+        $tmp = &$input;
+        foreach ($displayNamePath as $v) {
+            if (!isset($tmp[$v])) {
+                throw ValueUndefined::make($field->getDisplayName());
+            }
+            $tmp = &$tmp[$v];
         }
-        return $input[$field->getDisplayName()];
+
+        if (!array_key_exists($displayName, $tmp)) {
+            throw ValueUndefined::make($displayName);
+        }
+        return $tmp[$displayName];
     }
 
     /**

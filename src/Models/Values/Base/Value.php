@@ -71,7 +71,19 @@ abstract class Value
      */
     public function addToArray(array &$out)
     {
-        $out[$this->field->getDisplayName()] = $this->toArray();
+        // check for dot notation.
+        $displayNamePath = explode('.', $this->field->getDisplayName());
+        $displayName = array_pop($displayNamePath);
+
+        $tmp = &$out;
+        foreach ($displayNamePath as $path) {
+            if (!isset($tmp[$path])) {
+                $tmp[$path] = [];
+            }
+            $tmp = &$tmp[$path];
+        }
+
+        $tmp[$displayName] = $this->toArray();
     }
 
     /**
