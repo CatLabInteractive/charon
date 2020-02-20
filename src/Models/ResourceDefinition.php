@@ -12,9 +12,7 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Swagger\SwaggerBuilder;
-use CatLab\Requirements\Collections\RequirementCollection;
 use CatLab\Requirements\Collections\ValidatorCollection;
-use CatLab\Requirements\Interfaces\Requirement as RequirementInterface;
 use CatLab\Requirements\Interfaces\Validator;
 
 /**
@@ -249,7 +247,21 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
         foreach ($this->getFields() as $field) {
             /** @var ResourceField $field */
             if ($field->hasAction($action)) {
-                $out['properties'][$field->getDisplayName()] = $field->toSwagger($builder, $action);
+
+                $displayNamePath = explode('.', $field->getDisplayName());
+                $container = &$out['properties'];
+                while (count($displayNamePath) > 1) {
+                    $containerName = array_shift($displayNamePath);
+                    if (!isset($container[$containerName])) {
+                        $container[$containerName] = [
+                            'type' => 'object',
+                            'properties' => []
+                        ];
+                    }
+                    $container = &$container[$containerName]['properties'];
+                }
+
+                $container[array_shift($displayNamePath)] = $field->toSwagger($builder, $action);
             }
         }
 

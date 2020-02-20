@@ -321,6 +321,7 @@ class SwaggerBuilder implements DescriptionBuilder
     /**
      * @param Context $context
      * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     public function build(Context $context)
     {
