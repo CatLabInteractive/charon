@@ -205,7 +205,7 @@ abstract class RelationshipValue extends Value
 
         foreach ($children as $child) {
             if (!$child) {
-                return;
+                continue;
             }
 
             $this->childResourceToEntity(

@@ -63,6 +63,9 @@ class ChildValue extends RelationshipValue
      */
     public function getValue()
     {
+        if ($this->child === null) {
+            return null;
+        }
         return $this->child->toArray();
     }
 
