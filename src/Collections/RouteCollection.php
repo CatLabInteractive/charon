@@ -214,7 +214,7 @@ class RouteCollection extends RouteProperties
                     return 'Update an existing ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
-                ->parameters()->resource($resourceDefinitionFactory)->required()
+                ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
