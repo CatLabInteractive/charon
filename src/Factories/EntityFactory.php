@@ -12,7 +12,6 @@ use Exception;
  */
 class EntityFactory implements \CatLab\Charon\Interfaces\EntityFactory
 {
-
     /**
      * @param $entityClassName
      * @param Context $context
@@ -33,11 +32,16 @@ class EntityFactory implements \CatLab\Charon\Interfaces\EntityFactory
      */
     public function resolveLinkedEntity($parent, string $entityClassName, array $identifiers, Context $context)
     {
-        if (!isset($identifiers['id'])) {
-            throw new Exception('No ID identifier found for ' . $entityClassName);
+        if (isset($identifiers['id'])) {
+            return $entityClassName::find($identifiers['id']);
         }
 
-        return $entityClassName::find($identifiers['id']);
+        $query = $entityClassName::query();
+        foreach ($identifiers as $k => $v) {
+            $query->where($k, '=', $v);
+        }
+
+        return $query->first();
     }
 
     /**
@@ -50,11 +54,15 @@ class EntityFactory implements \CatLab\Charon\Interfaces\EntityFactory
     public function resolveFromIdentifier(string $entityClassName, Identifier $identifier, Context $context)
     {
         $data = $identifier->toArray();
-
-        if (!isset($data['id'])) {
-            throw new Exception('No ID identifier found for ' . $entityClassName);
+        if (isset($data['id'])) {
+            return $entityClassName::find($data['id']);
         }
 
-        return $entityClassName::find($data['id']);
+        $query = $entityClassName::query();
+        foreach ($data as $k => $v) {
+            $query->where($k, '=', $v);
+        }
+
+        return $query->first();
     }
 }
