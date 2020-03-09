@@ -193,7 +193,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         try {
             $child = $this->resolvePropertyInput($transformer, $input, $field, $context);
 
-            if ($child) {
+            if (is_array($child)) {
                 $childContext = $this->getInputChildContext($transformer, $field, $context);
                 return $transformer->fromArray($field->getChildResource(), $child, $childContext);
             }
