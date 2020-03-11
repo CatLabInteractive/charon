@@ -295,29 +295,6 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
-     * @param SwaggerBuilder $builder
-     * @param $action
-     * @return mixed[]
-     */
-    public function toSwagger(SwaggerBuilder $builder, $action)
-    {
-        $out = [];
-
-        $type = $this->type;
-        switch ($type) {
-            case PropertyType::DATETIME:
-                $out['type'] = 'string';
-                $out['format'] = 'date-time';
-                break;
-
-            default:
-                $out['type'] = $type;
-        }
-
-        return $out;
-    }
-
-    /**
      * @param $value
      * @param string $path
      * @param bool $validateNonProvidedFields
@@ -419,6 +396,29 @@ class Field implements Property, ResourceDefinitionManipulator
             'type' => $this->getType(),
             'access' => $this->actions
         ];
+
+        return $out;
+    }
+
+    /**
+     * @param SwaggerBuilder $builder
+     * @param $action
+     * @return mixed[]
+     */
+    public function toSwagger(SwaggerBuilder $builder, $action)
+    {
+        $out = [];
+
+        $type = $this->type;
+        switch ($type) {
+            case PropertyType::DATETIME:
+                $out['type'] = 'string';
+                $out['format'] = 'date-time';
+                break;
+
+            default:
+                $out['type'] = $type;
+        }
 
         return $out;
     }
