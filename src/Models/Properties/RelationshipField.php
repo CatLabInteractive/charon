@@ -291,6 +291,14 @@ class RelationshipField extends Field
     }
 
     /**
+     * @return string
+     */
+    public function getExpandAction()
+    {
+        return $this->expandContext;
+    }
+
+    /**
      * @param Context $context
      * @param CurrentPath $currentPath
      * @return bool

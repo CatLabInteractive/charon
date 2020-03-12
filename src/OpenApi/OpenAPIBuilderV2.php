@@ -4,6 +4,7 @@ namespace CatLab\Charon\OpenApi;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Interfaces\Documentation\DocumentationVisitor;
+use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -15,17 +16,25 @@ use CatLab\Charon\Swagger\SwaggerBuilder;
  * Class OpenAPIBuilder
  * @package CatLab\Charon
  */
-class OpenAPIBuilder implements DocumentationVisitor
+class OpenAPIBuilderV2 implements DocumentationVisitor
 {
     /**
      * @var SwaggerBuilder
      */
     private $builder;
 
-
-    public function __construct()
-    {
-        $this->builder = new SwaggerBuilder();
+    /**
+     * OpenAPIBuilderV2 constructor.
+     * @param string $host
+     * @param string $basePath
+     * @param ResourceFactoryInterface|null $resourceFactory
+     */
+    public function __construct(
+        string $host,
+        string $basePath,
+        ResourceFactoryInterface $resourceFactory = null
+    ) {
+        $this->builder = new SwaggerBuilder($host, $basePath, $resourceFactory);
     }
 
     /**
@@ -48,27 +57,28 @@ class OpenAPIBuilder implements DocumentationVisitor
 
     /**
      * @param RelationshipField $field
+     * @return array
      */
     protected function processRelationshipField(RelationshipField $field, $action)
     {
         if (Action::isReadContext($action) && $field->isExpanded()) {
 
             $schema = $this->builder->getRelationshipSchema(
-                ResourceDefinitionLibrary::make($field->childResource),
-                $field->expandContext,
-                $field->cardinality
+                $field->getChildResourceDefinition(),
+                $field->getExpandAction(),
+                $field->getCardinality()
             );
 
             return [
                 '$ref' => $schema['$ref']
             ];
         } elseif (Action::isWriteContext($action)) {
-            if ($field->linkOnly) {
+            if ($field->canLinkExistingEntities()) {
 
                 $schema = $this->builder->getRelationshipSchema(
-                    ResourceDefinitionLibrary::make($field->childResource),
+                    $field->getChildResourceDefinition(),
                     Action::IDENTIFIER,
-                    $field->cardinality
+                    $field->getCardinality()
                 );
 
                 return [
@@ -76,9 +86,9 @@ class OpenAPIBuilder implements DocumentationVisitor
                 ];
             } else {
                 $schema = $this->builder->getRelationshipSchema(
-                    ResourceDefinitionLibrary::make($field->childResource),
+                    $field->getChildResourceDefinition(),
                     Action::CREATE,
-                    $field->cardinality
+                    $field->getCardinality()
                 );
 
                 return [
