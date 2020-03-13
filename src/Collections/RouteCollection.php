@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Interfaces\Documentation\DocumentationVisitor;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Routing\MatchedRoute;
 use CatLab\Charon\Models\Routing\Route;
@@ -359,6 +360,16 @@ class RouteCollection extends RouteProperties
             }
         }
         return null;
+    }
+
+    /**
+     * @param DocumentationVisitor $documentationVisitor
+     */
+    public function buildDescription(DocumentationVisitor $documentationVisitor)
+    {
+        foreach ($this->getRoutes() as $route) {
+            $documentationVisitor->visitRoute($route);
+        }
     }
 
     /**

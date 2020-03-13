@@ -100,79 +100,6 @@ class Route extends RouteProperties implements RouteMutator
     }
 
     /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
-     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
-     */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
-    {
-        $out = [];
-
-        $options = $this->getOptions();
-        $parameters = $this->getParameters();
-
-        // Check return
-        $returnValues = $this->getReturnValues();
-        $hasManyReturnValue = false;
-        foreach ($returnValues as $returnValue) {
-            $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
-            $hasManyReturnValue =
-                $hasManyReturnValue || $returnValue->getCardinality() == Cardinality::MANY;
-        }
-
-        foreach ($this->getExtraParameters($hasManyReturnValue) as $parameter) {
-            $parameters[] = $parameter;
-        }
-
-        $out['summary'] = $this->getSummary();
-        $out['parameters'] = [];
-
-        if (isset($options['tags'])) {
-            if (is_array($options['tags'])) {
-                $out['tags'] = $options['tags'];
-            } else {
-                $out['tags'] = [ $options['tags'] ];
-            }
-        }
-
-        foreach ($parameters as $parameter) {
-            // Sometimes one parameter can result in multiple swagger parameters being added
-            $parameterSwaggerDescription = $parameter->toSwagger($builder, $context);
-            if (ArrayHelper::isAssociative($parameterSwaggerDescription)) {
-                $out['parameters'][] = $parameterSwaggerDescription;
-            } else {
-                $out['parameters'] = array_merge($out['parameters'], $parameterSwaggerDescription);
-            }
-
-        }
-
-        // Sort parameters: required first
-        usort($out['parameters'], function ($a, $b) {
-            if ($a['required'] && !$b['required']) {
-                return -1;
-            } elseif ($b['required'] && !$a['required']) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-
-        // Check consumes
-        $consumes = $this->getConsumeValues();
-        if ($consumes) {
-            $out['consumes'] = $consumes;
-        }
-
-        $security = $this->getOption('security');
-        if (isset($security)) {
-            $out['security'] = $security;
-        }
-
-        return $out;
-    }
-
-    /**
      * @param $method
      * @param $requestPath
      * @return MatchedRoute|boolean
@@ -240,8 +167,9 @@ class Route extends RouteProperties implements RouteMutator
      * @param bool TRUE if at least one return value consists of multiple models.
      * @return Parameter[]
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    protected function getExtraParameters($hasCardinalityMany)
+    public function getExtraParameters($hasCardinalityMany)
     {
         $returnValues = $this->getReturnValues();
 
