@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Swagger;
 
+use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -353,6 +354,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param Route $route
      * @param Context $context
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     protected function buildRoute(Route $route, Context $context)
     {
@@ -361,7 +363,82 @@ class SwaggerBuilder implements DescriptionBuilder
         $path = str_replace('?', '', $path);
         $method = $route->getHttpMethod();
 
-        $this->paths[$path][$method] = $route->toSwagger($this, $context);
+        $this->paths[$path][$method] = $this->routeToSwagger($route, $this, $context);
+    }
+
+    /**
+     * @param Route $route
+     * @param DescriptionBuilder $builder
+     * @param Context $context
+     * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
+     */
+    public function routeToSwagger(Route $route, DescriptionBuilder $builder, Context $context)
+    {
+        $out = [];
+
+        $options = $route->getOptions();
+        $parameters = $route->getParameters();
+
+        // Check return
+        $returnValues = $route->getReturnValues();
+        $hasManyReturnValue = false;
+        foreach ($returnValues as $returnValue) {
+            $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
+            $hasManyReturnValue =
+                $hasManyReturnValue || $returnValue->getCardinality() == Cardinality::MANY;
+        }
+
+        foreach ($route->getExtraParameters($hasManyReturnValue) as $parameter) {
+            $parameters[] = $parameter;
+        }
+
+        $out['summary'] = $route->getSummary();
+        $out['parameters'] = [];
+
+        if (isset($options['tags'])) {
+            if (is_array($options['tags'])) {
+                $out['tags'] = $options['tags'];
+            } else {
+                $out['tags'] = [ $options['tags'] ];
+            }
+        }
+
+        foreach ($parameters as $parameter) {
+            // Sometimes one parameter can result in multiple swagger parameters being added
+            $parameterSwaggerDescription = $parameter->toSwagger($builder, $context);
+            if (ArrayHelper::isAssociative($parameterSwaggerDescription)) {
+                $out['parameters'][] = $parameterSwaggerDescription;
+            } else {
+                $out['parameters'] = array_merge($out['parameters'], $parameterSwaggerDescription);
+            }
+
+        }
+
+        // Sort parameters: required first
+        usort($out['parameters'], function ($a, $b) {
+            if ($a['required'] && !$b['required']) {
+                return -1;
+            } elseif ($b['required'] && !$a['required']) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        // Check consumes
+        $consumes = $route->getConsumeValues();
+        if ($consumes) {
+            $out['consumes'] = $consumes;
+        }
+
+        $security = $route->getOption('security');
+        if (isset($security)) {
+            $out['security'] = $security;
+        }
+
+        return $out;
     }
 
     /**
