@@ -368,7 +368,7 @@ class ReturnValue implements RouteMutator
     /**
      * @return string
      */
-    protected function getDescriptionFromType()
+    public function getDescriptionFromType()
     {
         if (!$this->getType()) {
             return 'No description set.';

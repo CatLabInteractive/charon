@@ -4,6 +4,7 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Models\Routing\Route;
+use CatLab\Charon\OpenApi\Authentication\Authentication;
 
 /**
  * Class DescriptionBuilder
@@ -44,4 +45,28 @@ interface DescriptionBuilder
      * @return $this
      */
     public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality);
+
+    /**
+     * @param string $title
+     * @return $this
+     */
+    public function setTitle(string $title);
+
+    /**
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription(string $description);
+
+    /**
+     * @param string $terms
+     * @return $this
+     */
+    public function setTermsOfService(string $terms);
+
+    /**
+     * @param Authentication $authentication
+     * @return $this
+     */
+    public function addAuthentication(Authentication $authentication);
 }

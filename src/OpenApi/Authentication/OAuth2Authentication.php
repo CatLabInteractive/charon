@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\Charon\Swagger\Authentication;
+namespace CatLab\Charon\OpenApi\Authentication;
 
 /**
  * Class OAuth2Authentication

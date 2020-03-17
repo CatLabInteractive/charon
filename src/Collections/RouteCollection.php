@@ -363,16 +363,6 @@ class RouteCollection extends RouteProperties
     }
 
     /**
-     * @param DocumentationVisitor $documentationVisitor
-     */
-    public function buildDescription(DocumentationVisitor $documentationVisitor)
-    {
-        foreach ($this->getRoutes() as $route) {
-            $documentationVisitor->visitRoute($route);
-        }
-    }
-
-    /**
      * @return string
      */
     public function __toString()

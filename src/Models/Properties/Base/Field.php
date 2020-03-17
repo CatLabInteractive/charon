@@ -2,23 +2,22 @@
 
 namespace CatLab\Charon\Models\Properties\Base;
 
+use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Exceptions\InvalidScalarException;
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
 use CatLab\Charon\Interfaces\Transformer;
 use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\CurrentPath;
-use CatLab\Charon\Transformers\DateTransformer;
-use CatLab\Charon\Transformers\ScalarTransformer;
-use CatLab\Requirements\Exceptions\PropertyValidationException;
-use CatLab\Requirements\Interfaces\Property;
-use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Interfaces\Context;
-use CatLab\Requirements\Enums\PropertyType;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\ResourceDefinition;
-use CatLab\Charon\Swagger\SwaggerBuilder;
+use CatLab\Charon\Transformers\DateTransformer;
+use CatLab\Charon\Transformers\ScalarTransformer;
+use CatLab\Requirements\Enums\PropertyType;
+use CatLab\Requirements\Exceptions\PropertyValidationException;
+use CatLab\Requirements\Interfaces\Property;
 use CatLab\Requirements\Interfaces\Validator;
 
 /**
@@ -396,29 +395,6 @@ class Field implements Property, ResourceDefinitionManipulator
             'type' => $this->getType(),
             'access' => $this->actions
         ];
-
-        return $out;
-    }
-
-    /**
-     * @param SwaggerBuilder $builder
-     * @param $action
-     * @return mixed[]
-     */
-    public function toSwagger(SwaggerBuilder $builder, $action)
-    {
-        $out = [];
-
-        $type = $this->type;
-        switch ($type) {
-            case PropertyType::DATETIME:
-                $out['type'] = 'string';
-                $out['format'] = 'date-time';
-                break;
-
-            default:
-                $out['type'] = $type;
-        }
 
         return $out;
     }

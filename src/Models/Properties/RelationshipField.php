@@ -3,16 +3,16 @@
 namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
+use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Interfaces\ResourceTransformer;
-use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
-use CatLab\Charon\Swagger\SwaggerBuilder;
+use CatLab\Charon\OpenApi\OpenApiV2Builder;
 use CatLab\Charon\Validation\RelationshipExists;
 
 /**
@@ -398,11 +398,11 @@ class RelationshipField extends Field
     }
 
     /**
-     * @param SwaggerBuilder $builder
+     * @param OpenApiV2Builder $builder
      * @param $action
      * @return mixed[]
      */
-    public function toSwagger(SwaggerBuilder $builder, $action)
+    public function toSwagger(OpenApiV2Builder $builder, $action)
     {
         if (Action::isReadContext($action) && $this->isExpanded()) {
 

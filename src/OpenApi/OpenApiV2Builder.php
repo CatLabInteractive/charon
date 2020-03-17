@@ -1,24 +1,33 @@
 <?php
 
-namespace CatLab\Charon\Swagger;
+namespace CatLab\Charon\OpenApi;
 
 use CatLab\Base\Helpers\ArrayHelper;
+use CatLab\Charon\Collections\HeaderCollection;
+use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Enums\Cardinality;
+use CatLab\Charon\Exceptions\RouteAlreadyDefined;
 use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
-use CatLab\Charon\Enums\Cardinality;
-use CatLab\Charon\Exceptions\RouteAlreadyDefined;
+use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Library\PrettyEntityNameLibrary;
+use CatLab\Charon\Library\ResourceDefinitionLibrary;
+use CatLab\Charon\Models\Properties\Base\Field;
+use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
-use CatLab\Charon\Swagger\Authentication\Authentication;
+use CatLab\Charon\OpenApi\Authentication\Authentication;
+use CatLab\Requirements\Enums\PropertyType;
 
 /**
  * Class SwaggerBuilder
  * @package CatLab\Charon\Swagger
  */
-class SwaggerBuilder implements DescriptionBuilder
+class OpenApiV2Builder implements DescriptionBuilder
 {
     /**
      * @var string
@@ -150,6 +159,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param string $action
      * @param string $cardinality
      * @return string
+     * @throws OpenApiException
      */
     public function addResourceDefinition(
         ResourceDefinition $resourceDefinition,
@@ -161,7 +171,8 @@ class SwaggerBuilder implements DescriptionBuilder
         $name = $this->getResourceDefinitionName($resourceDefinition) . '_' . $action;
         if (!array_key_exists($name, $this->schemas)) {
             $this->schemas[$name] = null; // Set key to avoid circular references
-            $this->schemas[$name] = $resourceDefinition->toSwagger($this, $action);
+            //$this->schemas[$name] = $resourceDefinition->toSwagger($this, $action);
+            $this->schemas[$name] = $this->buildResourceDefinitionDescription($resourceDefinition, $action);
         }
 
         $refId = '#/definitions/' . $name;
@@ -216,6 +227,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param string $action
      * @param string $cardinality
      * @return array[]
+     * @throws OpenApiException
      */
     public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
     {
@@ -229,6 +241,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param string $action
      * @param string $cardinality
      * @return array[]
+     * @throws OpenApiException
      */
     public function getResponseSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
     {
@@ -323,6 +336,7 @@ class SwaggerBuilder implements DescriptionBuilder
      * @param Context $context
      * @return array
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function build(Context $context)
     {
@@ -497,6 +511,225 @@ class SwaggerBuilder implements DescriptionBuilder
 
         if (isset($this->version)) {
             $out['version'] = $this->version;
+        }
+
+        return $out;
+    }
+
+
+    /**
+     * @param Field $field
+     * @param $action
+     * @return mixed
+     * @throws OpenApiException
+     */
+    protected function buildFieldDescription(Field $field, $action)
+    {
+        switch (true) {
+
+            case $field instanceof RelationshipField:
+                return $this->buildRelationshipFieldDescription($field, $action);
+
+            case $field instanceof ResourceField:
+                return $this->buildResourceFieldDescription($field, $action);
+
+            default:
+                throw new OpenApiException('Invalid field provided: ' . get_class($field));
+        }
+    }
+
+
+    /**
+     * @param RelationshipField $field
+     * @return array
+     * @throws OpenApiException
+     */
+    protected function buildRelationshipFieldDescription(RelationshipField $field, $action)
+    {
+        if (Action::isReadContext($action) && $field->isExpanded()) {
+
+            $schema = $this->getRelationshipSchema(
+                $field->getChildResourceDefinition(),
+                $field->getExpandAction(),
+                $field->getCardinality()
+            );
+
+            return [
+                '$ref' => $schema['$ref']
+            ];
+        } elseif (Action::isWriteContext($action)) {
+            if ($field->canLinkExistingEntities()) {
+
+                $schema = $this->getRelationshipSchema(
+                    $field->getChildResourceDefinition(),
+                    Action::IDENTIFIER,
+                    $field->getCardinality()
+                );
+
+                return [
+                    '$ref' => $schema['$ref']
+                ];
+            } else {
+                $schema = $this->getRelationshipSchema(
+                    $field->getChildResourceDefinition(),
+                    Action::CREATE,
+                    $field->getCardinality()
+                );
+
+                return [
+                    '$ref' => $schema['$ref']
+                ];
+            }
+        } else {
+            return [
+                'properties' => [
+                    ResourceTransformer::RELATIONSHIP_LINK => [
+                        'type' => 'string'
+                    ]
+                ]
+            ];
+        }
+    }
+
+    /**
+     * @param ResourceField $field
+     * @return array
+     */
+    protected function buildResourceFieldDescription(ResourceField $field, $action)
+    {
+        $description = [];
+
+        $type = $field->getType();
+        switch ($type) {
+            case PropertyType::DATETIME:
+                $description['type'] = 'string';
+                $description['format'] = 'date-time';
+                break;
+
+            default:
+                $description['type'] = $type;
+        }
+
+        // Is array? Wrap in array definition
+        if ($field->isArray()) {
+            return [
+                'type' => 'array',
+                'items' => $description
+            ];
+        }
+
+        return $description;
+    }
+
+    /**
+     * @param ReturnValue $returnValue
+     * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @throws OpenApiException
+     */
+    protected function buildReturnValueDescription(ReturnValue $returnValue)
+    {
+        $response = [];
+
+        // Is this a native type?
+        if (PropertyType::isNative($returnValue->getType())) {
+            // Do nothing.
+        } else {
+
+            /*
+             * not supported yet.
+            // is oneOf or manyOf?
+            if (is_array($this->getType())) {
+                $schemas = [];
+                foreach ($this->getType() as $type) {
+                    $schemas = $builder->getRelationshipSchema(
+                        ResourceDefinitionLibrary::make($type),
+                        $this->getContext(),
+                        $this->getCardinality()
+                    );
+                }
+
+                $key = $this->getCardinality() === Cardinality::ONE ? 'oneOf' : 'anyOf';
+
+                $response = [
+                    'schema' => [
+                        $key => $schemas
+                    ]
+                ];
+
+            } else {
+            */
+            $schema = $this->getRelationshipSchema(
+                ResourceDefinitionLibrary::make($returnValue->getType()),
+                $returnValue->getContext(),
+                $returnValue->getCardinality()
+            );
+
+            $response = [
+                'schema' => $schema
+            ];
+            //}
+
+        }
+
+        if (isset($this->description)) {
+            $response['description'] = $this->description;
+        } else {
+            $response['description'] = $returnValue->getDescriptionFromType();
+        }
+
+        if ($returnValue->headers()->count() > 0) {
+            $response['headers'] = $this->buildHeaderDescription($returnValue->headers());
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param HeaderCollection $headers
+     * @return array
+     */
+    protected function buildHeaderDescription(HeaderCollection $headers)
+    {
+        return [];
+    }
+
+    /**
+     * @param ResourceDefinition $resourceDefinition
+     * @param $action
+     * @return array
+     * @throws OpenApiException
+     */
+    protected function buildResourceDefinitionDescription(ResourceDefinition $resourceDefinition, $action)
+    {
+        $out = [];
+
+        $out['type'] = 'object';
+        $out['properties'] = [];
+        foreach ($resourceDefinition->getFields() as $field) {
+            /** @var ResourceField $field */
+            if ($field->hasAction($action)) {
+
+                $displayNamePath = explode('.', $field->getDisplayName());
+                $container = &$out['properties'];
+                while (count($displayNamePath) > 1) {
+                    $containerName = array_shift($displayNamePath);
+                    if (!isset($container[$containerName])) {
+                        $container[$containerName] = [
+                            'type' => 'object',
+                            'properties' => []
+                        ];
+                    }
+                    $container = &$container[$containerName]['properties'];
+                }
+
+                //$container[array_shift($displayNamePath)] = $field->toSwagger($this, $action);
+                $container[array_shift($displayNamePath)] = $this->buildFieldDescription($field, $action);
+            }
+        }
+
+        if (count($out['properties']) === 0) {
+            $out['properties'] = (object) [];
         }
 
         return $out;

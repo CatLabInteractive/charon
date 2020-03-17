@@ -4,7 +4,6 @@ namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
-use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\ValidationException;
 use CatLab\Requirements\InArray;
@@ -162,25 +161,5 @@ class ResourceField extends Field
         } else {
             return parent::validate($value, $path, $validateNonProvidedFields);
         }
-    }
-
-    /**
-     * @param SwaggerBuilder $builder
-     * @param $action
-     * @return mixed[]
-     */
-    public function toSwagger(SwaggerBuilder $builder, $action)
-    {
-        $description = parent::toSwagger($builder, $action);
-
-        // Is array? Wrap in array definition
-        if ($this->isArray()) {
-            return [
-                'type' => 'array',
-                'items' => $description
-            ];
-        }
-
-        return $description;
     }
 }

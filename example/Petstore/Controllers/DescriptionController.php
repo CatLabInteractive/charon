@@ -3,7 +3,7 @@
 namespace App\Petstore\Controllers;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Swagger\SwaggerBuilder;
+use CatLab\Charon\OpenApi\OpenApiV2Builder;
 
 /**
  * Class DescriptionController
@@ -13,7 +13,7 @@ class DescriptionController extends AbstractResourceController
 {
     public function index()
     {
-        $builder = new SwaggerBuilder('', '/');
+        $builder = new OpenApiV2Builder('', '/');
 
         $builder
             ->setTitle('Petstore Example API')

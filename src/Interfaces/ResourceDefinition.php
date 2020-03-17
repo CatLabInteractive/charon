@@ -3,8 +3,6 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\ResourceFieldCollection;
-use CatLab\Charon\Swagger\SwaggerBuilder;
-use CatLab\Requirements\Collections\RequirementCollection;
 use CatLab\Requirements\Collections\ValidatorCollection;
 
 /**
@@ -50,11 +48,4 @@ interface ResourceDefinition
      * @return string|null
      */
     public function getDefaultOrder();
-
-    /**
-     * @param SwaggerBuilder $builder
-     * @param string $action
-     * @return mixed[]
-     */
-    public function toSwagger(SwaggerBuilder $builder, $action);
 }

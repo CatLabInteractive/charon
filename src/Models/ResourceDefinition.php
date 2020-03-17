@@ -8,10 +8,9 @@ use CatLab\Charon\Collections\ResourceFieldCollection;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
 use CatLab\Charon\Models\Properties\Base\PropertyGroup;
+use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
-use CatLab\Charon\Models\Properties\IdentifierField;
-use CatLab\Charon\Swagger\SwaggerBuilder;
 use CatLab\Requirements\Collections\ValidatorCollection;
 use CatLab\Requirements\Interfaces\Validator;
 
@@ -231,44 +230,5 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     public function getDefaultOrder()
     {
         return $this->defaultOrder;
-    }
-
-    /**
-     * @param SwaggerBuilder $builder
-     * @param string $action
-     * @return mixed[]
-     */
-    public function toSwagger(SwaggerBuilder $builder, $action)
-    {
-        $out = [];
-
-        $out['type'] = 'object';
-        $out['properties'] = [];
-        foreach ($this->getFields() as $field) {
-            /** @var ResourceField $field */
-            if ($field->hasAction($action)) {
-
-                $displayNamePath = explode('.', $field->getDisplayName());
-                $container = &$out['properties'];
-                while (count($displayNamePath) > 1) {
-                    $containerName = array_shift($displayNamePath);
-                    if (!isset($container[$containerName])) {
-                        $container[$containerName] = [
-                            'type' => 'object',
-                            'properties' => []
-                        ];
-                    }
-                    $container = &$container[$containerName]['properties'];
-                }
-
-                $container[array_shift($displayNamePath)] = $field->toSwagger($builder, $action);
-            }
-        }
-
-        if (count($out['properties']) === 0) {
-            $out['properties'] = (object) [];
-        }
-
-        return $out;
     }
 }

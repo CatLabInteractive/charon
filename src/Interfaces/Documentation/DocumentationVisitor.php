@@ -13,12 +13,5 @@ use CatLab\Charon\OpenApi\OpenApiException;
  */
 interface DocumentationVisitor
 {
-    /**
-     * @param Field $field
-     * @throws OpenApiException
-     * @return mixed
-     */
-    public function visitField(Field $field, $action);
 
-    public function visitRoute(Route $route);
 }

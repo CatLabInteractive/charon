@@ -11,12 +11,5 @@ use CatLab\Charon\Interfaces\DescriptionBuilder;
  */
 class HeaderCollection extends Collection
 {
-    /**
-     * @param DescriptionBuilder $builder
-     * @return array
-     */
-    public function toSwagger(DescriptionBuilder $builder)
-    {
-        return [];
-    }
+
 }
