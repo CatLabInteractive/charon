@@ -72,6 +72,7 @@ class ResourceParameter extends Parameter
     /**
      * @param string $action
      * @return $this
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
     public function setAction($action)
     {
@@ -94,36 +95,10 @@ class ResourceParameter extends Parameter
     }
 
     /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
-     * @throws SwaggerMultipleInputParsers
+     * @return mixed
      */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
+    public function getResourceDefinition()
     {
-        $out = [];
-
-        $resourceDefinition = ResourceDefinitionLibrary::make($this->resourceDefinition);
-
-        $inputParser = $context->getInputParser();
-        if ($inputParser instanceof Collection && $inputParser->count() > 1) {
-            throw SwaggerMultipleInputParsers::make();
-        }
-
-        $action = $this->getAction();
-        $parameters = $context->getInputParser()->getResourceRouteParameters(
-            $builder,
-            $this->route,
-            $this,
-            $resourceDefinition,
-            $this->getAction()
-        );
-
-        /** @var Parameter $v */
-        foreach ($parameters->toArray() as $v) {
-            $out[] = $v->toSwagger($builder, $context);
-        }
-
-        return $out;
+        return $this->resourceDefinition;
     }
 }

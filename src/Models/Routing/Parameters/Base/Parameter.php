@@ -389,67 +389,26 @@ class Parameter implements RouteMutator, Property
     }
 
     /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
+     * @return Route
      */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
+    public function getRoute()
     {
-        $out = [];
-
-        $out['name'] = $this->getName();
-        $out['type'] = $this->getSwaggerType();
-        $out['in'] = $this->getIn();
-        $out['required'] = $this->isRequired();
-
-        if (isset($this->description)) {
-            $out['description'] = $this->description;
-        }
-
-        if (isset($this->default)) {
-            $out['default'] = $this->default;
-        }
-
-        if (isset($this->allowMultiple)) {
-            //$out['allowMultiple'] = $this->allowMultiple;
-            $out['type'] = 'array';
-            $out['items'] = array(
-                'type' => $this->getSwaggerType()
-            );
-        }
-
-        $values = $this->getEnumValues();
-        if ($values !== null) {
-            $out['enum'] = $values;
-
-        }
-
-        return $out;
+        return $this->route;
     }
 
     /**
-     * Translate the local property type to swagger type.
      * @return string
      */
-    protected function getSwaggerType()
+    public function getDescription()
     {
-        $type = $this->getType();
-        switch ($type) {
-            case null:
-                return PropertyType::STRING;
+        return $this->description;
+    }
 
-            case PropertyType::INTEGER:
-            case PropertyType::STRING:
-            case PropertyType::NUMBER:
-            case PropertyType::BOOL:
-            case PropertyType::OBJECT:
-                return $type;
-
-            case PropertyType::DATETIME:
-                return PropertyType::STRING;
-
-            default:
-                throw new \InvalidArgumentException("Type cannot be matched with a swagger type.");
-        }
+    /**
+     * @return string
+     */
+    public function getDefault()
+    {
+        return $this->default;
     }
 }

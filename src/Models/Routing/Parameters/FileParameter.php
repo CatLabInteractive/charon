@@ -19,21 +19,11 @@ class FileParameter extends Parameter
     /**
      * PathParameter constructor.
      * @param string $name
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     public function __construct($name)
     {
         parent::__construct($name, self::IN_FORM);
         $this->setType('file');
-    }
-
-    /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
-     */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
-    {
-        $out = parent::toSwagger($builder, $context);
-        return $out;
     }
 }

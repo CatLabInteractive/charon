@@ -1,12 +1,14 @@
 <?php
 
-namespace CatLab\Charon\OpenApi;
+namespace CatLab\Charon\OpenApi\V2;
 
+use CatLab\Base\Collections\Collection;
 use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Collections\HeaderCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Exceptions\RouteAlreadyDefined;
+use CatLab\Charon\Exceptions\SwaggerMultipleInputParsers;
 use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -18,9 +20,15 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
+use CatLab\Charon\Models\Routing\Parameters\BodyParameter;
+use CatLab\Charon\Models\Routing\Parameters\FileParameter;
+use CatLab\Charon\Models\Routing\Parameters\HeaderParameter;
+use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\OpenApi\Authentication\Authentication;
+use CatLab\Charon\OpenApi\OpenApiException;
 use CatLab\Requirements\Enums\PropertyType;
 
 /**
@@ -421,7 +429,7 @@ class OpenApiV2Builder implements DescriptionBuilder
 
         foreach ($parameters as $parameter) {
             // Sometimes one parameter can result in multiple swagger parameters being added
-            $parameterSwaggerDescription = $parameter->toSwagger($builder, $context);
+            $parameterSwaggerDescription = $this->buildParameterDescription($parameter, $context);
             if (ArrayHelper::isAssociative($parameterSwaggerDescription)) {
                 $out['parameters'][] = $parameterSwaggerDescription;
             } else {
@@ -683,6 +691,149 @@ class OpenApiV2Builder implements DescriptionBuilder
         }
 
         return $response;
+    }
+
+    /**
+     * @param Parameter $parameter
+     * @param Context $context
+     * @return array
+     * @throws SwaggerMultipleInputParsers
+     */
+    protected function buildParameterDescription(Parameter $parameter, Context $context)
+    {
+        switch (true) {
+            case $parameter instanceof BodyParameter:
+                return $this->buildBodyParameterDescription($parameter, $context);
+
+            case $parameter instanceof ResourceParameter:
+                return $this->buildResourceParameterDescription($parameter, $context);
+
+            case $parameter instanceof FileParameter:
+            case $parameter instanceof HeaderParameter:
+            default:
+                return $this->buildNativeParameterDescription($parameter, $context);
+        }
+    }
+
+    /**
+     * @param BodyParameter $parameter
+     * @param Context $context
+     * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @throws OpenApiException
+     */
+    protected function buildBodyParameterDescription(BodyParameter $parameter, Context $context)
+    {
+        $out = $this->buildNativeParameterDescription($parameter, $context);
+        unset($out['type']);
+
+        $resourceDefinition = ResourceDefinitionLibrary::make($parameter->getResourceDefinition());
+
+        $out['schema'] = [
+            '$ref' => $this->addResourceDefinition(
+                $resourceDefinition,
+                $parameter->getAction(),
+                $parameter->getCardinality()
+            )
+        ];
+
+        return $out;
+    }
+
+    /**
+     * @param ResourceParameter $parameter
+     * @param Context $context
+     * @return array
+     * @throws SwaggerMultipleInputParsers
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     */
+    protected function buildResourceParameterDescription(ResourceParameter $parameter, Context $context)
+    {
+        $out = [];
+
+        $resourceDefinition = ResourceDefinitionLibrary::make($parameter->getResourceDefinition());
+
+        $inputParser = $context->getInputParser();
+        if ($inputParser instanceof Collection && $inputParser->count() > 1) {
+            throw SwaggerMultipleInputParsers::make();
+        }
+
+        $action = $parameter->getAction();
+        $parameters = $context->getInputParser()->getResourceRouteParameters(
+            $this,
+            $parameter->getRoute(),
+            $parameter,
+            $resourceDefinition,
+            $action
+        );
+
+        /** @var Parameter $v */
+        foreach ($parameters->toArray() as $v) {
+            $out[] = $this->buildParameterDescription($v, $context);
+        }
+
+        return $out;
+    }
+
+    protected function buildNativeParameterDescription(Parameter $parameter, Context $context)
+    {
+        $out = [];
+
+        $out['name'] = $parameter->getName();
+        $out['type'] = $this->getSwaggerType($parameter);
+        $out['in'] = $parameter->getIn();
+        $out['required'] = $parameter->isRequired();
+
+        if ($parameter->getDescription()) {
+            $out['description'] = $parameter->getDescription();
+        }
+
+        if ($parameter->getDefault()) {
+            $out['default'] = $parameter->getDefault();
+        }
+
+        if ($parameter->isAllowMultiple()) {
+            //$out['allowMultiple'] = $this->allowMultiple;
+            $out['type'] = 'array';
+            $out['items'] = array(
+                'type' => $this->getSwaggerType($parameter)
+            );
+        }
+
+        $values = $parameter->getEnumValues();
+        if ($values !== null) {
+            $out['enum'] = $values;
+
+        }
+
+        return $out;
+    }
+
+    /**
+     * Translate the local property type to swagger type.
+     * @param Parameter $parameter
+     * @return string
+     */
+    protected function getSwaggerType(Parameter $parameter)
+    {
+        $type = $parameter->getType();
+        switch ($type) {
+            case null:
+                return PropertyType::STRING;
+
+            case PropertyType::INTEGER:
+            case PropertyType::STRING:
+            case PropertyType::NUMBER:
+            case PropertyType::BOOL:
+            case PropertyType::OBJECT:
+                return $type;
+
+            case PropertyType::DATETIME:
+                return PropertyType::STRING;
+
+            default:
+                throw new \InvalidArgumentException("Type cannot be matched with a swagger type.");
+        }
     }
 
     /**

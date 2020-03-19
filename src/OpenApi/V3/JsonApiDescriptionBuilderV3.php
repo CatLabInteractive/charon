@@ -1,7 +1,7 @@
 <?php
 
 
-namespace CatLab\Charon\OpenApi;
+namespace CatLab\Charon\OpenApi\V3;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
@@ -9,12 +9,13 @@ use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
+use CatLab\Charon\OpenApi\OpenApiException;
 
 /**
  * Class JsonApiDescriptionBuilder
  * @package CatLab\Charon\OpenApi
  */
-class JsonApiDescriptionBuilder extends OpenApiV2Builder
+class JsonApiDescriptionBuilderV3 extends OpenApiV3Builder
 {
     /**
      * @param ResourceDefinition $resourceDefinition

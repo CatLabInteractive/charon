@@ -29,15 +29,4 @@ class HeaderParameter extends Parameter
     {
         return 'header';
     }
-
-    /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
-     */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
-    {
-        $out = parent::toSwagger($builder, $context);
-        return $out;
-    }
 }

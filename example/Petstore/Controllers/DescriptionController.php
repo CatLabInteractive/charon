@@ -3,7 +3,7 @@
 namespace App\Petstore\Controllers;
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\OpenApi\OpenApiV2Builder;
+use CatLab\Charon\OpenApi\V2\OpenApiV2Builder;
 
 /**
  * Class DescriptionController

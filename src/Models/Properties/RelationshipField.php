@@ -12,7 +12,7 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
-use CatLab\Charon\OpenApi\OpenApiV2Builder;
+use CatLab\Charon\OpenApi\V2\OpenApiV2Builder;
 use CatLab\Charon\Validation\RelationshipExists;
 
 /**

@@ -6,7 +6,7 @@ use CatLab\Charon\Enums\Action;
 use CatLab\Charon\InputParsers\JsonBodyInputParser;
 use CatLab\Charon\Models\Context;
 use CatLab\Charon\OpenApi\Authentication\OAuth2Authentication;
-use CatLab\Charon\OpenApi\OpenApiV2Builder;
+use CatLab\Charon\OpenApi\V2\OpenApiV2Builder;
 use PHPUnit_Framework_TestCase;
 
 /**
