@@ -344,4 +344,12 @@ class ReturnValue implements RouteMutator
     {
         return $this->parent->defaultOrder($order, $direction);
     }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 }

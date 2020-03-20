@@ -392,6 +392,8 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param DescriptionBuilder $builder
      * @param Context $context
      * @return array
+     * @throws OpenApiException
+     * @throws SwaggerMultipleInputParsers
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
@@ -406,7 +408,7 @@ class OpenApiV2Builder implements DescriptionBuilder
         $returnValues = $route->getReturnValues();
         $hasManyReturnValue = false;
         foreach ($returnValues as $returnValue) {
-            $out['responses'][$returnValue->getStatusCode()] = $returnValue->toSwagger($builder);
+            $out['responses'][$returnValue->getStatusCode()] = $this->buildReturnValueDescription($returnValue);
             $hasManyReturnValue =
                 $hasManyReturnValue || $returnValue->getCardinality() == Cardinality::MANY;
         }
@@ -679,8 +681,8 @@ class OpenApiV2Builder implements DescriptionBuilder
 
         }
 
-        if (isset($this->description)) {
-            $response['description'] = $this->description;
+        if ($returnValue->getDescription()) {
+            $response['description'] = $returnValue->getDescription();
         } else {
             $response['description'] = $returnValue->getDescriptionFromType();
         }
