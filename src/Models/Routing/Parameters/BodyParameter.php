@@ -86,25 +86,9 @@ class BodyParameter extends Parameter
     }
 
     /**
-     * @param DescriptionBuilder $builder
-     * @param Context $context
-     * @return array
+     * @param Parameter $parameter
+     * @return $this|Parameter
      */
-    public function toSwagger(DescriptionBuilder $builder, Context $context)
-    {
-        $out = parent::toSwagger($builder, $context);
-        unset($out['type']);
-
-        $resourceDefinition = ResourceDefinitionLibrary::make($this->resourceDefinition);
-
-        $out['schema'] = [
-            '$ref' => $builder->addResourceDefinition($resourceDefinition, $this->getAction(), $this->cardinality)
-        ];
-
-        return $out;
-    }
-
-
     public function merge(Parameter $parameter)
     {
         parent::merge($parameter);
@@ -114,5 +98,13 @@ class BodyParameter extends Parameter
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResourceDefinition()
+    {
+        return $this->resourceDefinition;
     }
 }

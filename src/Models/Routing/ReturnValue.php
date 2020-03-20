@@ -303,69 +303,6 @@ class ReturnValue implements RouteMutator
     }
 
     /**
-     * @param DescriptionBuilder $builder
-     * @return array
-     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
-     */
-    public function toSwagger(DescriptionBuilder $builder)
-    {
-        $response = [];
-
-        // Is this a native type?
-        if (PropertyType::isNative($this->getType())) {
-            // Do nothing.
-        } else {
-
-            /*
-             * not supported yet.
-            // is oneOf or manyOf?
-            if (is_array($this->getType())) {
-                $schemas = [];
-                foreach ($this->getType() as $type) {
-                    $schemas = $builder->getRelationshipSchema(
-                        ResourceDefinitionLibrary::make($type),
-                        $this->getContext(),
-                        $this->getCardinality()
-                    );
-                }
-
-                $key = $this->getCardinality() === Cardinality::ONE ? 'oneOf' : 'anyOf';
-
-                $response = [
-                    'schema' => [
-                        $key => $schemas
-                    ]
-                ];
-
-            } else {
-            */
-                $schema = $builder->getRelationshipSchema(
-                    ResourceDefinitionLibrary::make($this->getType()),
-                    $this->getContext(),
-                    $this->getCardinality()
-                );
-
-                $response = [
-                    'schema' => $schema
-                ];
-            //}
-
-        }
-
-        if (isset($this->description)) {
-            $response['description'] = $this->description;
-        } else {
-            $response['description'] = $this->getDescriptionFromType();
-        }
-
-        if ($this->headers->count() > 0) {
-            $response['headers'] = $this->headers->toSwagger($builder);
-        }
-
-        return $response;
-    }
-
-    /**
      * @return string
      */
     public function getDescriptionFromType()

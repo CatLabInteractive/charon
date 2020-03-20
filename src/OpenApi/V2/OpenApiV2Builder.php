@@ -179,7 +179,6 @@ class OpenApiV2Builder implements DescriptionBuilder
         $name = $this->getResourceDefinitionName($resourceDefinition) . '_' . $action;
         if (!array_key_exists($name, $this->schemas)) {
             $this->schemas[$name] = null; // Set key to avoid circular references
-            //$this->schemas[$name] = $resourceDefinition->toSwagger($this, $action);
             $this->schemas[$name] = $this->buildResourceDefinitionDescription($resourceDefinition, $action);
         }
 
