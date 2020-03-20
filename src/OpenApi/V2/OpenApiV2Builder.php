@@ -182,7 +182,7 @@ class OpenApiV2Builder implements DescriptionBuilder
             $this->schemas[$name] = $this->buildResourceDefinitionDescription($resourceDefinition, $action);
         }
 
-        $refId = '#/definitions/' . $name;
+        $refId = $this->getResourceDefinitionReference($name);
 
         if ($cardinality === Cardinality::ONE) {
             return $this->addItemDefinition($this->getResourceDefinitionName($resourceDefinition), $refId, $action);
@@ -193,6 +193,15 @@ class OpenApiV2Builder implements DescriptionBuilder
                 $action
             );
         }
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    protected function getResourceDefinitionReference($name)
+    {
+        return '#/definitions/' . $name;
     }
 
     /**
@@ -488,7 +497,7 @@ class OpenApiV2Builder implements DescriptionBuilder
             $resourceCollection = $this->resourceFactory->createResourceCollection();
             $this->schemas[$name] = $resourceCollection->getSwaggerDescription($reference);
         }
-        return '#/definitions/' . $name;
+        return $this->getResourceDefinitionReference($name);
     }
 
     /**
@@ -698,7 +707,9 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param Parameter $parameter
      * @param Context $context
      * @return array
+     * @throws OpenApiException
      * @throws SwaggerMultipleInputParsers
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     protected function buildParameterDescription(Parameter $parameter, Context $context)
     {
