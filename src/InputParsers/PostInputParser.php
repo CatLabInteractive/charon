@@ -11,8 +11,8 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
 use CatLab\Charon\Interfaces\ResourceDefinition;
+use CatLab\Charon\Interfaces\ResourceDefinitionFactory;
 use CatLab\Charon\Interfaces\ResourceTransformer;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
@@ -37,7 +37,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
      */
     public function getIdentifiers(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     ) {
@@ -67,7 +67,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
-        ResourceDefinition $resourceDefinition,
+        ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
     ) {
@@ -111,6 +111,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
      * @param ResourceDefinition $resourceDefinition
      * @param null $request
      * @return ParameterCollection
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     public function getResourceRouteParameters(
         DescriptionBuilder $builder,
@@ -139,6 +140,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
      * @param ParameterCollection $parameterCollection
      * @param ResourceDefinition $resourceDefinition
      * @param Context|null $context
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     protected function postParametersFromResourceDefinition(
         Route $route,
@@ -170,6 +172,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
      * @param Field $field
      * @param Context $context
      * @return mixed
+     * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
     protected function postParameterFromField(
         ParameterCollection $parameterCollection,
