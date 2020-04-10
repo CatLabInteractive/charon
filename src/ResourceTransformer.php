@@ -650,6 +650,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             return;
         }
 
+        $childResourceFactory = $field->getChildResourceDefinitionFactory();
         $childResource = $field->getChildResourceDefinition();
 
         // fetch the records
@@ -663,7 +664,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
         // transform to resources
         $resources = $this->toResources(
-            $childResource,
+            $childResourceFactory,
             $children,
             $context,
             null,
@@ -707,7 +708,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
         if ($child) {
             $childResource = $this->toResource(
-                $field->getChildResourceDefinition(),
+                $field->getChildResourceDefinitionFactory(),
                 $child,
                 $childContext,
                 $childValue,

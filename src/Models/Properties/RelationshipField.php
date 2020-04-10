@@ -12,6 +12,7 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
+use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 use CatLab\Charon\OpenApi\V2\OpenApiV2Builder;
 use CatLab\Charon\Validation\RelationshipExists;
 
@@ -203,8 +204,9 @@ class RelationshipField extends Field
     }
 
     /**
-     * @deprecated Use getChildResourceDefinition()
      * @return ResourceDefinitionContract
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @deprecated Use getChildResourceDefinition()
      */
     public function getChildResource()
     {
@@ -213,10 +215,20 @@ class RelationshipField extends Field
 
     /**
      * @return ResourceDefinitionContract
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function getChildResourceDefinition()
     {
-        return ResourceDefinitionLibrary::make($this->childResource);
+        return $this->getChildResourceDefinitionFactory()->getDefault();
+    }
+
+    /**
+     * @return \CatLab\Charon\Interfaces\ResourceDefinitionFactory
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     */
+    public function getChildResourceDefinitionFactory()
+    {
+        return StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($this->childResource);
     }
 
     /**
