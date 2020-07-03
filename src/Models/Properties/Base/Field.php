@@ -68,6 +68,11 @@ class Field implements Property, ResourceDefinitionManipulator
     protected $transformer;
 
     /**
+     * @var bool
+     */
+    protected $requiredForSorting;
+
+    /**
      * ResourceField constructor.
      * @param ResourceDefinition $resourceDefinition
      * @param string $fieldName
@@ -82,6 +87,8 @@ class Field implements Property, ResourceDefinitionManipulator
         $this->name = $fieldName;
         $this->displayName = $fieldName;
         $this->resourceDefinition = $resourceDefinition;
+
+        $this->requiredForSorting = false;
     }
 
     /**
@@ -334,6 +341,28 @@ class Field implements Property, ResourceDefinitionManipulator
     public function isSortable()
     {
         return false;
+    }
+
+    /**
+     * @param bool $requiredForSorting
+     * @return $this
+     */
+    public function setRequiredForProcessor($requiredForSorting = true)
+    {
+        $this->requiredForSorting = $requiredForSorting;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequiredForSorting()
+    {
+        if (!$this->isSortable()) {
+            return false;
+        }
+
+        return $this->requiredForSorting;
     }
 
     /**

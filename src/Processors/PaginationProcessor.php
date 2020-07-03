@@ -122,6 +122,8 @@ class PaginationProcessor implements Processor
         foreach ($filter->getSort() as $sort) {
             $entity = $sort->getEntity();
             if ($entity instanceof Field) {
+                $entity->setRequiredForProcessor();
+
                 $transformer->getQueryAdapter()->applyPropertySorting(
                     $transformer,
                     $entity->getResourceDefinition(),

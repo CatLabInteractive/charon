@@ -243,8 +243,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         /** @var Field $field */
         foreach ($fields as $field) {
             $this->currentPath->push($field);
-            $visible = $this->shouldInclude($field, $context);
-            if ($visible || $field->isSortable()) {
+            if ($this->shouldInclude($field, $context)) {
+
+                $visible = $field->shouldInclude($context, $this->currentPath);
                 if ($field instanceof RelationshipField) {
                     if ($this->shouldExpand($field, $context)) {
                         $this->expandRelationship($field, $entity, $resource, $context, $visible);
@@ -814,7 +815,8 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      */
     private function shouldInclude(Field $field, ContextContract $context)
     {
-        return $field->shouldInclude($context, $this->currentPath);
+        return $field->shouldInclude($context, $this->currentPath) ||
+            $field->isRequiredForSorting();
     }
 
     /**
