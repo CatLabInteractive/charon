@@ -2,14 +2,14 @@
 
 namespace CatLab\Charon\Models;
 
+use CatLab\Charon\Interfaces\InputParser;
+use CatLab\Charon\Interfaces\Processor;
+use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ProcessorCollection;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Exceptions\VariableNotFoundInContext;
-use CatLab\Charon\Interfaces\InputParser;
-use CatLab\Charon\Interfaces\Processor;
 use CatLab\Charon\Models\Properties\Base\Field;
-use CatLab\Charon\Interfaces\Context as ContextContract;
+use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 
 /**
  * Class Context
@@ -52,12 +52,14 @@ class Context implements ContextContract
      */
     private $url;
 
-
     /**
      * @var InputParserCollection
      */
     private $inputParsers;
 
+    /**
+     *
+     */
     const FIELD_PATH_DELIMITER = '.';
 
     /**
@@ -86,7 +88,6 @@ class Context implements ContextContract
         $this->processors->add($processor);
         return $this;
     }
-
 
     /**
      * @param string $inputParser
@@ -171,6 +172,9 @@ class Context implements ContextContract
      */
     public function expandField($field)
     {
+        // also include the expanded field in the 'show field'.
+        $this->showField($field);
+
         $path = explode(self::FIELD_PATH_DELIMITER, $field);
         $this->touchArrayPath($this->fieldsToExpand, $path);
 
