@@ -243,6 +243,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         /** @var Field $field */
         foreach ($fields as $field) {
             $this->currentPath->push($field);
+
             if ($this->shouldInclude($field, $context)) {
 
                 $visible = $field->shouldInclude($context, $this->currentPath);

@@ -153,12 +153,13 @@ class ResolverBase
     }
 
     /**
-     * @param mixed $entity
-     * @param string $name
-     * @param mixed[] $getterParameters
-     * @return mixed
+     * @param $entity
+     * @param $name
+     * @param array $getterParameters
+     * @param Context $context
+     * @return mixed|null
      */
-    protected function getValueFromEntity($entity, $name, array $getterParameters)
+    protected function getValueFromEntity($entity, $name, array $getterParameters, Context $context)
     {
         // Check for get method
         if ($this->methodExists($entity, 'get'.ucfirst($name))) {
@@ -215,7 +216,7 @@ class ResolverBase
         list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $name, $context, $field, $entity);
 
         try {
-            return $this->getValueFromEntity($entity, $name, $parameters);
+            return $this->getValueFromEntity($entity, $name, $parameters, $context);
         } catch (InvalidPropertyException $e) {
             throw new InvalidPropertyException(
                 "Property $name could not be found in {$field->getResourceDefinition()->getEntityClassName()}.",
@@ -358,20 +359,20 @@ class ResolverBase
         switch ($namespace) {
             case self::NAMESPACE_MODEL:
                 if ($entity) {
-                    return $this->descentIntoParameter($path, $this->getValueFromEntity($entity, $parameterName, $parameters));
+                    return $this->descentIntoParameter($path, $this->getValueFromEntity($entity, $parameterName, $parameters, $context), $context);
                 } else {
                     return null;
                 }
                 break;
 
             case self::NAMESPACE_CONTEXT:
-                return $this->descentIntoParameter($path, $context->getParameter($parameterName, $entity));
+                return $this->descentIntoParameter($path, $context->getParameter($parameterName, $entity), $context);
                 break;
 
             case self::NAMESPACE_PARENT:
                 $parent = $transformer->getParentEntity();
                 if ($parent) {
-                    return $this->descentIntoParameter($path, $this->getValueFromEntity($parent, $parameterName, $parameters));
+                    return $this->descentIntoParameter($path, $this->getValueFromEntity($parent, $parameterName, $parameters, $context), $context);
                 } else {
                     return null;
                 }
@@ -428,21 +429,22 @@ class ResolverBase
     /**
      * @param array $path
      * @param $parameter
-     * @return mixed
+     * @param Context $context
+     * @return null
      */
-    private function descentIntoParameter(array $path, $parameter)
+    private function descentIntoParameter(array $path, $parameter, Context $context)
     {
         if (count($path) === 0) {
             return $parameter;
         }
 
         $attr = array_shift($path);
-        $value = $this->getValueFromEntity($parameter, $attr, []);
+        $value = $this->getValueFromEntity($parameter, $attr, [], $context);
 
         if ($value === null) {
             return null;
         }
 
-        return $this->descentIntoParameter($path, $value);
+        return $this->descentIntoParameter($path, $value, $context);
     }
 }
