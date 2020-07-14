@@ -655,6 +655,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $childResourceFactory = $field->getChildResourceDefinitionFactory();
         $childResource = $field->getChildResourceDefinition();
 
+        // Process eager loading
+        $this->processEagerLoading($childrenQueryBuilder, $childResourceFactory, $childContext);
+
         // fetch the records
         $children = $this->getQueryAdapter()
             ->getRecords(
