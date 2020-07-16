@@ -544,12 +544,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 // Filterable fields
                 if ($field->isFilterable()) {
                     $value = $this->getRequestResolver()->getFilter($request, $field);
-                    if ($value) {
+                    if ($value !== null) {
                         $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
                     }
                 } elseif ($field->isSearchable()) {
                     $value = $this->getRequestResolver()->getFilter($request, $field);
-                    if ($value) {
+                    if ($value !== null) {
                         $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
                     }
                 }
