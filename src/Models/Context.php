@@ -172,9 +172,6 @@ class Context implements ContextContract
      */
     public function expandField($field)
     {
-        // also include the expanded field in the 'show field'.
-        $this->showField($field);
-
         $path = explode(self::FIELD_PATH_DELIMITER, $field);
         $this->touchArrayPath($this->fieldsToExpand, $path);
 
@@ -214,6 +211,11 @@ class Context implements ContextContract
     {
         if (count($this->fieldsToShow) === 0) {
             return null;
+        }
+
+        // all expanded fields are also always included by default.
+        if ($this->arrayPathExists($this->fieldsToExpand, $fieldPath->toArray())) {
+            return true;
         }
 
         return $this->arrayPathExists($this->fieldsToShow, $fieldPath->toArray());
