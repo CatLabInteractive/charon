@@ -383,6 +383,9 @@ class PaginationProcessor implements Processor
         }
 
         $sorting = $transformer->getRequestResolver()->getSorting($request);
+        if (!$sorting) {
+            $sorting = $definition->getDefaultOrder();
+        }
 
         $sortedOn = [];
         $sortDirections = [];
