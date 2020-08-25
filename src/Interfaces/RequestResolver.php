@@ -37,7 +37,7 @@ interface RequestResolver
     public function getParameter($request, $key);
 
     /**
-     * @return string|null
+     * @return int|null
      */
     public function getPage($request);
 

@@ -17,6 +17,12 @@ interface ResourceCollection extends SerializableResource
     public function addMeta($name, $data);
 
     /**
+     * @param $name
+     * @return mixed
+     */
+    public function getMeta($name);
+
+    /**
      * @param $value
      * @return void
      */

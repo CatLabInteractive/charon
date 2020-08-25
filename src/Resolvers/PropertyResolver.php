@@ -2,13 +2,8 @@
 
 namespace CatLab\Charon\Resolvers;
 
-use CatLab\Base\Enum\Operator;
-use CatLab\Base\Models\Database\OrderParameter;
-use CatLab\Base\Models\Database\SelectQueryParameters;
-use CatLab\Base\Models\Database\WhereParameter;
 use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Collections\ResourceCollection;
-use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Exceptions\ValueUndefined;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
 use CatLab\Charon\Interfaces\ResourceDefinition;

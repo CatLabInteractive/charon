@@ -11,7 +11,7 @@ use CatLab\Charon\Models\Properties\ResourceField;
  */
 class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
 {
-    const PAGE_PARAMETER = 'number';
+    const PAGE_PARAMETER = 'page';
     const CURSOR_BEFORE_PARAMETER = 'before';
     const CURSOR_AFTER_PARAMETER = 'after';
 
@@ -58,7 +58,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
 
     /**
      * @param $request
-     * @return string|null
+     * @return int|null
      */
     public function getPage($request)
     {
@@ -66,7 +66,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
         if (!is_string($page)) {
             return null;
         }
-        return $page;
+        return intval($page);
     }
 
     /**

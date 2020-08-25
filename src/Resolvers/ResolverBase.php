@@ -42,9 +42,10 @@ class ResolverBase
     /**
      * @param ResourceTransformer $transformer
      * @param $entity
-     * @param string $path
+     * @param $path
      * @param Context $context
-     * @return string
+     * @return string|string[]|null
+     * @throws VariableNotFoundInContext
      */
     public function resolvePathParameters(
         ResourceTransformer $transformer,

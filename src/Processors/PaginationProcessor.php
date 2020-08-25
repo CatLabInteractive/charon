@@ -95,7 +95,7 @@ class PaginationProcessor implements Processor
         $catlabQueryBuilder = new \CatLab\Base\Models\Database\SelectQueryParameters();
         $builder->build($catlabQueryBuilder);
 
-        $this->processProcessorFilters($transformer, $context, $definition, $catlabQueryBuilder, $queryBuilder);
+        $this->processProcessorFilters($transformer, $context, $definition, $catlabQueryBuilder, $queryBuilder, $filterResults);
     }
 
     /**
@@ -103,7 +103,8 @@ class PaginationProcessor implements Processor
      * @param Context $context
      * @param ResourceDefinition $resourceDefinition
      * @param SelectQueryParameters $filter
-     * @param null $queryBuilder
+     * @param $queryBuilder
+     * @param FilterResults $filterResults
      * @throws NotImplementedException
      */
     protected function processProcessorFilters(
@@ -111,11 +112,33 @@ class PaginationProcessor implements Processor
         Context $context,
         ResourceDefinition $resourceDefinition,
         SelectQueryParameters $filter,
-        $queryBuilder = null
+        $queryBuilder,
+        FilterResults $filterResults
     ) {
-        $where = $filter->getWhere();
-        if (count($where) > 0) {
-            throw new NotImplementedException('NOT IMPLEMENTED YET!');
+        $wheres = $filter->getWhere();
+        if (count($wheres) > 0) {
+            //throw new NotImplementedException('NOT IMPLEMENTED YET!');
+            foreach ($wheres as $where) {
+                if (count($where->getChildren()) > 0) {
+                    throw new NotImplementedException('NOT IMPLEMENTED YET!');
+                }
+
+                $condition = $where->getComparison();
+                $entity = $condition->getEntity();
+                if ($entity instanceof Field) {
+                    $entity->setRequiredForProcessor();
+
+                    $transformer->getQueryAdapter()->applyPropertyFilter(
+                        $transformer,
+                        $entity->getResourceDefinition(),
+                        $context,
+                        $entity,
+                        $queryBuilder,
+                        $condition->getValue(),
+                        $condition->getOperator()
+                    );
+                }
+            }
         }
 
         // now we need to translate these to our own system
@@ -146,6 +169,8 @@ class PaginationProcessor implements Processor
                 $limit->getOffset()
             );
         }
+
+        $filterResults->setReversed($filter->isReverse());
     }
 
     /**
@@ -471,7 +496,12 @@ class PaginationProcessor implements Processor
             $field->getName(),
             $field->getDisplayName(),
             function($value) use ($field, $context) {
-                return $field->getTransformer()->toEntityValue($value, $context);
+                $transformer = $field->getTransformer();
+                if ($transformer) {
+                    return $field->getTransformer()->toEntityValue($value, $context);
+                } else {
+                    return $value;
+                }
             });
     }
 
