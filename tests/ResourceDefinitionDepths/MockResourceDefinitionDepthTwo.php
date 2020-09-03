@@ -15,7 +15,7 @@ class MockResourceDefinitionDepthTwo extends \CatLab\Charon\Models\ResourceDefin
 
             ->relationship('children', MockResourceDefinitionDepthTwo::class)
                 ->expanded()
-                ->visible()
+                ->visible(true)
                 ->many()
                 ->maxDepth(2)
                 ->writeable()

@@ -19,7 +19,7 @@ class MockResourceDefinitionDepthFour extends \CatLab\Charon\Models\ResourceDefi
 
             ->relationship('children', MockResourceDefinitionDepthFour::class)
                 ->expanded()
-                ->visible()
+                ->visible(true)
                 ->many()
                 ->maxDepth(4)
                 ->writeable()
