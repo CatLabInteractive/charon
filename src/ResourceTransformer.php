@@ -671,7 +671,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $resources = $this->toResources(
             $childResourceFactory,
             $children,
-            $context,
+            $childContext,
             null,
             $childrenValue,
             $entity
