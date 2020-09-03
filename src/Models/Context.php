@@ -130,17 +130,26 @@ class Context implements ContextContract
         $className = spl_object_hash($field) . '|' . $action;
 
         if (!isset($this->childContext[$className])) {
-            $childContext = new self($action);
-
-            $childContext->parameters = $this->parameters;
-            $childContext->fieldsToShow = $this->fieldsToShow;
-            $childContext->fieldsToExpand = $this->fieldsToExpand;
-            $childContext->processors = $this->processors;
-
-            $this->childContext[$className] = $childContext;
+            $this->childContext[$className] = $this->createChildContext($action);
         }
 
         return $this->childContext[$className];
+    }
+
+    /**
+     * @param string $action
+     * @return static
+     */
+    protected function createChildContext($action = Action::INDEX)
+    {
+        $childContext = new static($action);
+
+        $childContext->parameters = $this->parameters;
+        $childContext->fieldsToShow = $this->fieldsToShow;
+        $childContext->fieldsToExpand = $this->fieldsToExpand;
+        $childContext->processors = $this->processors;
+
+        return $childContext;
     }
 
     /**
