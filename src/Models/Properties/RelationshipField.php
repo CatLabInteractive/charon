@@ -7,13 +7,10 @@ use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition as ResourceDefinitionContract;
-use CatLab\Charon\Interfaces\ResourceTransformer;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Models\StaticResourceDefinitionFactory;
-use CatLab\Charon\OpenApi\V2\OpenApiV2Builder;
 use CatLab\Charon\Validation\RelationshipExists;
 
 /**
@@ -326,6 +323,24 @@ class RelationshipField extends Field
         }
 
         return parent::shouldInclude($context, $currentPath);
+    }
+
+    /**
+     * @param Context $context
+     * @param CurrentPath $currentPath
+     * @return bool
+     */
+    public function isWriteable(Context $context, CurrentPath $currentPath)
+    {
+        // Check for max depth.
+        if ($maxDepth = $this->getMaxDepth()) {
+            $existing = $currentPath->countSame($this);
+            if ($existing > $maxDepth) {
+                return false;
+            }
+        }
+
+        return $this->hasAction($context->getAction());
     }
 
     /**
