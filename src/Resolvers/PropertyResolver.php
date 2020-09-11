@@ -174,10 +174,11 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
 
     /**
      * @param ResourceTransformer $transformer
-     * @param mixed &$input ,
+     * @param mixed $input
      * @param RelationshipField $field
      * @param Context $context
-     * @return RESTResource
+     * @return \CatLab\Charon\Interfaces\RESTResource|RESTResource|null
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function resolveOneRelationshipInput(
         ResourceTransformer $transformer,
@@ -325,7 +326,6 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         } catch (ValueUndefined $e) {
             return null;
         }
-
 
         if (
             $children &&

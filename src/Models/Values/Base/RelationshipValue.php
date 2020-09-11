@@ -391,7 +391,7 @@ abstract class RelationshipValue extends Value
                     /** @var RESTResource $child */
                     foreach ($identifiers as $identifier) {
                         /** @var IdentifierField $identifier */
-                        $prop = $child->getProperties()->getProperty($identifier);
+                        $prop = $child->getProperties()->getFromName($identifier->getName());
                         if (!$prop || $prop->getValue() === null) {
                             $identifier->setPath($this->appendToPath($path, $field));
                             $propertyException = RequirementValidationException::make($identifier, new Exists(), null);
