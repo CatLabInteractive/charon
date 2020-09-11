@@ -248,6 +248,16 @@ class Field implements Property, ResourceDefinitionManipulator
         return $this->hasAction($context->getAction());
     }
 
+    /**
+     * @param Context $context
+     * @param CurrentPath $currentPath
+     * @return bool
+     */
+    public function isWriteable(Context $context, CurrentPath $currentPath)
+    {
+        return $this->hasAction($context->getAction());
+    }
+
     /***************************
      * Parent methods           *
      ***************************/

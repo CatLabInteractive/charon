@@ -40,6 +40,7 @@ use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\FilterResults;
 use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
+use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
@@ -830,7 +831,11 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      */
     private function isWritable(Field $field, ContextContract $context)
     {
-        return $field->shouldInclude($context, $this->currentPath);
+        if ($field instanceof IdentifierField) {
+            return true;
+        }
+
+        return $field->isWriteable($context, $this->currentPath);
     }
 
     /**
