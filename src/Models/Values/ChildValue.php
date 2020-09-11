@@ -131,6 +131,7 @@ class ChildValue extends RelationshipValue
     }
 
     /**
+     * Look for a child with given identifiers
      * @param ResourceTransformer $transformer
      * @param PropertyResolver $propertyResolver
      * @param $parent
