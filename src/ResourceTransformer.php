@@ -541,20 +541,24 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         // First process all filtersable and searchable fields.
         foreach ($definition->getFields() as $field) {
             if ($field instanceof ResourceField) {
-
                 // Filterable fields
-                if ($field->isFilterable()) {
-                    $value = $this->getRequestResolver()->getFilter($request, $field);
-                    if ($value !== null) {
-                        $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
-                    }
-                } elseif ($field->isSearchable()) {
-                    $value = $this->getRequestResolver()->getFilter($request, $field);
-                    if ($value !== null) {
-                        $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
-                    }
-                }
+                if (
+                    $field->isFilterable() &&
+                    $this->getRequestResolver()->hasFilter($request, $field)
+                ) {
 
+                    $value = $this->getRequestResolver()->getFilter($request, $field);
+                    $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
+
+                } elseif (
+                    $field->isSearchable() &&
+                    $this->getRequestResolver()->hasFilter($request, $field)
+                ) {
+
+                    $value = $this->getRequestResolver()->getFilter($request, $field);
+                    $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
+
+                }
             }
         }
 

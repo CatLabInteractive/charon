@@ -26,6 +26,16 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
     }
 
     /**
+     * @param mixed $request
+     * @param ResourceField $field
+     * @return bool|void
+     */
+    public function hasFilter($request, ResourceField $field)
+    {
+        return $this->hasParameter($request, $field->getDisplayName());
+    }
+
+    /**
      * @param $request
      * @return mixed
      */
@@ -54,6 +64,16 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
             return $request[$key];
         }
         return null;
+    }
+
+    /**
+     * @param mixed $request
+     * @param string $key
+     * @return bool
+     */
+    public function hasParameter($request, $key)
+    {
+        return key_exists($key, $request);
     }
 
     /**

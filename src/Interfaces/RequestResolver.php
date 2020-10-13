@@ -11,6 +11,13 @@ use CatLab\Charon\Models\Properties\ResourceField;
 interface RequestResolver
 {
     /**
+     * @param mixed $request
+     * @param ResourceField $field
+     * @return boolean
+     */
+    public function hasFilter($request, ResourceField $field);
+
+    /**
      * @param $request
      * @param ResourceField $field
      * @return string|null
@@ -30,9 +37,16 @@ interface RequestResolver
     public function getSorting($request);
 
     /**
+     * @param mixed $request
+     * @param string $key
+     * @return boolean
+     */
+    public function hasParameter($request, $key);
+
+    /**
      * @param $request
-     * @param ResourceTransformer $
-     * @return string|null
+     * @param $key
+     * @return mixed
      */
     public function getParameter($request, $key);
 
