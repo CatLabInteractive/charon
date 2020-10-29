@@ -50,7 +50,7 @@ class RouteCollection extends RouteProperties
             $options = [];
         }
 
-        $child = new self($options);
+        $child = $this->createRouteCollection($options);
         $child->setParent($this);
 
         $this->children[] = $child;
@@ -150,7 +150,7 @@ class RouteCollection extends RouteProperties
      */
     public function action($method, $path, $action, array $options = [])
     {
-        $route = new Route($this, $method, $path, $action, $options);
+        $route = $this->createRoute($method, $path, $action, $options);
         $this->routes[] = $route;
 
         return $route;
@@ -377,5 +377,26 @@ class RouteCollection extends RouteProperties
         }
 
         return $out;
+    }
+
+    /**
+     * @param $method
+     * @param $path
+     * @param $action
+     * @param $options
+     * @return Route
+     */
+    protected function createRoute($method, $path, $action, $options)
+    {
+        return new Route($this, $method, $path, $action, $options);
+    }
+
+    /**
+     * @param $options
+     * @return $this
+     */
+    protected function createRouteCollection($options)
+    {
+        return new static($options);
     }
 }
