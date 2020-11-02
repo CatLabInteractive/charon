@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Interfaces\Documentation\DocumentationVisitor;
 use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Routing\MatchedRoute;
@@ -14,7 +15,7 @@ use CatLab\Charon\Models\StaticResourceDefinitionFactory;
  * Class RouteCollection
  * @package CatLab\RESTResource\src\CatLab\RESTResource\Collections
  */
-class RouteCollection extends RouteProperties
+class RouteCollection extends RouteProperties implements \ArrayAccess
 {
     /**
      * @var Route[]
@@ -27,6 +28,12 @@ class RouteCollection extends RouteProperties
     private $children;
 
     /**
+     * Helper to access routes in a collection more dynamically.
+     * @var array
+     */
+    private $namedRoutesMap;
+
+    /**
      * RouteCollection constructor.
      * @param array $options
      */
@@ -36,6 +43,7 @@ class RouteCollection extends RouteProperties
 
         $this->routes = [];
         $this->children = [];
+        $this->namedRoutesMap = [];
     }
 
     /**
@@ -66,55 +74,60 @@ class RouteCollection extends RouteProperties
      * @param string $path
      * @param string|callable $action
      * @param array $options
+     * @param null|string $name
      * @return Route
      */
-    public function get($path, $action, array $options = [])
+    public function get($path, $action, array $options = [], $name = null)
     {
-        return $this->action('get', $path, $action, $options);
+        return $this->action('get', $path, $action, $options, $name);
     }
 
     /**
      * @param string $path
      * @param string|callable $action
      * @param array $options
+     * @param null|string $name
      * @return Route
      */
-    public function post($path, $action, array $options = [])
+    public function post($path, $action, array $options = [], $name = null)
     {
-        return $this->action('post', $path, $action, $options);
+        return $this->action('post', $path, $action, $options, $name);
     }
 
     /**
      * @param string $path
      * @param string|callable $action
      * @param array $options
+     * @param null|string $name
      * @return Route
      */
-    public function put($path, $action, array $options = [])
+    public function put($path, $action, array $options = [], $name = null)
     {
-        return $this->action('put', $path, $action, $options);
+        return $this->action('put', $path, $action, $options, $name);
     }
 
     /**
      * @param string $path
      * @param string|callable $action
      * @param array $options
+     * @param null|string $name
      * @return Route
      */
-    public function patch($path, $action, array $options = [])
+    public function patch($path, $action, array $options = [], $name = null)
     {
-        return $this->action('patch', $path, $action, $options);
+        return $this->action('patch', $path, $action, $options, $name);
     }
 
     /**
      * @param string $path
      * @param string|callable $action
      * @param array $options
+     * @param null|string $name
      * @return Route
      */
-    public function delete($path, $action, array $options = [])
+    public function delete($path, $action, array $options = [], $name = null)
     {
-        return $this->action('delete', $path, $action, $options);
+        return $this->action('delete', $path, $action, $options, $name);
     }
 
     /**
@@ -122,11 +135,12 @@ class RouteCollection extends RouteProperties
      * @param $path
      * @param $action
      * @param array $options
+     * @param null|string $name
      * @return Route
      */
-    public function link($path, $action, array $options = [])
+    public function link($path, $action, array $options = [], $name = null)
     {
-        return $this->action(Method::LINK, $path, $action, $options);
+        return $this->action(Method::LINK, $path, $action, $options, $name);
     }
 
     /**
@@ -146,13 +160,17 @@ class RouteCollection extends RouteProperties
      * @param string $path
      * @param string|callable $action
      * @param mixed[] $options
+     * @param string|null $name = null
      * @return Route
      */
-    public function action($method, $path, $action, array $options = [])
+    public function action($method, $path, $action, array $options = [], $name = null)
     {
         $route = $this->createRoute($method, $path, $action, $options);
-        $this->routes[] = $route;
+        if (isset($name)) {
+            $this->namedRoutesMap[$name] = $route;
+        }
 
+        $this->routes[] = $route;
         return $route;
     }
 
@@ -177,7 +195,7 @@ class RouteCollection extends RouteProperties
         $group = $this->group([]);
 
         if (in_array('index', $only)) {
-            $group->get($path, $controller . '@index')
+            $group->get($path, $controller . '@index', [], 'index')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
@@ -186,7 +204,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('view', $only)) {
-            $group->get($path . '/{' . $id . '}', $controller . '@view')
+            $group->get($path . '/{' . $id . '}', $controller . '@view', [], 'view')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -197,7 +215,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('store', $only)) {
-            $group->post($path, $controller . '@store')
+            $group->post($path, $controller . '@store', [], 'store')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -208,7 +226,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('edit', $only)) {
-            $group->put($path . '/{' . $id . '}', $controller . '@edit')
+            $group->put($path . '/{' . $id . '}', $controller . '@edit', [], 'edit')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -220,7 +238,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('patch', $only)) {
-            $group->patch($path . '/{' . $id . '}', $controller . '@patch')
+            $group->patch($path . '/{' . $id . '}', $controller . '@patch', [], 'patch')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -232,7 +250,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('destroy', $only)) {
-            $group->delete($path . '/{' . $id . '}', $controller . '@destroy')
+            $group->delete($path . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -249,10 +267,10 @@ class RouteCollection extends RouteProperties
      * Set all crud actions, including documentation
      * Really only usable for the default case
      * @param $resourceDefinition
-     * @param $parentPath
-     * @param $childPath
+     * @param string $parentPath
+     * @param string $childPath
      * @param string $controller
-     * @param $options
+     * @param array $options
      * @return RouteCollection
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
@@ -268,7 +286,7 @@ class RouteCollection extends RouteProperties
         $group = $this->group([]);
 
         if (in_array('index', $only)) {
-            $group->get($parentPath, $controller . '@index')
+            $group->get($parentPath, $controller . '@index', [], 'index')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
@@ -278,7 +296,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('view', $only)) {
-            $group->get($childPath . '/{' . $id . '}', $controller . '@view')
+            $group->get($childPath . '/{' . $id . '}', $controller . '@view', [], 'view')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -289,7 +307,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('store', $only)) {
-            $group->post($parentPath, $controller . '@store')
+            $group->post($parentPath, $controller . '@store', [], 'store')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -301,7 +319,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('edit', $only)) {
-            $group->put($childPath . '/{' . $id . '}', $controller . '@edit')
+            $group->put($childPath . '/{' . $id . '}', $controller . '@edit', [], 'edit')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -313,7 +331,7 @@ class RouteCollection extends RouteProperties
         }
 
         if (in_array('destroy', $only)) {
-            $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy')
+            $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -344,6 +362,40 @@ class RouteCollection extends RouteProperties
         }
 
         return $out;
+    }
+
+    /**
+     * Get routes within this collection that match the action.
+     * @param $action
+     * @return array
+     */
+    public function getFromAction($action)
+    {
+        $out = [];
+        foreach ($this->routes as $route) {
+            if ($route->getAction() === $action) {
+                $out[] = $route;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * @param $path
+     * @param $method
+     * @return Route|null
+     */
+    public function getFromPath($path, $method)
+    {
+        foreach ($this->routes as $route) {
+            if (
+                $route->getPath() === $path &&
+                strtoupper($route->getMethod()) === strtoupper($method)
+            ) {
+                return $route;
+            }
+        }
+        return null;
     }
 
     /**
@@ -398,5 +450,51 @@ class RouteCollection extends RouteProperties
     protected function createRouteCollection($options)
     {
         return new static($options);
+    }
+
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        if (is_string($offset)) {
+            return isset($this->namedRoutesMap[$offset]);
+        } else {
+            return isset($this->routes[$offset]);
+        }
+    }
+
+    /**
+     * @param mixed $offset
+     * @return mixed|void
+     * @throws NotImplementedException
+     */
+    public function offsetGet($offset)
+    {
+        if (is_string($offset)) {
+            return $this->namedRoutesMap[$offset];
+        } else {
+            return $this->routes[$offset];
+        }
+    }
+
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     * @throws NotImplementedException
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new NotImplementedException('Cannot set routes this way; use action()');
+    }
+
+    /**
+     * @param mixed $offset
+     * @throws NotImplementedException
+     */
+    public function offsetUnset($offset)
+    {
+        throw new NotImplementedException('Cannot unset routes.');
     }
 }
