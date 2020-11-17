@@ -292,7 +292,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     return 'Returns all ' . $entityName;
                 })
                 ->parameters()->path($parentId)->string()->required()
-                ->returns()->statusCode(200)->many($resourceDefinition);
+                ->returns()->statusCode(200)->many($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('view', $only)) {
@@ -303,7 +303,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     return 'View a single ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('store', $only)) {
@@ -313,9 +313,9 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
                     return 'Create a new ' . $entityName;
                 })
-                ->parameters()->resource($resourceDefinition)->required()
+                ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
                 ->parameters()->path($parentId)->string()->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('edit', $only)) {
@@ -326,8 +326,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     return 'Update an existing ' . $entityName;
                 })
                 ->parameters()->path($id)->string()->required()
-                ->parameters()->resource($resourceDefinition)->required()
-                ->returns()->statusCode(200)->one($resourceDefinition);
+                ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
         if (in_array('destroy', $only)) {
