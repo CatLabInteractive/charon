@@ -187,6 +187,20 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
+     * Given a ResourceDefinition and the entity it belongs to, return
+     * the (processed) ResourceDefinition. Useful in case ResourceDefinitionFactories are used.
+     * @param $resourceDefinition
+     * @param $entity
+     * @return ResourceDefinitionContract
+     * @throws InvalidResourceDefinition
+     */
+    public function getResourceDefinition($resourceDefinition, $entity)
+    {
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        return $resourceDefinitionFactory->fromEntity($entity);
+    }
+
+    /**
      * @param ResourceDefinitionContract|string $resourceDefinition
      * @param mixed $entity
      * @param ContextContract $context
@@ -208,9 +222,8 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $parentEntity = null
     ) : ResourceContract {
 
-        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
+        $resourceDefinition = $this->getResourceDefinition($resourceDefinition, $entity);
 
-        $resourceDefinition = $resourceDefinitionFactory->fromEntity($entity);
         $this->checkEntityType($resourceDefinition, $entity);
 
         if (!Action::isReadContext($context->getAction())) {
@@ -579,7 +592,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param $resourceDefinition
      * @return ResourceDefinitionFactory
      */
-    protected function getResourceDefinitionFactory($resourceDefinition)
+    public function getResourceDefinitionFactory($resourceDefinition)
     {
         return StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
     }
