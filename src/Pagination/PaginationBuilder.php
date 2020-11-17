@@ -27,7 +27,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
     /**
      * @var OrderParameter[]
      */
-    private $sort;
+    private $sort = [];
 
     /**
      * @var int
