@@ -1,6 +1,6 @@
 <?php
 
-namespace CatLab\Charon\Validation;
+namespace CatLab\Charon\Validation\Requirements;
 
 use CatLab\Requirements\Exists;
 

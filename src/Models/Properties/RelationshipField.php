@@ -11,7 +11,7 @@ use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Models\StaticResourceDefinitionFactory;
-use CatLab\Charon\Validation\RelationshipExists;
+use CatLab\Charon\Validation\Requirements\RelationshipExists;
 
 /**
  * Class RelationshipField
