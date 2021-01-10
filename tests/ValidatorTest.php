@@ -16,7 +16,7 @@ use PHPUnit_Framework_TestCase;
 class ValidatorTest extends BaseTest
 {
     /**
-     *
+     * Check valid input.
      */
     public function testPetInput()
     {
