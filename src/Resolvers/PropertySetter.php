@@ -287,7 +287,6 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         }
 
         list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $name, $context, $field, $entity);
-
         return [ $entity, $name, $parameters ];
     }
 

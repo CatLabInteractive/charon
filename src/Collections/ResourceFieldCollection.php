@@ -37,7 +37,23 @@ class ResourceFieldCollection extends Collection
     public function getFromDisplayName(string $name)
     {
         foreach ($this as $v) {
+            /** @var ResourceField $v */
             if ($v->getDisplayName() === $name) {
+                return $v;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @return ResourceField|null
+     */
+    public function getFromName(string $name)
+    {
+        foreach ($this as $v) {
+            /** @var ResourceField $v */
+            if ($v->getName() === $name) {
                 return $v;
             }
         }
