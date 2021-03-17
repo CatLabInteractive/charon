@@ -71,10 +71,7 @@ abstract class Value
      */
     public function addToArray(array &$out)
     {
-        // check for dot notation, but make sure the dot is not associated with a parameter
-        $pattern = '~[{.](?:(?<={)[^}]*}?(*SKIP)(*F))?~';
-        $displayNamePath = preg_split($pattern, $this->field->getDisplayName());
-
+        $displayNamePath = $this->splitParameterPath($this->field->getDisplayName());
         $displayName = array_pop($displayNamePath);
 
         $tmp = &$out;
@@ -173,4 +170,33 @@ abstract class Value
      * @return
      */
     abstract public function validate(Context $context, string $path, $validateNonProvidedFields = true);
+
+    /**
+     * Split a parameter path on dot, ignore dots inside parameter
+     * (example: "progress:{context.user?}.percentage" should return [ "progress:{context.user?}", "percentage" ]
+     * @return string[]
+     */
+    protected function splitParameterPath($path)
+    {
+        $out = [];
+        $buffer = '';
+        $openBrackets = 0;
+
+        for ($i = 0; $i < strlen($path); $i ++) {
+            if ($path[$i] === '.' && $openBrackets < 1) {
+                $out[] = $buffer;
+                $buffer = '';
+            } else {
+                if ($path[$i] === '{') {
+                    $openBrackets ++;
+                } elseif ($path[$i] === '}') {
+                    $openBrackets --;
+                }
+                $buffer .= $path[$i];
+            }
+        }
+
+        $out[] = $buffer;
+        return $out;
+    }
 }
