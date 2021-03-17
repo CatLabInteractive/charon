@@ -71,8 +71,10 @@ abstract class Value
      */
     public function addToArray(array &$out)
     {
-        // check for dot notation.
-        $displayNamePath = explode('.', $this->field->getDisplayName());
+        // check for dot notation, but make sure the dot is not associated with a parameter
+        $pattern = '~[{.](?:(?<={)[^}]*}?(*SKIP)(*F))?~';
+        $displayNamePath = preg_split($pattern, $this->field->getDisplayName());
+
         $displayName = array_pop($displayNamePath);
 
         $tmp = &$out;

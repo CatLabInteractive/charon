@@ -67,7 +67,7 @@ class ResolverBase
             $path
         );
     }
-    
+
     /**
      * @param string $path
      * @return mixed
@@ -133,6 +133,8 @@ class ResolverBase
                 $value = $this->parseParameter($transformer, $parameter, $context, $entity);
                 if ($value !== null) {
                     $out[] = $value;
+                } elseif ($this->isOptionalParameter($v)) {
+                    $out[] = null;
                 } else {
                     if ($field) {
                         throw new VariableNotFoundInContext(
@@ -333,7 +335,23 @@ class ResolverBase
     private function getParameter($parameter)
     {
         if (mb_substr($parameter, 0, 1) === '{') {
-            return mb_substr($parameter, 1, -1);
+            if (mb_substr($parameter, -2, 1) === '?') {
+                return mb_substr($parameter, 1, -2);
+            } else {
+                return mb_substr($parameter, 1, -1);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param $parameter
+     * @return bool
+     */
+    private function isOptionalParameter($parameter)
+    {
+        if (mb_substr($parameter, 0, 1) === '{') {
+            return mb_substr($parameter, -2, 1) === '?';
         }
         return null;
     }
