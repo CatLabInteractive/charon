@@ -3,6 +3,8 @@
 namespace App\Petstore\Controllers;
 
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\InputParsers\JsonBodyInputParser;
+use CatLab\Charon\InputParsers\PostInputParser;
 use CatLab\Charon\Interfaces\RESTResource;
 use CatLab\Charon\Models\Context;
 
@@ -50,6 +52,8 @@ class AbstractResourceController
     {
         $context = new Context($action);
 
+        $context->addInputParser(JsonBodyInputParser::class);
+
         if (isset($_GET['fields'])) {
             $context->showFields(array_map('trim', explode(',', $_GET['fields'])));
         }
@@ -76,7 +80,7 @@ class AbstractResourceController
      */
     protected function abortNotFound($entity, $id)
     {
-        http_send_status(404);
+        http_response_code(404);
         echo $entity . ' with id ' . $id . ' not found';
         exit;
     }
