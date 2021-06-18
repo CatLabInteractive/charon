@@ -140,8 +140,6 @@ class Route extends RouteProperties implements RouteMutator
                     return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
                 }
             }, $matches, array_keys($matches));
-
-            var_dump($params);
             return new MatchedRoute($this, $params);
         }
         return false;
