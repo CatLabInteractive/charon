@@ -6,7 +6,6 @@ use App\Petstore\Definitions\PetDefinition;
 use App\Petstore\Factories\PetFactory;
 use App\Petstore\Models\Pet;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\ResourceTransformer;
 use App\SimpleResolvers\SimpleResourceTransformer;
 
 /**
@@ -32,6 +31,12 @@ class PetController extends AbstractResourceController
     /**
      * @param $id
      * @param $contentType
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     * @throws \CatLab\Charon\Exceptions\InvalidEntityException
+     * @throws \CatLab\Charon\Exceptions\InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     * @throws \CatLab\Charon\Exceptions\IterableExpected
      */
     public function show($id, $contentType)
     {

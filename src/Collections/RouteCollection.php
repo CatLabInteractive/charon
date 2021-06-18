@@ -4,8 +4,6 @@ namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Exceptions\NotImplementedException;
-use CatLab\Charon\Interfaces\Documentation\DocumentationVisitor;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Routing\MatchedRoute;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Models\Routing\RouteProperties;
