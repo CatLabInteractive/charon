@@ -6,7 +6,7 @@ use App\Petstore\Definitions\PetDefinition;
 use App\Petstore\Factories\PetFactory;
 use App\Petstore\Models\Pet;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\ResourceTransformer;
+use App\SimpleResolvers\SimpleResourceTransformer;
 
 /**
  * Class PetController
@@ -21,7 +21,7 @@ class PetController extends AbstractResourceController
     {
         $pets = PetFactory::instance()->getAll();
 
-        $transformer = new ResourceTransformer();
+        $transformer = new SimpleResourceTransformer();
         $context = $this->getContext(Action::INDEX);
 
         $resources = $transformer->toResources(PetDefinition::class, $pets, $context);
@@ -31,12 +31,18 @@ class PetController extends AbstractResourceController
     /**
      * @param $id
      * @param $contentType
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     * @throws \CatLab\Charon\Exceptions\InvalidEntityException
+     * @throws \CatLab\Charon\Exceptions\InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     * @throws \CatLab\Charon\Exceptions\IterableExpected
      */
     public function show($id, $contentType)
     {
         $pet = $this->getPet($id);
 
-        $transformer = new ResourceTransformer();
+        $transformer = new SimpleResourceTransformer();
         $context = $this->getContext(Action::VIEW);
 
         $resource = $transformer->toResource(PetDefinition::class, $pet, $context);

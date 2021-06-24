@@ -45,6 +45,11 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
+use App\SimpleResolvers\SimplePropertyResolver;
+use App\SimpleResolvers\SimplePropertySetter;
+use App\SimpleResolvers\SimpleQueryAdapter;
+use App\SimpleResolvers\SimpleRequestResolver;
+use App\SimpleResolvers\SimpleResourceFactory;
 
 /**
  * Class ResourceTransformer
@@ -106,17 +111,17 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ResourceFactoryContract $resourceFactory
      */
     public function __construct(
-        PropertyResolverContract $propertyResolver,
-        PropertySetterContract $propertySetter,
-        RequestResolverContract $requestResolver,
-        QueryAdapterContract $queryAdapter,
-        ResourceFactoryContract $resourceFactory
+        PropertyResolverContract $propertyResolver = null,
+        PropertySetterContract $propertySetter = null,
+        RequestResolverContract $requestResolver = null,
+        QueryAdapterContract $queryAdapter = null,
+        ResourceFactoryContract $resourceFactory = null
     ) {
-        $this->propertyResolver = $propertyResolver;
-        $this->propertySetter = $propertySetter;
-        $this->resourceFactory = $resourceFactory;
-        $this->requestResolver = $requestResolver;
-        $this->queryAdapter = $queryAdapter;
+        $this->propertyResolver = $propertyResolver ?? new SimplePropertyResolver();
+        $this->propertySetter = $propertySetter ?? new SimplePropertySetter();
+        $this->resourceFactory = $resourceFactory ?? new SimpleResourceFactory();
+        $this->requestResolver = $requestResolver ?? new SimpleRequestResolver();
+        $this->queryAdapter = $queryAdapter ?? new SimpleQueryAdapter();
 
         $this->currentPath = new CurrentPath();
         $this->parents = new ParentEntityCollection();

@@ -114,19 +114,25 @@ class Route extends RouteProperties implements RouteMutator
         if (preg_match_all('#^' . $path . '$#', $requestPath, $matches, PREG_OFFSET_CAPTURE)) {
 
             // Rework matches to only contain the matches, not the orig string
+            $basePosition = strlen($matches[0][0][0]);
             $matches = array_slice($matches, 1);
+
             // Extract the matched URL parameters (and only the parameters)
-            $params = array_map(function($match, $index) use ($matches) {
+            $params = array_map(function($match, $index) use ($matches, $basePosition) {
                 // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
-                if (isset($matches[$index+1]) && isset($matches[$index+1][0]) && is_array($matches[$index+1][0])) {
-                    return trim(substr($match[0][0], 0, $matches[$index+1][0][1] - $match[0][1]), '/');
+                if (
+                    isset($matches[$index+1]) &&
+                    $matches[$index+1][0][1] >= 0 &&
+                    isset($matches[$index+1][0]) &&
+                    is_array($matches[$index+1][0])
+                ) {
+                    return trim(substr($match[0][0], 0, $matches[$index+1][0][1] - $match[0][1] + $basePosition), '/');
                 }
-                // We have no following paramete: return the whole lot
+                // We have no following parameters: return the whole lot
                 else {
                     return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
                 }
             }, $matches, array_keys($matches));
-
             return new MatchedRoute($this, $params);
         }
         return false;
