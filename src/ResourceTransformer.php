@@ -21,7 +21,6 @@ use CatLab\Charon\Interfaces\ResourceTransformer as ResourceTransformerContract;
 
 use CatLab\Base\Enum\Operator;
 use CatLab\Base\Helpers\ArrayHelper;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 
 use CatLab\Charon\Collections\InputParserCollection;
 use CatLab\Charon\Collections\ParentEntityCollection;

@@ -2,21 +2,14 @@
 
 namespace CatLab\Charon\Models\Routing;
 
-use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Collections\RouteCollection;
-use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
-use CatLab\Charon\Exceptions\InvalidPropertyException;
-use CatLab\Charon\Interfaces\Context;
-use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 use CatLab\Charon\Models\Routing\Parameters\QueryParameter;
-use CatLab\Requirements\Enums\PropertyType;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Requirements\InArray;
 
 /**

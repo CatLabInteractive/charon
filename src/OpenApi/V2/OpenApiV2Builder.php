@@ -16,7 +16,6 @@ use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Library\PrettyEntityNameLibrary;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
@@ -27,6 +26,7 @@ use CatLab\Charon\Models\Routing\Parameters\HeaderParameter;
 use CatLab\Charon\Models\Routing\Parameters\ResourceParameter;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
+use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 use CatLab\Charon\OpenApi\Authentication\Authentication;
 use CatLab\Charon\OpenApi\OpenApiException;
 use CatLab\Requirements\Enums\PropertyType;
@@ -653,32 +653,11 @@ class OpenApiV2Builder implements DescriptionBuilder
         if (PropertyType::isNative($returnValue->getType())) {
             // Do nothing.
         } else {
+            $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($returnValue->getType());
+            $resourceDefinition = $factory->getDefault();
 
-            /*
-             * not supported yet.
-            // is oneOf or manyOf?
-            if (is_array($this->getType())) {
-                $schemas = [];
-                foreach ($this->getType() as $type) {
-                    $schemas = $builder->getRelationshipSchema(
-                        ResourceDefinitionLibrary::make($type),
-                        $this->getContext(),
-                        $this->getCardinality()
-                    );
-                }
-
-                $key = $this->getCardinality() === Cardinality::ONE ? 'oneOf' : 'anyOf';
-
-                $response = [
-                    'schema' => [
-                        $key => $schemas
-                    ]
-                ];
-
-            } else {
-            */
             $schema = $this->getRelationshipSchema(
-                ResourceDefinitionLibrary::make($returnValue->getType()),
+                $resourceDefinition,
                 $returnValue->getContext(),
                 $returnValue->getCardinality()
             );
@@ -739,7 +718,8 @@ class OpenApiV2Builder implements DescriptionBuilder
         $out = $this->buildNativeParameterDescription($parameter, $context);
         unset($out['type']);
 
-        $resourceDefinition = ResourceDefinitionLibrary::make($parameter->getResourceDefinition());
+        $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($parameter->getResourceDefinition());
+        $resourceDefinition = $factory->getDefault();
 
         $out['schema'] = [
             '$ref' => $this->addResourceDefinition(
@@ -763,7 +743,8 @@ class OpenApiV2Builder implements DescriptionBuilder
     {
         $out = [];
 
-        $resourceDefinition = ResourceDefinitionLibrary::make($parameter->getResourceDefinition());
+        $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($parameter->getResourceDefinition());
+        $resourceDefinition = $factory->getDefault();
 
         $inputParser = $context->getInputParser();
         if ($inputParser instanceof Collection && $inputParser->count() > 1) {

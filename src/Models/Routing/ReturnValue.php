@@ -2,17 +2,14 @@
 
 namespace CatLab\Charon\Models\Routing;
 
-use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\Collections\HeaderCollection;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Enums\Cardinality;
-use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 use CatLab\Requirements\Enums\PropertyType;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 
 /**
  * Class ReturnValue
@@ -293,7 +290,8 @@ class ReturnValue implements RouteMutator
         $out = [];
         foreach ($types as $v) {
             if (!PropertyType::isNative($v)) {
-                $r = ResourceDefinitionLibrary::make($v);
+                $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($v);
+                $r = $factory->getDefault();
                 if ($r) {
                     $out[] = $r;
                 }
@@ -304,6 +302,7 @@ class ReturnValue implements RouteMutator
 
     /**
      * @return string
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function getDescriptionFromType()
     {
@@ -318,7 +317,10 @@ class ReturnValue implements RouteMutator
             $types = $this->getTypes();
 
             $classNames = array_map(function($type) {
-                $type = ResourceDefinitionLibrary::make($type);
+
+                $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($type);
+                $type = $factory->getDefault();
+
                 return $type->getEntityClassName();
             }, $types);
 

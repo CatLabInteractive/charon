@@ -2,28 +2,11 @@
 
 namespace CatLab\Charon\OpenApi\V3;
 
-use CatLab\Base\Helpers\ArrayHelper;
-use CatLab\Charon\Collections\HeaderCollection;
-use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Exceptions\RouteAlreadyDefined;
-use CatLab\Charon\Factories\ResourceFactory;
 use CatLab\Charon\Interfaces\Context;
-use CatLab\Charon\Interfaces\DescriptionBuilder;
-use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceFactory as ResourceFactoryInterface;
-use CatLab\Charon\Interfaces\ResourceTransformer;
-use CatLab\Charon\Library\PrettyEntityNameLibrary;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
-use CatLab\Charon\Models\Properties\Base\Field;
-use CatLab\Charon\Models\Properties\RelationshipField;
-use CatLab\Charon\Models\Properties\ResourceField;
-use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
-use CatLab\Charon\OpenApi\Authentication\Authentication;
-use CatLab\Charon\OpenApi\OpenApiException;
 use CatLab\Charon\OpenApi\V2\OpenApiV2Builder;
-use CatLab\Requirements\Enums\PropertyType;
 
 /**
  * Class OpenApiV3Builder
