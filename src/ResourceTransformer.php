@@ -45,11 +45,11 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\StaticResourceDefinitionFactory;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
-use App\SimpleResolvers\SimplePropertyResolver;
-use App\SimpleResolvers\SimplePropertySetter;
-use App\SimpleResolvers\SimpleQueryAdapter;
-use App\SimpleResolvers\SimpleRequestResolver;
-use App\SimpleResolvers\SimpleResourceFactory;
+use CatLab\Charon\SimpleResolvers\SimplePropertyResolver;
+use CatLab\Charon\SimpleResolvers\SimplePropertySetter;
+use CatLab\Charon\SimpleResolvers\SimpleQueryAdapter;
+use CatLab\Charon\SimpleResolvers\SimpleRequestResolver;
+use CatLab\Charon\SimpleResolvers\SimpleResourceFactory;
 
 /**
  * Class ResourceTransformer

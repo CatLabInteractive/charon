@@ -1,6 +1,6 @@
 <?php
 
-namespace App\SimpleResolvers;
+namespace CatLab\Charon\SimpleResolvers;
 
 use CatLab\Base\Enum\Operator;
 use CatLab\Charon\Collections\PropertyValueCollection;

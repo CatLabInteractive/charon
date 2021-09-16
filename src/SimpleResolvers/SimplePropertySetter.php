@@ -1,6 +1,6 @@
 <?php
 
-namespace App\SimpleResolvers;
+namespace CatLab\Charon\SimpleResolvers;
 
 use CatLab\Charon\Resolvers\PropertySetter;
 
