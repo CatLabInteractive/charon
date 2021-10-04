@@ -6,7 +6,7 @@ use App\Petstore\Definitions\PetDefinition;
 use App\Petstore\Factories\PetFactory;
 use App\Petstore\Models\Pet;
 use CatLab\Charon\Enums\Action;
-use App\SimpleResolvers\SimpleResourceTransformer;
+use CatLab\Charon\SimpleResolvers\SimpleResourceTransformer;
 
 /**
  * Class PetController

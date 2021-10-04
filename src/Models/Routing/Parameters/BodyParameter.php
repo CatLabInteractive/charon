@@ -3,12 +3,8 @@
 namespace CatLab\Charon\Models\Routing\Parameters;
 
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Interfaces\Context;
-use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Enums\Method;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
-use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 
 /**
@@ -26,7 +22,7 @@ class BodyParameter extends Parameter
      * @var string
      */
     private $cardinality = Cardinality::ONE;
-    
+
     /**
      * PathParameter constructor.
      * @param $resourceDefinition

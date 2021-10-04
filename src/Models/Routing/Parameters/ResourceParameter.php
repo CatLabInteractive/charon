@@ -2,14 +2,9 @@
 
 namespace CatLab\Charon\Models\Routing\Parameters;
 
-use CatLab\Base\Collections\Collection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Method;
-use CatLab\Charon\Exceptions\SwaggerMultipleInputParsers;
-use CatLab\Charon\Interfaces\Context;
-use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Enums\Cardinality;
-use CatLab\Charon\Library\ResourceDefinitionLibrary;
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 
 /**
@@ -32,7 +27,7 @@ class ResourceParameter extends Parameter
      * @var Action
      */
     private $resourceAction = null;
-    
+
     /**
      * PathParameter constructor.
      * @param $resourceDefinition
