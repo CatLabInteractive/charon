@@ -57,9 +57,11 @@ abstract class AbstractInputParser
      * @param ResourceDefinitionFactory $resourceDefinition
      * @param array $data
      * @return Identifier
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    protected function arrayToIdentifier(ResourceDefinitionFactory $resourceDefinition, array $data)
+    protected function arrayToIdentifier(ResourceDefinitionFactory $resourceDefinitionFactory, array $data)
     {
+        $resourceDefinition = $resourceDefinitionFactory->getDefault();
         return Identifier::fromArray($resourceDefinition, $data);
     }
 

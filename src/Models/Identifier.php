@@ -11,7 +11,10 @@ namespace CatLab\Charon\Models;
  */
 class Identifier extends RESTResource
 {
-    public static function fromArray($resourceDefinition, array $data)
+    /**
+     *
+     */
+    public static function fromArray(\CatLab\Charon\Interfaces\ResourceDefinition $resourceDefinition, array $data)
     {
         $identifier = new self($resourceDefinition);
         foreach ($data as $k => $v) {
