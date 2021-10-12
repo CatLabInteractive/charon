@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Resolvers;
 
+use CatLab\Base\Enum\Operator;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\Properties\ResourceField;
 
@@ -18,9 +19,10 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
     /**
      * @param $request
      * @param ResourceField $field
+     * @param string $operator
      * @return string|null
      */
-    public function getFilter($request, ResourceField $field)
+    public function getFilter($request, ResourceField $field, $operator = Operator::EQ)
     {
         return $this->getParameter($request, $field->getDisplayName());
     }
@@ -28,9 +30,10 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
     /**
      * @param mixed $request
      * @param ResourceField $field
+     * @param string $operator
      * @return bool|void
      */
-    public function hasFilter($request, ResourceField $field)
+    public function hasFilter($request, ResourceField $field, $operator = Operator::EQ)
     {
         return $this->hasParameter($request, $field->getDisplayName());
     }
