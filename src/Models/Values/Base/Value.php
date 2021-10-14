@@ -7,6 +7,7 @@ use CatLab\Charon\Interfaces\EntityFactory;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\ResourceField;
 
@@ -169,7 +170,7 @@ abstract class Value
      * @param bool $validateNonProvidedFields
      * @return
      */
-    abstract public function validate(Context $context, string $path, $validateNonProvidedFields = true);
+    abstract public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true);
 
     /**
      * Split a parameter path on dot, ignore dots inside parameter

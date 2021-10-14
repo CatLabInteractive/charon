@@ -559,8 +559,10 @@ class OpenApiV2Builder implements DescriptionBuilder
 
     /**
      * @param RelationshipField $field
+     * @param $action
      * @return array
      * @throws OpenApiException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     protected function buildRelationshipFieldDescription(RelationshipField $field, $action)
     {
@@ -576,7 +578,7 @@ class OpenApiV2Builder implements DescriptionBuilder
                 '$ref' => $schema['$ref']
             ];
         } elseif (Action::isWriteContext($action)) {
-            if ($field->canLinkExistingEntities()) {
+            if ($field->canLinkExistingEntities(new \CatLab\Charon\Models\Context($action))) {
 
                 $schema = $this->getRelationshipSchema(
                     $field->getChildResourceDefinition(),
@@ -611,6 +613,7 @@ class OpenApiV2Builder implements DescriptionBuilder
 
     /**
      * @param ResourceField $field
+     * @param $action
      * @return array
      */
     protected function buildResourceFieldDescription(ResourceField $field, $action)

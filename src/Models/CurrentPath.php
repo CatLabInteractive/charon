@@ -55,6 +55,17 @@ class CurrentPath implements Countable
     }
 
     /**
+     * @param Field $field
+     * @return CurrentPath
+     */
+    public function clonePush(Field $field)
+    {
+        $path = clone $this;
+        $path->push($field);
+        return $path;
+    }
+
+    /**
      * @return Field
      */
     public function getTopField()

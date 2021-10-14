@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
+use CatLab\Charon\Models\CurrentPath;
 
 /**
  * Class Resource
@@ -44,5 +45,5 @@ interface RESTResource extends SerializableResource
      * @param string $path
      * @return mixed
      */
-    public function validate(Context $context, $original = null, string $path = '');
+    public function validate(Context $context, $original = null, CurrentPath $path = null);
 }

@@ -204,6 +204,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
      * @param RelationshipField $field
      * @param Context $context
      * @return Context
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     private function getInputChildContext(ResourceTransformer $transformer, RelationshipField $field, Context $context)
     {
@@ -212,7 +213,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         // Check if we want to create a new child or edit an existing child
         if (
             $context->getAction() !== Action::CREATE &&
-            $field->canCreateNewChildren() &&
+            $field->canCreateNewChildren($context) &&
             $this->hasInputIdentifier($transformer, $childResourceDefinition, $context, $input)
         ) {
             $action = Action::EDIT;

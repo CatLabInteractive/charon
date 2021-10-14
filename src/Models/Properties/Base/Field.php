@@ -221,15 +221,15 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $context
      * @return bool
      */
-    public function hasAction($context)
+    public function hasAction($action)
     {
         if (
-            $context === Action::IDENTIFIER
+            $action === Action::IDENTIFIER
         ) {
             return $this instanceof IdentifierField;
         }
 
-        return isset($this->actions[$context]) && $this->actions[$context];
+        return isset($this->actions[$action]) && $this->actions[$action];
     }
 
     /**

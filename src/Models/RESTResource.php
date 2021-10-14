@@ -3,7 +3,6 @@
 namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Interfaces\Context as ContextContract;
-use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -265,9 +264,13 @@ class RESTResource implements ResourceContract
     public function validate(
         ContextContract $context,
         $original = null,
-        string $path = '',
+        CurrentPath $path = null,
         bool $validateNonProvidedFields = true
     ) {
+        if ($path === null) {
+            $path = new CurrentPath();
+        }
+
         $messages = new MessageCollection();
 
         foreach ($this->getResourceDefinition()->getFields() as $field) {

@@ -3,14 +3,13 @@
 namespace CatLab\Charon\Models\Values\Base;
 
 use CatLab\Charon\Exceptions\EntityNotFoundException;
-use CatLab\Charon\Models\Values\ChildrenValue;
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\RequirementValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
 use CatLab\Requirements\Exists;
 use CatLab\Charon\Collections\PropertyValueCollection;
-use CatLab\Charon\Enums\Cardinality;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\EntityFactory;
 use CatLab\Charon\Interfaces\PropertyResolver;
@@ -302,14 +301,17 @@ abstract class RelationshipValue extends Value
                 $identifiersToKeep[] = $childIdentifiers;
 
                 // if we can't edit the child from here, there is no points in going further.
-                if (!$field->canCreateNewChildren()) {
+                if (!$field->canCreateNewChildren($context)) {
                     return;
                 }
             }
         }
 
         // Do we just link the resource? In this case we can't edit it right now.
-        if ($field->canLinkExistingEntities() && !$childEntity) {
+        if (
+            $field->canLinkExistingEntities($context) &&
+            !$childEntity
+        ) {
             $entity = $factory->resolveLinkedEntity(
                 $parent,
                 $child->getResourceDefinition()->getEntityClassName(),
@@ -325,7 +327,7 @@ abstract class RelationshipValue extends Value
         }
 
         // Is this a new child? We might not be able to add it...
-            if (!$childEntity && !$field->canCreateNewChildren()) {
+        if (!$childEntity && !$field->canCreateNewChildren($context)) {
             throw new EntityNotFoundException(
                 // The related resource does not exist.
                 "The related " . $child->getResourceDefinition()->getEntityName() . " at " . ObjectHelper::class_basename($parent) . "->" . $field->getName() . " does not exist"
@@ -341,21 +343,21 @@ abstract class RelationshipValue extends Value
 
         if (!isset($childEntity)) {
             $childrenToAdd[] = $entity;
-        } elseif ($field->canCreateNewChildren()) {
+        } elseif ($field->canCreateNewChildren($context)) {
             $childrenToEdit[] = $entity;
         }
     }
 
     /**
      * @param Context $context
-     * @param string $path
+     * @param CurrentPath $path
      * @param bool $validateNonProvidedFields
      * @throws PropertyValidationException
      * @throws RequirementValidationException
      * @throws ResourceException
      * @throws \CatLab\Requirements\Exceptions\ValidationException
      */
-    public function validate(Context $context, string $path, $validateNonProvidedFields = true)
+    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true)
     {
         $messages = new MessageCollection();
 
@@ -364,7 +366,7 @@ abstract class RelationshipValue extends Value
             throw new ResourceException("RelationshipValue found without a RelationshipField.");
         }
 
-        if ($field->canCreateNewChildren()) {
+        if ($field->canCreateNewChildren($context)) {
             /*
              * Now check the children
              */
@@ -374,32 +376,27 @@ abstract class RelationshipValue extends Value
                     try {
                         $child->validate($context, null, $this->appendToPath($path, $field), $validateNonProvidedFields);
                     } catch (ResourceValidationException $e) {
-                        $messages->merge($e->getMessages());
+
+                        // Validation failed... but it is now possible that the entry is linkable.
+                        // That means we now need to figure out if we can use this entry for linking
+                        try {
+                            $this->validateLinkableResource($child, $path);
+                        } catch (PropertyValidationException $linkException) {
+                            // HOWEVER! We want to include the original messages, not the exception thrown by the link validation.
+                            $messages->merge($e->getMessages());
+                        }
                     }
                 } else {
                     $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
                 }
             }
-        } elseif ($field->canLinkExistingEntities()) {
+        } elseif ($field->canLinkExistingEntities($context)) {
             /*
              *  We only need identifiers...
              */
-            $identifiers = $field->getChildResource()->getFields()->getIdentifiers();
-
             foreach ($this->getChildrenToProcess() as $child) {
                 if ($child) {
-                    /** @var RESTResource $child */
-                    foreach ($identifiers as $identifier) {
-                        /** @var IdentifierField $identifier */
-                        $prop = $child->getProperties()->getFromName($identifier->getName());
-                        if (!$prop || $prop->getValue() === null) {
-                            $identifier->setPath($this->appendToPath($path, $field));
-                            $propertyException = RequirementValidationException::make($identifier, new Exists(), null);
-                            $messages = new MessageCollection();
-                            $messages->add($propertyException->getRequirement()->getErrorMessage($propertyException));
-                            throw PropertyValidationException::make($identifier, $messages);
-                        }
-                    }
+                    $this->validateLinkableResource($child, $path);
                 } else {
                     try {
                         $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
@@ -416,12 +413,39 @@ abstract class RelationshipValue extends Value
     }
 
     /**
-     * @param $path
+     * @param RESTResource $child
+     * @param CurrentPath $path
+     * @throws PropertyValidationException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     */
+    protected function validateLinkableResource(RESTResource $child, CurrentPath $path)
+    {
+        $field = $this->getField();
+
+        $identifiers = $field->getChildResource()->getFields()->getIdentifiers();
+
+        /** @var RESTResource $child */
+        foreach ($identifiers as $identifier) {
+            /** @var IdentifierField $identifier */
+            $prop = $child->getProperties()->getFromName($identifier->getName());
+            if (!$prop || $prop->getValue() === null) {
+                $identifier->setPath($this->appendToPath($path, $field));
+                $propertyException = RequirementValidationException::make($identifier, new Exists(), null);
+                $messages = new MessageCollection();
+                $messages->add($propertyException->getRequirement()->getErrorMessage($propertyException));
+                throw PropertyValidationException::make($identifier, $messages);
+            }
+        }
+    }
+
+    /**
+     * @param CurrentPath $path
      * @param Field $field
      * @return string
      */
-    private function appendToPath($path, Field $field)
+    private function appendToPath(CurrentPath $path, Field $field)
     {
+        /*
         $display = $field->getDisplayName();
         if ($field instanceof RelationshipField) {
             if ($field->getCardinality() === Cardinality::MANY) {
@@ -434,5 +458,8 @@ abstract class RelationshipValue extends Value
         } else {
             return $display;
         }
+        */
+
+        return $path->clonePush($field);
     }
 }

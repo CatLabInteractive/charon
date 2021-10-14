@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Values;
 
+use CatLab\Charon\Models\CurrentPath;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\EntityFactory;
@@ -68,11 +69,11 @@ class LinkValue extends Value
 
     /**
      * @param Context $context
-     * @param string $path
+     * @param CurrentPath $path
      * @param bool $validateNonProvidedFields
      * @throws PropertyValidationException
      */
-    public function validate(Context $context, string $path, $validateNonProvidedFields = true)
+    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true)
     {
         $this->getField()->validate($this->value, $path, $validateNonProvidedFields);
     }

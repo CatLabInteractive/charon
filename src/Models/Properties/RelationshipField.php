@@ -45,9 +45,14 @@ class RelationshipField extends Field
     private $relationUrl;
 
     /**
-     * @var bool
+     * @var string[]
      */
-    private $linkOnly;
+    private $linkActions;
+
+    /**
+     * @var string[]
+     */
+    private $createActions;
 
     /**
      * @var string
@@ -91,6 +96,9 @@ class RelationshipField extends Field
         $childResource
     ) {
         parent::__construct($resourceDefinition, $fieldName);
+
+        $this->linkActions = [];
+        $this->createActions = [];
 
         $this->childResource = $childResource;
         $this->cardinality = Cardinality::MANY;
@@ -260,9 +268,24 @@ class RelationshipField extends Field
      */
     public function linkable($create = true, $edit = true)
     {
-        $this->linkOnly = true;
-        parent::writeable($create, $edit);
-        return $this;
+        $this->linkActions[Action::CREATE] = $create;
+        $this->linkActions[Action::EDIT] = $edit;
+
+        return parent::writeable($create, $edit);
+    }
+
+    /**
+     * @param bool $edit
+     * @param bool $create
+     *
+     * @return $this
+     */
+    public function writeable($create = true, $edit = true)
+    {
+        $this->createActions[Action::CREATE] = $create;
+        $this->createActions[Action::EDIT] = $edit;
+
+        return parent::writeable($create, $edit);
     }
 
     /**
@@ -352,19 +375,23 @@ class RelationshipField extends Field
     }
 
     /**
+     * @param Context $context
+     * @param CurrentPath $currentPath
      * @return bool
      */
-    public function canCreateNewChildren()
+    public function canCreateNewChildren(Context $context)
     {
-        return !$this->linkOnly;
+        $action = $context->getAction();
+        return isset($this->createActions[$action]) && $this->createActions[$action];
     }
 
     /**
      * @return bool
      */
-    public function canLinkExistingEntities()
+    public function canLinkExistingEntities(Context $context)
     {
-        return $this->linkOnly;
+        $action = $context->getAction();
+        return isset($this->linkActions[$action]) && $this->linkActions[$action];
     }
 
     /**
