@@ -105,7 +105,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
             $tmp = &$tmp[$v];
         }
 
-        if (!array_key_exists($displayName, $tmp)) {
+        if (!is_array($tmp) || !array_key_exists($displayName, $tmp)) {
             throw ValueUndefined::make($displayName);
         }
         return $tmp[$displayName];
