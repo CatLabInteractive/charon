@@ -5,6 +5,7 @@ namespace CatLab\Charon\InputParsers;
 use CatLab\Charon\Collections\IdentifierCollection;
 use CatLab\Charon\Collections\ParameterCollection;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\InputDecodeException;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\InputParser;
@@ -45,11 +46,11 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
             return null;
         }
 
-        $content = $this->getRawContent();
-        $content = json_decode($content, true);
+        $rawContent = $this->getRawContent();
+        $content = json_decode($rawContent, true);
 
         if (!$content) {
-            throw new \InvalidArgumentException("Could not decode body.");
+            throw InputDecodeException::make($rawContent);
         }
 
         $identifierCollection = new IdentifierCollection();
@@ -94,7 +95,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         $content = json_decode($rawContent, true);
 
         if (!$content) {
-            throw new \InvalidArgumentException("Could not decode body: " . $rawContent);
+            throw InputDecodeException::make($rawContent);
         }
 
         $resourceCollection = $resourceTransformer->getResourceFactory()->createResourceCollection();

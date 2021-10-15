@@ -4,7 +4,7 @@ namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
 use CatLab\Charon\Enums\Action;
-use CatLab\Charon\Enums\Method;
+use CatLab\Charon\Exceptions\InputDecodeException;
 use CatLab\Charon\Exceptions\NoInputParsersSet;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\DescriptionBuilder;
@@ -39,16 +39,27 @@ class InputParserCollection extends Collection implements InputParser
     ) {
         $this->checkExists();
 
+        $lastException = null;
+
         /** @var InputParser $inputParser */
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
-            $content = $inputParser->getIdentifiers($resourceTransformer, $resourceDefinition, $context, $request);
+
+            try {
+                $content = $inputParser->getIdentifiers($resourceTransformer, $resourceDefinition, $context, $request);
+            } catch (InputDecodeException $e) {
+                $lastException = $lastException;
+                $content = null;
+            }
 
             if ($content) {
                 return $content;
             }
         }
 
+        if ($lastException) {
+            throw $lastException;
+        }
         return null;
     }
 
@@ -60,6 +71,7 @@ class InputParserCollection extends Collection implements InputParser
      * @param null $request
      * @return ResourceCollection|null
      * @throws NoInputParsersSet
+     * @throws InputDecodeException
      */
     public function getResources(
         ResourceTransformer $resourceTransformer,
@@ -69,15 +81,27 @@ class InputParserCollection extends Collection implements InputParser
     ) {
         $this->checkExists();
 
+        $lastException = null;
+
         /** @var InputParser $inputParser */
         foreach ($this as $inputParser) {
             $inputParser = InputParserLibrary::make($inputParser);
-            $content = $inputParser->getResources($resourceTransformer, $resourceDefinition, $context, $request);
+
+            try {
+                $content = $inputParser->getResources($resourceTransformer, $resourceDefinition, $context, $request);
+            } catch (InputDecodeException $e) {
+                $lastException = $e;
+                $content = null;
+            }
+
             if ($content) {
                 return $content;
             }
         }
 
+        if ($lastException !== null) {
+            throw $lastException;
+        }
         return null;
     }
 
@@ -97,8 +121,8 @@ class InputParserCollection extends Collection implements InputParser
         Route $route,
         ResourceParameter $parameter,
         ResourceDefinition $resourceDefinition,
-        $action,
-        $request = null
+                           $action,
+                           $request = null
     ): ParameterCollection
     {
         Action::checkValid($action);
