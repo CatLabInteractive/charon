@@ -286,7 +286,7 @@ class RESTResource implements ResourceContract
 
             try {
                 if (!isset($value)) {
-                    if ($validateNonProvidedFields) {
+                    if ($validateNonProvidedFields || $field->alwaysValidate()) {
                         $field->validate(null, $path, $validateNonProvidedFields);
                     }
                 } else {

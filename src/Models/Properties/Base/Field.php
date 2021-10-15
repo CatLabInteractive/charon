@@ -73,6 +73,11 @@ class Field implements Property, ResourceDefinitionManipulator
     protected $requiredForSorting;
 
     /**
+     * @var bool
+     */
+    protected $alwaysValidate;
+
+    /**
      * ResourceField constructor.
      * @param ResourceDefinition $resourceDefinition
      * @param string $fieldName
@@ -83,6 +88,7 @@ class Field implements Property, ResourceDefinitionManipulator
         $this->visible = false;
         $this->path = '';
         $this->type = PropertyType::STRING;
+        $this->alwaysValidate = false;
 
         $this->name = $fieldName;
         $this->displayName = $fieldName;
@@ -436,5 +442,32 @@ class Field implements Property, ResourceDefinitionManipulator
         ];
 
         return $out;
+    }
+
+    /**
+     * Marks this field as required, even for PATCH requests.
+     * @return $this
+     */
+    public function alwaysRequired()
+    {
+        $this->required();
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function alwaysValidate()
+    {
+        $this->alwaysValidate = true;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldAlwaysValidate()
+    {
+        return $this->alwaysValidate;
     }
 }
