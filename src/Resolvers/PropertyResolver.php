@@ -148,7 +148,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         if ($children) {
             foreach ($children as $child) {
                 $childContext = $this->getInputChildContext($transformer, $field, $context);
-                $out->add($transformer->fromArray($field->getChildResource(), $child, $childContext));
+                $out->add($transformer->fromArray($field->getChildResourceDefinitionFactory(), $child, $childContext));
             }
         }
 
