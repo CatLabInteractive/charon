@@ -7,7 +7,7 @@ namespace CatLab\Charon\Exceptions;
  * Class NoInputDataFound
  * @package CatLab\Charon\Exceptions
  */
-class NoInputDataFound extends ResourceException
+class NoInputDataFound extends InputDataException
 {
     public static function make()
     {

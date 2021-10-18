@@ -6,7 +6,7 @@ namespace CatLab\Charon\Exceptions;
  * Class NoInputParsersSet
  * @package CatLab\Charon\Exceptions
  */
-class NoInputParsersSet extends ResourceException
+class NoInputParsersSet extends InputDataException
 {
     public static function make()
     {

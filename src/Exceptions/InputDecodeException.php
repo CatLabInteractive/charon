@@ -5,7 +5,7 @@ namespace CatLab\Charon\Exceptions;
 /**
  *
  */
-class InputDecodeException extends ResourceException
+class InputDecodeException extends InputDataException
 {
     /**
      * @return InputDecodeException
