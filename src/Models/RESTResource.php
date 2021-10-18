@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Interfaces\Context as ContextContract;
+use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -274,27 +275,7 @@ class RESTResource implements ResourceContract
         $messages = new MessageCollection();
 
         foreach ($this->getResourceDefinition()->getFields() as $field) {
-
-            /** @var ResourceField $field */
-
-            // Is field applicable?
-            if (!$field->hasAction($context->getAction())) {
-                continue;
-            }
-
-            $value = $this->properties->getProperty($field);
-
-            try {
-                if (!isset($value)) {
-                    if ($validateNonProvidedFields || $field->shouldAlwaysValidate()) {
-                        $field->validate(null, $path, $validateNonProvidedFields);
-                    }
-                } else {
-                    $value->validate($context, $path, $validateNonProvidedFields);
-                }
-            } catch(PropertyValidationException $e) {
-                $messages->merge($e->getMessages());
-            }
+            $this->validateField($field, $context, $original, $path, $validateNonProvidedFields, $messages);
         }
 
         // Also check all resource wide requirements
@@ -317,6 +298,42 @@ class RESTResource implements ResourceContract
 
         if (count($messages) > 0) {
             throw ResourceValidationException::make($messages);
+        }
+    }
+
+    /**
+     * @param Field $field
+     * @param ContextContract $context
+     * @param $original
+     * @param CurrentPath $path
+     * @param bool $validateNonProvidedFields
+     * @param MessageCollection $messages
+     */
+    protected function validateField(
+        Field $field,
+        ContextContract $context,
+        $original,
+        CurrentPath $path,
+        bool $validateNonProvidedFields,
+        MessageCollection $messages
+    ) {
+        // Is field applicable?
+        if (!$field->hasAction($context->getAction())) {
+            return;
+        }
+
+        $value = $this->properties->getProperty($field);
+
+        try {
+            if (!isset($value)) {
+                if ($validateNonProvidedFields || $field->shouldAlwaysValidate()) {
+                    $field->validate(null, $path, $validateNonProvidedFields);
+                }
+            } else {
+                $value->validate($context, $path, $validateNonProvidedFields);
+            }
+        } catch(PropertyValidationException $e) {
+            $messages->merge($e->getMessages());
         }
     }
 }
