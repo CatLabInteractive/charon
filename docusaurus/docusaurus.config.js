@@ -27,6 +27,7 @@ const config = {
           editUrl: 'https://github.com/catlabinteractive/charon/edit/master/docs/',
         },
         blog: {
+          path: '../blogs',
           showReadingTime: true,
           editUrl: 'https://github.com/catlabinteractive/charon/edit/master/blog/',
         },
@@ -51,7 +52,7 @@ const config = {
             type: 'doc',
             docId: 'intro',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Docs',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -78,16 +79,8 @@ const config = {
             items: [
               {
                 label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
-              },
+                href: 'https://stackoverflow.com/questions/tagged/charon',
+              }
             ],
           },
           {
