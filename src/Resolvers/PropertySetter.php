@@ -254,9 +254,20 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         $entity,
         RelationshipField $field,
         Context $context
-    )
-    {
+    ) {
         list ($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+        $existingChild = $this->getValueFromEntity($entity, $name, $parameters, $context);
+
+        // Don't remove any new entities
+        if (!$this->entityExists(
+            $transformer,
+            $existingChild,
+            $field->getResourceDefinition()->getFields()->getIdentifiers(),
+            $context
+        )) {
+            return;
+        }
+
         $this->clearChildInEntity($entity, $name, $parameters);
     }
 

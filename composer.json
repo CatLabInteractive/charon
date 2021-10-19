@@ -3,7 +3,7 @@
   "description": "Charon is a framework for building self documented RESTfull API's.",
   "type": "library",
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.4",
     "catlabinteractive/requirements": "^1.0.4",
     "ext-mbstring": "*"
   },
