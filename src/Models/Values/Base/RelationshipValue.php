@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Values\Base;
 
 use CatLab\Charon\Exceptions\EntityNotFoundException;
+use CatLab\Charon\Exceptions\LinkRelationshipContainsAttributesException;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -22,6 +23,7 @@ use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Base\Helpers\ObjectHelper;
+use CatLab\Requirements\Models\Message;
 
 /**
  * Class RelationshipValue
@@ -373,19 +375,20 @@ abstract class RelationshipValue extends Value
             foreach ($this->getChildrenToProcess() as $child) {
                 /** @var RESTResource $child */
                 if ($child) {
+                    // First check if this could be a 'linkable' request
                     try {
-                        $child->validate($context, null, $this->appendToPath($path, $field), $validateNonProvidedFields);
-                    } catch (ResourceValidationException $e) {
-
-                        // Validation failed... but it is now possible that the entry is linkable.
-                        // That means we now need to figure out if we can use this entry for linking
-                        try {
+                        if ($field->canLinkExistingEntities($context)) {
                             $this->validateLinkableResource($child, $path);
-                        } catch (PropertyValidationException $linkException) {
-                            // HOWEVER! We want to include the original messages, not the exception thrown by the link validation.
+                        }
+                    } catch (PropertyValidationException $e) {
+                        // If not, do a full validation.
+                        try {
+                            $child->validate($context, null, $this->appendToPath($path, $field), $validateNonProvidedFields);
+                        } catch (ResourceValidationException $e) {
                             $messages->merge($e->getMessages());
                         }
                     }
+
                 } else {
                     $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
                 }
@@ -415,6 +418,7 @@ abstract class RelationshipValue extends Value
     /**
      * @param RESTResource $child
      * @param CurrentPath $path
+     * @return bool
      * @throws PropertyValidationException
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
@@ -436,6 +440,22 @@ abstract class RelationshipValue extends Value
                 throw PropertyValidationException::make($identifier, $messages);
             }
         }
+
+        // But it can't have any other attributes!
+        $fields = $field->getChildResource()->getFields();
+        foreach ($fields as $field) {
+            if (!($field instanceof IdentifierField)) {
+                $prop = $child->getProperties()->getFromName($field->getName());
+                if ($prop && $prop->getValue() !== null) {
+                    $messages = new MessageCollection();
+                    $message = new Message('Linkable resources may not contain any other attributes', null, $field->getDisplayName());
+                    $messages->add($message);
+                    throw LinkRelationshipContainsAttributesException::make($field, $messages);
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
