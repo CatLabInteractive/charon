@@ -44,7 +44,7 @@ const config = {
       navbar: {
         title: 'Charon API Framework',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'Charon logo',
           src: 'img/charon.png',
         },
         items: [
