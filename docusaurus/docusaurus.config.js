@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Charon',
-  tagline: 'PHP framework to develop self documenting RESTfull APIs',
+  tagline: 'PHP framework to develop self documenting RESTful APIs',
   url: 'https://charon.catlab.eu',
   baseUrl: '/',
   onBrokenLinks: 'throw',

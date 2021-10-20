@@ -26,7 +26,7 @@ module.exports = function (grunt) {
                     mm: {
                         context: {
                             title: 'Charon API',
-                            description: 'Charon is a framework for building self documented RESTfull API\'s.',
+                            description: 'Charon is a framework for building self documented RESTful API\'s.',
                             keywords: 'Charon rest api framework swagger',
                             documents: documents
                         }

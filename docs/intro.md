@@ -5,7 +5,7 @@ sidebar_position: 1
 # What is Charon?
 
 Charon is an open source php library that uses resource definitions (recipes) to transform entities to resources and 
-exposes those through a customizable RESTfull API.
+exposes those through a customizable RESTful API.
 
 Very basic example of what Charon can do:
 
