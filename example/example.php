@@ -58,7 +58,7 @@ class PetResourceDefinition extends \CatLab\Charon\Models\ResourceDefinition {
             ->one()
             ->visible(true, true)
             ->expandable()
-            ->url('/api/users/{model.id}')
+            ->url('/api/users/{model.petId}')
             ->writeable();
     }
 }
@@ -85,7 +85,7 @@ $resource = $charon->toResource(PetResourceDefinition::class, $pet, $readContext
 echo "\n\n";
 
 echo "Which we can then output in any syntax we want (simple array in this example):\n";
-var_dump($resource->toArray());
+print_r($resource->toArray());
 
 echo "\n";
 echo "(Note that the attributes have been translated to their 'display' names, ie `petName` is called `name` in the resource)\n\n";
@@ -96,7 +96,7 @@ $expandedReadContext->expandField('owner');
 
 echo "Context with 'owner' attribute expanded:\n\n";
 
-var_dump($charon->toResource(PetResourceDefinition::class, $pet, $expandedReadContext)->toArray());
+print_r($charon->toResource(PetResourceDefinition::class, $pet, $expandedReadContext)->toArray());
 
 echo "\n";
 echo "Pretty neat, huh? Now let's to in the opposite direction:\n";
@@ -104,13 +104,13 @@ echo "Let's start with this simple array content:\n\n";
 
 // And of course it works both ways (we'll start from an array for this example)
 $content = [
-    'name' => 'Corgi',
+    'name' => 'CO',
     'owner' => [
         'name' => 'The Queen'
     ]
 ];
 
-var_dump($content);
+print_r($content);
 
 echo "\nWe need to define a 'create' context (in order to create a resource from input)\n";
 $writeContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::CREATE);
@@ -118,14 +118,34 @@ $writeContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::C
 echo "... and bam! We have our resource:\n\n";
 $inputResource = $charon->fromArray(PetResourceDefinition::class, $content, $writeContext);
 
-var_dump($inputResource->toArray());
+print_r($inputResource->toArray());
 
-echo "Now lets validate that (feel free to change the input so that validation fails)\n\n";
+echo "Now lets validate that";
 try {
     $inputResource->validate($writeContext);
 } catch (\CatLab\Requirements\Exceptions\ResourceValidationException $e) {
-    var_dump ($this->getValidationErrorResponse($e));
-    exit;
+    print_r ($e->getMessages()->toArray());
+}
+
+/**
+ * With correct validation
+ */
+
+$content = [
+    'name' => 'Corgi',
+    'owner' => [
+        'name' => 'The Queen'
+    ]
+];
+
+$writeContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::CREATE);
+$inputResource = $charon->fromArray(PetResourceDefinition::class, $content, $writeContext);
+
+
+try {
+    $inputResource->validate($writeContext);
+} catch (\CatLab\Requirements\Exceptions\ResourceValidationException $e) {
+    print_r ($e->getMessages()->toArray());
 }
 
 echo "And once the resource is validated, we can then turn it into an entity again:\n";

@@ -9,14 +9,10 @@ exposes those through a customizable RESTfull API.
 
 Very basic example of what Charon can do:
 
+We start with defining our entities:
+
 ```php
 <?php
-
-require '../vendor/autoload.php';
-
-echo "Charon very simple example script:\n";
-echo "----------------------------------\n";
-
 class Person {
     public int $personId;
     public string $personName;
@@ -27,7 +23,11 @@ class Pet {
     public string $petName;
     public Person $petOwner;
 }
+```
 
+Then we define `Resource Definitions` that describe how we want to expose these entities to the world:
+
+```php
 class PersonResourceDefinition extends \CatLab\Charon\Models\ResourceDefinition {
     public function __construct()
     {
@@ -70,11 +70,15 @@ class PetResourceDefinition extends \CatLab\Charon\Models\ResourceDefinition {
             ->one()
             ->visible(true, true)
             ->expandable()
-            ->url('/api/users/{model.id}')
+            ->url('/api/users/{model.petId}')
             ->writeable();
     }
 }
+```
 
+Initialize the entities that we are going to use in our example:
+
+```php
 $owner = new Person();
 $owner->personId = 1;
 $owner->personName = 'Batman';
@@ -83,38 +87,131 @@ $pet = new Pet();
 $pet->petId = 1;
 $pet->petName = 'Robin';
 $pet->petOwner = $owner;
+```
 
-echo "Done generating all required classes!\n\n";
+... and prepare these entities for exposure:
 
+```php
 $charon = new \CatLab\Charon\SimpleResolvers\SimpleResourceTransformer();
 
-echo "We define a context that we can use to set preferences.\n";
+// We define a context that we can use to set preferences
 $readContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::VIEW);
 
-echo "... and convert the entity into a resource. Done!\n";
+// ... and convert the entity into a resource.
 $resource = $charon->toResource(PetResourceDefinition::class, $pet, $readContext);
+```
 
-echo "\n\n";
+We now have a resource that we can return in any format depending on our API design (JSON, XML, JSON-API, ...) But let's 
+keep it to simple associative arrays for now.
+ 
+```php
+print_r($resource->toArray());
+```
 
-echo "Which we can then output in any syntax we want (simple array in this example):\n";
-var_dump($resource->toArray());
+```
+Array
+(
+    [id] => 1
+    [name] => Robin
+    [owner] => Array
+        (
+            [link] => /api/users/1
+        )
 
-echo "\n";
-echo "(Note that the attributes have been translated to their 'display' names, ie `petName` is called `name` in the resource)\n\n";
+)
+```
 
-echo "Additionally, we can change the context so that we also include the 'owner' relationship:\n";
+Note that the attributes have been translated to their 'display' names, ie `petName` is called `name` in the resource
+
+Additionally, we can change the context so that we also expand the `owner` relationship in the resource: 
+
+```php
 $expandedReadContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::VIEW);
 $expandedReadContext->expandField('owner');
 
-echo "Context with 'owner' attribute expanded:\n\n";
+$resource = $charon->toResource(PetResourceDefinition::class, $pet, $expandedReadContext);
 
-var_dump($charon->toResource(PetResourceDefinition::class, $pet, $expandedReadContext)->toArray());
+print_r($resource->toArray());
+```
 
-echo "\n";
-echo "Pretty neat, huh? Now let's to in the opposite direction:\n";
-echo "Let's start with this simple array content:\n\n";
+```
+Array
+(
+    [id] => 1
+    [name] => Robin
+    [owner] => Array
+        (
+            [id] => 1
+            [name] => Batman
+        )
 
-// And of course it works both ways (we'll start from an array for this example)
+)
+```
+
+Now let's do the same in the opposite direction, from raw input to entity.
+We start with a simple array of the content:
+
+```php
+$content = [
+    'name' => 'Corgi',
+    'owner' => [
+        'name' => 'The Queen'
+    ]
+];
+```
+
+We need to define a `create` context (in order to create a resource from input):
+
+```php
+$writeContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::CREATE);
+$inputResource = $charon->fromArray(PetResourceDefinition::class, $content, $writeContext);
+```
+
+`$inputResource` now contains a regular resource, the same type we saw before. However, since the identifier fields 
+are not described as being writable, they are not included in this resource:
+
+```php
+print_r($inputResource->toArray());
+```
+
+```
+Array
+(
+    [name] => CO
+    [owner] => Array
+        (
+            [name] => The Queen
+        )
+
+)
+```
+
+To make sure our resource matches our expectations we can then run a validator on the resource. There are a few validators
+built in (required, scalar types, dates, ...) but every `Resource Definition` can be extended with custom validators.
+
+```php
+try {
+    $inputResource->validate($writeContext);
+} catch (\CatLab\Requirements\Exceptions\ResourceValidationException $e) {
+    print_r ($e->getMessages()->toArray());
+}
+```
+
+```
+Array
+(
+    [0] => Array
+        (
+            [property] => name
+            [message] => Property 'name' must have a minimum length of 3.
+        )
+
+)
+```
+
+Oh no! The name we have given our Pet is too short. Let's fix that:
+
+```php
 $content = [
     'name' => 'Corgi',
     'owner' => [
@@ -122,27 +219,39 @@ $content = [
     ]
 ];
 
-var_dump($content);
-
-echo "\nWe need to define a 'create' context (in order to create a resource from input)\n";
 $writeContext = new \CatLab\Charon\Models\Context(\CatLab\Charon\Enums\Action::CREATE);
-
-echo "... and bam! We have our resource:\n\n";
 $inputResource = $charon->fromArray(PetResourceDefinition::class, $content, $writeContext);
 
-var_dump($inputResource->toArray());
-
-echo "Now lets validate that (feel free to change the input so that validation fails)\n\n";
 try {
     $inputResource->validate($writeContext);
 } catch (\CatLab\Requirements\Exceptions\ResourceValidationException $e) {
-    var_dump ($this->getValidationErrorResponse($e));
-    exit;
+    print_r ($e->getMessages()->toArray());
 }
+```
 
-echo "And once the resource is validated, we can then turn it into an entity again:\n";
-$entity = $charon->toEntity($inputResource, new \CatLab\Charon\Factories\EntityFactory(), $writeContext);
+Great! No more validation errors. Now convert our resource back to entities so that we can store them in our database:
 
-echo "Ready to be stored in your database!\n\n";
+```php
+$entityFactory = new \CatLab\Charon\Factories\EntityFactory();
+$entity = $charon->toEntity($inputResource, $entityFactory, $writeContext);
+
 var_dump($entity);
 ```
+
+```
+object(Pet)#52 (2) {
+  ["petId"]=>
+  uninitialized(int)
+  ["petName"]=>
+  string(5) "Corgi"
+  ["petOwner"]=>
+  object(Person)#58 (1) {
+    ["personId"]=>
+    uninitialized(int)
+    ["personName"]=>
+    string(9) "The Queen"
+  }
+}
+```
+
+And that's a very basic description of what Charon does.
