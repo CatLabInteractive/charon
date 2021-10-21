@@ -24,6 +24,7 @@ use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Base\Helpers\ObjectHelper;
 use CatLab\Requirements\Models\Message;
+use CatLab\Requirements\Models\TranslatableMessage;
 
 /**
  * Class RelationshipValue
@@ -448,7 +449,13 @@ abstract class RelationshipValue extends Value
                 $prop = $child->getProperties()->getFromName($field->getName());
                 if ($prop && $prop->getValue() !== null) {
                     $messages = new MessageCollection();
-                    $message = new Message('Linkable resources may not contain any other attributes', null, $field->getDisplayName());
+                    $message = new TranslatableMessage(
+                        'Linkable resources may not contain any other attributes.',
+                        [],
+                        null,
+                        $field->getDisplayName()
+                    );
+
                     $messages->add($message);
                     throw LinkRelationshipContainsAttributesException::make($field, $messages);
                 }

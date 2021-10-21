@@ -4,7 +4,7 @@
   "type": "library",
   "require": {
     "php": ">=7.4",
-    "catlabinteractive/requirements": "^1.0.4",
+    "catlabinteractive/requirements": "^1.0.5",
     "ext-mbstring": "*"
   },
   "require-dev": {
