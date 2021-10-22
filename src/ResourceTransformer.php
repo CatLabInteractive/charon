@@ -161,7 +161,10 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     ) : \CatLab\Charon\Interfaces\ResourceCollection {
         
         if (!ArrayHelper::isIterable($entities)) {
-            throw new InvalidEntityException(__CLASS__ . '::toResources expects an iterable object of entities at ' . $this->currentPath);
+            throw InvalidEntityException::makeTranslatable('%s expects an iterable object of entities at %s.', [
+                __CLASS__ . '::toResources',
+                $this->currentPath
+            ]);
         }
 
         $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
@@ -636,7 +639,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 break;
 
             default:
-                throw new InvalidPropertyException("Relationship has invalid type.");
+                throw InvalidPropertyException::makeTranslatable('Relationship has invalid type.');
         }
     }
 
@@ -784,7 +787,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 break;
 
             default:
-                throw new InvalidPropertyException("Relationship has invalid type.");
+                throw InvalidPropertyException::makeTranslatable('Relationship has invalid type.');
         }
     }
 
@@ -828,8 +831,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 $providedType = gettype($entity);
             }
 
-            throw new InvalidEntityException(
-                "ResourceTransformer expects $entityClassName, " . $providedType . " given."
+            throw InvalidEntityException::makeTranslatable(
+                'ResourceTransformer expects %s, %s given.',
+                [
+                    $entityClassName,
+                    $providedType
+                ]
             );
         }
     }

@@ -40,7 +40,7 @@ class DateTransformer implements Transformer
         }
 
         if (!$value instanceof \DateTime) {
-            throw new InvalidPropertyException("Date value must implement \\DateTime");
+            throw InvalidPropertyException::makeTranslatable('Date value must implement %s.', [ \DateTime::class ]);
         }
 
         $format = $this->formatOut ?? $this->format;

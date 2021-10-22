@@ -14,6 +14,6 @@ class ValueUndefined extends ResourceException
      */
     public static function make($valueName)
     {
-        return new self("Value " . $valueName . " is not defined.");
+        return self::makeTranslatable('Value %s is not defined.', [ $valueName ]);
     }
 }

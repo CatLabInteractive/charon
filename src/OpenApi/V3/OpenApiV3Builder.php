@@ -43,7 +43,7 @@ class OpenApiV3Builder extends OpenApiV2Builder
 
         $method = $route->getHttpMethod();
         if (isset($this->paths[$path][$method])) {
-            throw new RouteAlreadyDefined('Route ' . $method . ' ' . $path . ' is already defined.');
+            throw RouteAlreadyDefined::makeTranslatable('Route %s %s is already defined.', [ $method, $path ]);
         }
 
         $this->paths[$path][$method] = true;

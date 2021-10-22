@@ -10,6 +10,6 @@ class InvalidPropertyException extends ResourceException
 {
     public static function create($name, $className)
     {
-        return new self("Invalid property '" . $name . "' in " . $className);
+        return self::makeTranslatable('Invalid property %s in %s.', [ $name, $className ]);
     }
 }

@@ -10,6 +10,6 @@ class NoInputParsersSet extends InputDataException
 {
     public static function make()
     {
-        return new self('Failed parsing any input: no input parsers were set. Make sure to set input parsers in your context.');
+        return self::makeTranslatable('Failed parsing any input: no input parsers were set. Make sure to set input parsers in your context.');
     }
 }

@@ -42,7 +42,7 @@ class MatchedRoute
     {
         $action = explode('@', $this->route->getAction());
         if (count($action) !== 2) {
-            throw new InvalidPropertyException('Route action must be of type ClassName@action');
+            throw InvalidPropertyException::makeTranslatable('Route action must be of type ClassName@action');
         }
         return $action[0];
     }
@@ -55,7 +55,7 @@ class MatchedRoute
     {
         $action = explode('@', $this->route->getAction());
         if (count($action) !== 2) {
-            throw new InvalidPropertyException('Route action must be of type ClassName@action');
+            throw InvalidPropertyException::makeTranslatable('Route action must be of type ClassName@action.');
         }
         return $action[1];
     }

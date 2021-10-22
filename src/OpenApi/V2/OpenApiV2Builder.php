@@ -153,7 +153,11 @@ class OpenApiV2Builder implements DescriptionBuilder
 
         $method = $route->getHttpMethod();
         if (isset($this->paths[$path][$method])) {
-            throw new RouteAlreadyDefined('Route ' . $method . ' ' . $path . ' is already defined.');
+            throw RouteAlreadyDefined::makeTranslatable('Route %s %s is already defined.', [
+                    $method,
+                    $path
+                ]
+            );
         }
 
         $this->paths[$path][$method] = true;
@@ -552,7 +556,7 @@ class OpenApiV2Builder implements DescriptionBuilder
                 return $this->buildResourceFieldDescription($field, $action);
 
             default:
-                throw new OpenApiException('Invalid field provided: ' . get_class($field));
+                throw OpenApiException::makeTranslatable('Invalid field provided: %s.', [ get_class($field) ]);
         }
     }
 

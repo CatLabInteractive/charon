@@ -60,17 +60,24 @@ class InputParserLibrary
                 $this->inputParsers[$classname] = new $classname;
             }
             catch (\Exception $e) {
-                throw new InvalidInputParser(
-                    "Could not instantiate {$classname}: " . $e->getMessage(),
+                throw InvalidInputParser::makeTranslatable(
+                    'Could not instantiate %s: %s.',
+                    [
+                        $classname,
+                        $e->getMessage()
+                    ],
                     $e->getCode(),
                     $e
                 );
             }
             
             if (! ($this->inputParsers[$classname] instanceof InputParser)) {
-                throw new InvalidInputParser(
-                    "All resources definitions must implement " . ResourceDefinition::class . "; " .
-                    $classname . " does not."
+                throw InvalidInputParser::makeTranslatable(
+                    'All resources definitions must implement %s; %s does not.',
+                    [
+                        ResourceDefinition::class,
+                        $classname
+                    ]
                 );
             }
         }

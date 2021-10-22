@@ -57,7 +57,7 @@ class Action
     public static function checkValid($action)
     {
         if (!self::isReadContext($action) && !self::isWriteContext($action)) {
-            throw new InvalidContextAction("Unknown context provided: " . $action);
+            throw InvalidContextAction::makeTranslatable('Unknown context provided: %s.', [ $action ]);
         }
     }
 

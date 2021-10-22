@@ -137,14 +137,19 @@ class ResolverBase
                     $out[] = null;
                 } else {
                     if ($field) {
-                        throw new VariableNotFoundInContext(
-                            'Field ' . $field->getName() . ' requires a parameter $' . $parameter
-                            . ' to be set in the context, but no such parameter was defined.'
+                        throw VariableNotFoundInContext::makeTranslatable(
+                            'Field %s requires a parameter %s to be set in the context, but no such parameter was defined.',
+                            [
+                                $field->getName(),
+                                '$' . $parameter
+                            ]
                         );
                     } else {
-                        throw new VariableNotFoundInContext(
-                            'A parameter $' . $parameter
-                            . ' is required to be set in the context, but no such parameter was defined.'
+                        throw VariableNotFoundInContext::makeTranslatable(
+                            'A parameter %s is required to be set in the context, but no such parameter was defined.',
+                            [
+                                '$' . $parameter
+                            ]
                         );
                     }
                 }
@@ -221,8 +226,12 @@ class ResolverBase
         try {
             return $this->getValueFromEntity($entity, $name, $parameters, $context);
         } catch (InvalidPropertyException $e) {
-            throw new InvalidPropertyException(
-                "Property $name could not be found in {$field->getResourceDefinition()->getEntityClassName()}.",
+            throw InvalidPropertyException::makeTranslatable(
+                "Property %s could not be found in %s.",
+                [
+                    $name,
+                    $field->getResourceDefinition()->getEntityClassName()
+                ],
                 $e->getCode(),
                 $e
             );

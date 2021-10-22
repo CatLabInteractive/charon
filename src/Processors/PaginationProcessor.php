@@ -120,7 +120,7 @@ class PaginationProcessor implements Processor
             //throw new NotImplementedException('NOT IMPLEMENTED YET!');
             foreach ($wheres as $where) {
                 if (count($where->getChildren()) > 0) {
-                    throw new NotImplementedException('NOT IMPLEMENTED YET!');
+                    throw NotImplementedException::makeTranslatable('Not implemented yet.');
                 }
 
                 $condition = $where->getComparison();

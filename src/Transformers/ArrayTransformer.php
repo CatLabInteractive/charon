@@ -25,7 +25,7 @@ class ArrayTransformer implements Transformer
      */
     public function toResourceValue($value, Context $context)
     {
-        throw new NotImplementedException("ArrayTransformer only works for parameters.");
+        throw NotImplementedException::makeTranslatable('ArrayTransformer only works for parameters.');
     }
 
     /**
@@ -36,7 +36,7 @@ class ArrayTransformer implements Transformer
      */
     public function toEntityValue($value, Context $context)
     {
-        throw new NotImplementedException("ArrayTransformer only works for parameters.");
+        throw NotImplementedException::makeTranslatable('ArrayTransformer only works for parameters.');
     }
 
     /**

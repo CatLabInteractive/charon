@@ -17,6 +17,6 @@ class IterableExpected extends ResourceException
      */
     public static function make(Field $field, $value)
     {
-        return new self("Iterable object / array expected for field " . $field->getName());
+        return self::makeTranslatable("Iterable object / array expected for field %s.", [ $field->getName() ]);
     }
 }

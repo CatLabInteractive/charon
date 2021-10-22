@@ -14,6 +14,6 @@ class InvalidScalarException extends ResourceException
      */
     public static function make($scalar)
     {
-        return new self("Only php scalars are accepted, " . $scalar . " provided.");
+        return self::makeTranslatable('Only php scalars are accepted, %s provided.', [ $scalar ]);
     }
 }

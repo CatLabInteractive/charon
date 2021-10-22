@@ -101,17 +101,24 @@ class TransformerLibrary
                 }
             }
             catch (\Exception $e) {
-                throw new InvalidTransformer(
-                    "Could not instantiate {$classname}: " . $e->getMessage(),
+                throw InvalidTransformer::makeTranslatable(
+                    'Could not instantiate %s: %s.',
+                    [
+                        $classname,
+                        $e->getMessage()
+                    ],
                     $e->getCode(),
                     $e
                 );
             }
             
             if (! ($this->transformers[$classname] instanceof Transformer)) {
-                throw new InvalidTransformer(
-                    "All Transformers must implement " . Transformer::class . "; " .
-                    $classname . " does not."
+                throw InvalidTransformer::makeTranslatable(
+                    'All Transformers must implement %s; %s does not.',
+                    [
+                        Transformer::class,
+                        $classname
+                    ]
                 );
             }
         }

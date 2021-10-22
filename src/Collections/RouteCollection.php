@@ -484,7 +484,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        throw new NotImplementedException('Cannot set routes this way; use action()');
+        throw NotImplementedException::makeTranslatable('Cannot set routes this way; use action()');
     }
 
     /**
@@ -493,6 +493,6 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        throw new NotImplementedException('Cannot unset routes.');
+        throw NotImplementedException::makeTranslatable('Cannot unset routes.');
     }
 }

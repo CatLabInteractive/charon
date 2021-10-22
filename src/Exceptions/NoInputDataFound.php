@@ -9,8 +9,11 @@ namespace CatLab\Charon\Exceptions;
  */
 class NoInputDataFound extends InputDataException
 {
+    /**
+     * @return NoInputDataFound
+     */
     public static function make()
     {
-        return new self('Failed parsing any input: no input data found. Did you provide a proper content type?');
+        return self::makeTranslatable('Failed parsing any input: no input data found. Did you provide a proper content type?');
     }
 }

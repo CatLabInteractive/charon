@@ -59,17 +59,24 @@ class ResourceDefinitionLibrary
                 $this->descriptions[$classname] = new $classname;
             }
             catch (\Exception $e) {
-                throw new InvalidResourceDefinition(
-                    "Could not instantiate {$classname}: " . $e->getMessage(),
+                throw InvalidResourceDefinition::makeTranslatable(
+                    'Could not instantiate %s: %s',
+                    [
+                        $classname,
+                        $e->getMessage()
+                    ],
                     $e->getCode(),
                     $e
                 );
             }
             
             if (! ($this->descriptions[$classname] instanceof ResourceDefinition)) {
-                throw new InvalidResourceDefinition(
-                    "All resources definitions must implement " . ResourceDefinition::class . "; " .
-                    $classname . " does not."
+                throw InvalidResourceDefinition::makeTranslatable(
+                    'All resources definitions must implement %s; %s does not.',
+                    [
+                        ResourceDefinition::class,
+                        $classname
+                    ]
                 );
             }
         }
