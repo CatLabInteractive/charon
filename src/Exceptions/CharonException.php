@@ -21,6 +21,7 @@ class CharonException extends \Exception
      * @param array $values
      * @param int $code
      * @param Throwable|null $previous
+     * @return CharonException
      */
     public static function makeTranslatable(string $template, array $values = [], $code = 0, Throwable $previous = null)
     {
