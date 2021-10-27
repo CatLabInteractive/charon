@@ -416,7 +416,11 @@ class PaginationProcessor implements Processor
         $sortDirections = [];
 
         if ($sorting) {
-            $sortFields = explode(',', $sorting);
+            if (!is_array($sorting)) {
+                $sorting = explode(',', $sorting);
+            }
+
+            $sortFields = $sorting;
 
             // Set the sort order
             foreach ($sortFields as $sortField) {

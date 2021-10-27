@@ -49,7 +49,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
 
     /**
      * @param $request
-     * @return mixed
+     * @return string[]
      */
     public function getSorting($request)
     {

@@ -31,8 +31,9 @@ interface RequestResolver
     public function getRecords($request);
 
     /**
+     * Return an array of property names on which to sort.
      * @param $request
-     * @return mixed
+     * @return string[]
      */
     public function getSorting($request);
 
