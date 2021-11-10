@@ -37,6 +37,23 @@ class TranslatableErrorMessage implements ErrorMessage
         return vsprintf($this->template, $this->values);
     }
 
+
+    /**
+     * @return string
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
     /**
      * @return string
      */

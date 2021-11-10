@@ -564,7 +564,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 // Filterable fields
                 if (
                     $field->isFilterable() &&
-                    $this->getRequestResolver()->hasFilter($request, $field)
+                    $this->getRequestResolver()->hasFilter($request, $field, Operator::EQ)
                 ) {
 
                     $value = $this->getRequestResolver()->getFilter($request, $field);
@@ -572,10 +572,10 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
                 } elseif (
                     $field->isSearchable() &&
-                    $this->getRequestResolver()->hasFilter($request, $field)
+                    $this->getRequestResolver()->hasFilter($request, $field, Operator::SEARCH)
                 ) {
 
-                    $value = $this->getRequestResolver()->getFilter($request, $field);
+                    $value = $this->getRequestResolver()->getFilter($request, $field, Operator::SEARCH);
                     $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
 
                 }
