@@ -332,7 +332,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
             if (!$this->entityExists(
                 $transformer,
                 $child,
-                $field->getResourceDefinition()->getFields()->getIdentifiers(),
+                $field->getChildResourceDefinition()->getFields()->getIdentifiers(),
                 $context
             )) {
                 continue 1;
