@@ -21,6 +21,8 @@ use CatLab\Requirements\InArray;
 use CatLab\Requirements\Interfaces\Property;
 use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Enums\PropertyType;
+use CatLab\Requirements\Interfaces\Validator;
+use CatLab\Requirements\Traits\RequirementSetter;
 
 /**
  * Class Parameter
@@ -83,8 +85,15 @@ class Parameter implements RouteMutator, Property
      */
     protected $transformers;
 
-
+    /**
+     * @var Validator|null
+     */
     protected $validator;
+
+    /**
+     * @var string[]
+     */
+    protected $enumValues;
 
     /**
      * Parameter constructor.
@@ -97,6 +106,7 @@ class Parameter implements RouteMutator, Property
         $this->in = $type;
         $this->type = 'string';
         $this->transformers = [];
+        $this->enumValues = null;
     }
 
     /**
@@ -106,6 +116,22 @@ class Parameter implements RouteMutator, Property
     public function setRoute(RouteMutator $route)
     {
         $this->route = $route;
+        return $this;
+    }
+
+    /**
+     * @param array $values
+     * @param bool $enforce
+     * @return $this
+     */
+    public function enum(array $values, $enforce = true)
+    {
+        $this->enumValues = $values;
+        if ($enforce) {
+            $this->addRequirement(new InArray($values));
+        }
+
+        return $this;
     }
 
     /**
@@ -113,12 +139,7 @@ class Parameter implements RouteMutator, Property
      */
     public function getEnumValues()
     {
-        foreach ($this->getRequirements() as $requirement) {
-            if ($requirement instanceof InArray) {
-                return $requirement->getValues();
-            }
-        }
-        return null;
+        return $this->enumValues;
     }
 
     /**
