@@ -7,6 +7,9 @@ namespace CatLab\Charon\Models;
  */
 abstract class Singleton
 {
+    /**
+     *
+     */
     protected function __construct()
     {
     }
@@ -28,7 +31,10 @@ abstract class Singleton
         return $instances[$calledClass];
     }
 
-    final private function __clone()
+    /**
+     * @return void
+     */
+    private function __clone()
     {
     }
 }
