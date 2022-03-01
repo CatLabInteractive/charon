@@ -21,10 +21,16 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
      * @param ResourceField $field
      * @param string $operator
      * @return string|null
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
     public function getFilter($request, ResourceField $field, $operator = Operator::EQ)
     {
-        return $this->getParameter($request, $field->getDisplayName());
+        $value = $this->getParameter($request, $field->getDisplayName());
+        if ($field->getTransformer()) {
+            $value = $field->getTransformer()->toParameterValue($value);
+        }
+
+        return $value;
     }
 
     /**

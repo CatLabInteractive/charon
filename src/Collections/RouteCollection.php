@@ -4,6 +4,7 @@ namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Exceptions\NotImplementedException;
+use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Models\Routing\MatchedRoute;
 use CatLab\Charon\Models\Routing\Route;
 use CatLab\Charon\Models\Routing\RouteProperties;
@@ -15,6 +16,19 @@ use CatLab\Charon\Models\StaticResourceDefinitionFactory;
  */
 class RouteCollection extends RouteProperties implements \ArrayAccess
 {
+    const OPTIONS_IDENTIFIER_NAME = 'id';
+    const OPTIONS_PARENT_IDENTIFIER_NAME = 'parentId';
+    const OPTIONS_IDENTIFIER_TRANSFORMER = 'identifier_transformer';
+    const OPTIONS_ONLY_INCLUDE_METHODS = 'only';
+
+    // 'index', 'view', 'store', 'edit', 'destroy'
+    const OPTIONS_METHOD_INDEX = 'index';
+    const OPTIONS_METHOD_VIEW = 'view';
+    const OPTIONS_METHOD_STORE = 'store';
+    const OPTIONS_METHOD_EDIT = 'edit';
+    const OPTIONS_METHOD_DESTROY = 'destroy';
+    const OPTIONS_METHOD_PATCH = 'patch';
+
     /**
      * @var Route[]
      */
@@ -187,12 +201,19 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     {
         $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
 
-        $id = $options['id'] ?? 'id';
-        $only = $options['only'] ?? [ 'index', 'view', 'store', 'edit', 'destroy' ];
+        $only = $options[self::OPTIONS_ONLY_INCLUDE_METHODS] ?? [
+            self::OPTIONS_METHOD_INDEX,
+            self::OPTIONS_METHOD_VIEW,
+            self::OPTIONS_METHOD_STORE,
+            self::OPTIONS_METHOD_EDIT,
+            self::OPTIONS_METHOD_DESTROY
+        ];
+
+        $id = $options[self::OPTIONS_IDENTIFIER_NAME] ?? 'id';
 
         $group = $this->group([]);
 
-        if (in_array('index', $only)) {
+        if (in_array(self::OPTIONS_METHOD_INDEX, $only)) {
             $group->get($path, $controller . '@index', [], 'index')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
@@ -201,18 +222,19 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 ->returns()->statusCode(200)->many($resourceDefinitionFactory->getDefault());
         }
 
-        if (in_array('view', $only)) {
-            $group->get($path . '/{' . $id . '}', $controller . '@view', [], 'view')
+        if (in_array(self::OPTIONS_METHOD_VIEW, $only)) {
+            $viewRoute = $group->get($path . '/{' . $id . '}', $controller . '@view', [], 'view')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'View a single ' . $entityName;
                 })
-                ->parameters()->path($id)->string()->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($viewRoute, $id, $options);
         }
 
-        if (in_array('store', $only)) {
+        if (in_array(self::OPTIONS_METHOD_STORE, $only)) {
             $group->post($path, $controller . '@store', [], 'store')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
@@ -223,31 +245,33 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
         }
 
-        if (in_array('edit', $only)) {
-            $group->put($path . '/{' . $id . '}', $controller . '@edit', [], 'edit')
+        if (in_array(self::OPTIONS_METHOD_EDIT, $only)) {
+            $editRoute = $group->put($path . '/{' . $id . '}', $controller . '@edit', [], 'edit')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Update an existing ' . $entityName;
                 })
-                ->parameters()->path($id)->string()->required()
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($editRoute, $id, $options);
         }
 
-        if (in_array('patch', $only)) {
-            $group->patch($path . '/{' . $id . '}', $controller . '@patch', [], 'patch')
+        if (in_array(self::OPTIONS_METHOD_PATCH, $only)) {
+            $patchRoute = $group->patch($path . '/{' . $id . '}', $controller . '@patch', [], 'patch')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Patch an existing ' . $entityName;
                 })
-                ->parameters()->path($id)->string()->required()
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($patchRoute, $id, $options);
         }
 
-        if (in_array('destroy', $only)) {
+        if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
             $group->delete($path . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
@@ -259,6 +283,20 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
         }
 
         return $group;
+    }
+
+    /**
+     * @param Route $route
+     * @param $idName
+     * @param array $options
+     * @return void
+     */
+    private function addIdParameterToRoutePath(RouteMutator $route, $idName, array $options)
+    {
+        $idParameter = $route->parameters()->path($idName)->string()->required();
+        if (isset($options[self::OPTIONS_IDENTIFIER_TRANSFORMER])) {
+            $idParameter->transformer($options[self::OPTIONS_IDENTIFIER_TRANSFORMER]);
+        }
     }
 
     /**
@@ -276,67 +314,78 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     {
         $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
 
-        $id = $options['id'] ?? 'id';
-        $parentId = $options['parentId'] ?? 'parentId';
+        $id = $options[self::OPTIONS_IDENTIFIER_NAME] ?? 'id';
+        $parentId = $options[self::OPTIONS_PARENT_IDENTIFIER_NAME] ?? 'parentId';
 
-        $only = $options['only'] ?? [ 'index', 'view', 'store', 'edit', 'destroy' ];
+        //$only = $options['only'] ?? [ 'index', 'view', 'store', 'edit', 'destroy' ];
+        $only = $options[self::OPTIONS_ONLY_INCLUDE_METHODS] ?? [
+            self::OPTIONS_METHOD_INDEX,
+            self::OPTIONS_METHOD_VIEW,
+            self::OPTIONS_METHOD_STORE,
+            self::OPTIONS_METHOD_EDIT,
+            self::OPTIONS_METHOD_DESTROY
+        ];
 
         $group = $this->group([]);
 
-        if (in_array('index', $only)) {
-            $group->get($parentPath, $controller . '@index', [], 'index')
+        if (in_array(self::OPTIONS_METHOD_INDEX, $only)) {
+            $indexRoute = $group->get($parentPath, $controller . '@index', [], 'index')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
-                ->parameters()->path($parentId)->string()->required()
                 ->returns()->statusCode(200)->many($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($indexRoute, $parentId, $options);
         }
 
-        if (in_array('view', $only)) {
-            $group->get($childPath . '/{' . $id . '}', $controller . '@view', [], 'view')
+        if (in_array(self::OPTIONS_METHOD_VIEW, $only)) {
+            $viewRoute = $group->get($childPath . '/{' . $id . '}', $controller . '@view', [], 'view')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'View a single ' . $entityName;
                 })
-                ->parameters()->path($id)->string()->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($viewRoute, $id, $options);
         }
 
-        if (in_array('store', $only)) {
-            $group->post($parentPath, $controller . '@store', [], 'store')
+        if (in_array(self::OPTIONS_METHOD_STORE, $only)) {
+            $storeRoute = $group->post($parentPath, $controller . '@store', [], 'store')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Create a new ' . $entityName;
                 })
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
-                ->parameters()->path($parentId)->string()->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($storeRoute, $parentId, $options);
         }
 
-        if (in_array('edit', $only)) {
-            $group->put($childPath . '/{' . $id . '}', $controller . '@edit', [], 'edit')
+        if (in_array(self::OPTIONS_METHOD_EDIT, $only)) {
+            $editRoute = $group->put($childPath . '/{' . $id . '}', $controller . '@edit', [], 'edit')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Update an existing ' . $entityName;
                 })
-                ->parameters()->path($id)->string()->required()
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($editRoute, $id, $options);
         }
 
-        if (in_array('destroy', $only)) {
-            $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
+        if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
+            $destroyRoute = $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Delete a ' . $entityName;
-                })
-                ->parameters()->path($id)->string()->required()
-            ;
+                });
+
+            $this->addIdParameterToRoutePath($destroyRoute, $id, $options);
         }
 
         return $group;
