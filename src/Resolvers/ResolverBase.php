@@ -8,6 +8,7 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Exceptions\VariableNotFoundInContext;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\ResourceField;
 use InvalidArgumentException;
@@ -277,9 +278,11 @@ class ResolverBase
     protected function entityEquals(
         ResourceTransformer $transformer,
         $original,
-        PropertyValueCollection $identifiers,
+        Identifier $identifier,
         Context $context
     ) {
+        $identifiers = $identifier->getIdentifiers();
+
         if (count($identifiers->getValues()) === 0) {
             return false;
         }
@@ -289,7 +292,14 @@ class ResolverBase
             $path = $this->splitPathParameters($identifier->getField()->getName());
             $propertyValue = $this->resolveChildPath($transformer, $original, $path, $identifier->getField(), $context);
 
-            if (!$identifier->equals($propertyValue)) {
+            // this value may be transformed, while the entity value is not transformed.
+            // therefor, first 'decode' the provided value back to a value we expect.
+            $decodedProvidedIdentifier = $identifier->getValue();
+            if ($identifier->getField()->getTransformer()) {
+                $decodedProvidedIdentifier = $identifier->getField()->getTransformer()->toEntityValue($decodedProvidedIdentifier, $context);
+            }
+
+            if ($decodedProvidedIdentifier != $propertyValue) {
                 return false;
             }
         }

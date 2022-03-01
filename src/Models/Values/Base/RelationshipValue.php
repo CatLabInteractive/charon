@@ -5,6 +5,7 @@ namespace CatLab\Charon\Models\Values\Base;
 use CatLab\Charon\Exceptions\EntityNotFoundException;
 use CatLab\Charon\Exceptions\LinkRelationshipContainsAttributesException;
 use CatLab\Charon\Models\CurrentPath;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\RequirementValidationException;
@@ -96,7 +97,7 @@ abstract class RelationshipValue extends Value
      * @param PropertySetter $propertySetter
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValueCollection[] $identifiers
+     * @param Identifier[] $identifiers
      * @param Context $context
      * @return mixed
      */
@@ -114,7 +115,7 @@ abstract class RelationshipValue extends Value
      * @param ResourceTransformer $transformer
      * @param PropertyResolver $propertyResolver
      * @param $parent
-     * @param PropertyValueCollection $identifiers
+     * @param Identifier $identifier
      * @param Context $context
      * @return mixed
      */
@@ -122,7 +123,7 @@ abstract class RelationshipValue extends Value
         ResourceTransformer $transformer,
         PropertyResolver $propertyResolver,
         &$parent,
-        PropertyValueCollection $identifiers,
+        Identifier $identifier,
         Context $context
     );
 
@@ -201,7 +202,7 @@ abstract class RelationshipValue extends Value
 
         /**
          * Keep a list of all identifies we've touched, so we can removed those we haven't
-         * @var PropertyValueCollection[] $identifiersToKeep
+         * @var Identifier[] $identifiersToKeep
          */
         $identifiersToKeep = [];
 
@@ -284,8 +285,6 @@ abstract class RelationshipValue extends Value
         /** @var RelationshipField $field */
         $field = $this->getField();
 
-        $childIdentifiers = $child->getProperties()->getIdentifiers();
-
         /** @var bool $isNew */
         $isNew = $child->isNew();
 
@@ -296,12 +295,12 @@ abstract class RelationshipValue extends Value
                 $resourceTransformer,
                 $propertyResolver,
                 $parent,
-                $childIdentifiers,
+                $child->getIdentifier(),
                 $context
             );
 
             if ($childEntity) {
-                $identifiersToKeep[] = $childIdentifiers;
+                $identifiersToKeep[] = $child->getIdentifier();
 
                 // if we can't edit the child from here, there is no points in going further.
                 if (!$field->canCreateNewChildren($context)) {
@@ -318,13 +317,13 @@ abstract class RelationshipValue extends Value
             $entity = $factory->resolveLinkedEntity(
                 $parent,
                 $child->getResourceDefinition()->getEntityClassName(),
-                $childIdentifiers->toMap(),
+                $child->getIdentifier(),
                 $context
             );
 
             if ($entity) {
                 $childrenToAdd[] = $entity;
-                $identifiersToKeep[] = $childIdentifiers;
+                $identifiersToKeep[] = $child->getIdentifier();
                 return;
             }
         }

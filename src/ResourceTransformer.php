@@ -278,7 +278,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                     $value = $this->getPropertyResolver()->resolveProperty($this, $entity, $field, $context);
 
                     if ($field->isArray()) {
-                        // Null values = emtpy arrays.
+                        // Null values = empty arrays.
                         if ($value === null) {
                             $value = [];
                         }
@@ -363,7 +363,14 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
         $values = $resource->getProperties()->getValues();
         foreach ($values as $property) {
-            $property->toEntity($entity, $this, $this->getPropertyResolver(), $this->getPropertySetter(), $factory, $context);
+            $property->toEntity(
+                $entity,
+                $this,
+                $this->getPropertyResolver(),
+                $this->getPropertySetter(),
+                $factory,
+                $context
+            );
         }
 
         $this->parents->pop();

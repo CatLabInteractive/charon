@@ -31,18 +31,20 @@ class EntityFactory implements \CatLab\Charon\Interfaces\EntityFactory
      * @return mixed
      * @throws Exception
      */
-    public function resolveLinkedEntity($parent, string $entityClassName, array $identifiers, Context $context)
+    public function resolveLinkedEntity($parent, string $entityClassName, Identifier $identifier, Context $context)
     {
-        if (isset($identifiers['id'])) {
-            return $this->getAuthorizedResolvedEntity($entityClassName::find($identifiers['id']));
+        $identifierValues = $identifier->getIdentifiers()->transformToEntityValuesMap($context);
+
+        if (isset($identifierValues['id'])) {
+            return $this->getAuthorizedResolvedEntity($entityClassName::find($identifierValues['id']));
         }
 
-        if (count($identifiers) === 0) {
+        if (count($identifierValues) === 0) {
             return null;
         }
 
         $query = $entityClassName::query();
-        foreach ($identifiers as $k => $v) {
+        foreach ($identifierValues as $k => $v) {
             $query->where($k, '=', $v);
         }
 
@@ -58,17 +60,18 @@ class EntityFactory implements \CatLab\Charon\Interfaces\EntityFactory
      */
     public function resolveFromIdentifier(string $entityClassName, Identifier $identifier, Context $context)
     {
-        $data = $identifier->toArray();
-        if (isset($data['id'])) {
-            return $this->getAuthorizedResolvedEntity($entityClassName::find($data['id']));
+        $identifierValues = $identifier->getIdentifiers()->transformToEntityValuesMap($context);
+
+        if (isset($identifierValues['id'])) {
+            return $this->getAuthorizedResolvedEntity($entityClassName::find($identifierValues['id']));
         }
 
-        if (count($data) === 0) {
+        if (count($identifierValues) === 0) {
             return null;
         }
 
         $query = $entityClassName::query();
-        foreach ($data as $k => $v) {
+        foreach ($identifierValues as $k => $v) {
             $query->where($k, '=', $v);
         }
 

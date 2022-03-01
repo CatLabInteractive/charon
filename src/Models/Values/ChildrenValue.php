@@ -8,6 +8,7 @@ use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\PropertyResolver;
 use CatLab\Charon\Interfaces\PropertySetter;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
@@ -131,14 +132,14 @@ class ChildrenValue extends RelationshipValue
         ResourceTransformer $transformer,
         PropertyResolver $propertyResolver,
         &$parent,
-        PropertyValueCollection $identifiers,
+        Identifier $identifier,
         Context $context
     ) {
         return $propertyResolver->getChildByIdentifiers(
             $transformer,
             $this->getField(),
             $parent,
-            $identifiers,
+            $identifier,
             $context
         );
     }

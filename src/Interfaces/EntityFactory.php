@@ -20,11 +20,11 @@ interface EntityFactory
     /**
      * @param $parent
      * @param $entityClassName
-     * @param array $identifiers
+     * @param Identifier $identifier
      * @param Context $context
      * @return mixed
      */
-    public function resolveLinkedEntity($parent, string $entityClassName, array $identifiers, Context $context);
+    public function resolveLinkedEntity($parent, string $entityClassName, Identifier $identifier, Context $context);
 
     /**
      * @param string $entityClassName

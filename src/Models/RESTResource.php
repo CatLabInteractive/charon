@@ -4,6 +4,7 @@ namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Charon\Models\Values\PropertyValue;
 use CatLab\Charon\Validation\ResourceValidator;
 use CatLab\Requirements\Collections\MessageCollection;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
@@ -216,11 +217,27 @@ class RESTResource implements ResourceContract
     }
 
     /**
+     * Shortcut for $this->getPropeties()->getIdentifiers()
      * @return PropertyValueCollection
      */
     public function getIdentifiers()
     {
         return $this->getProperties()->getIdentifiers();
+    }
+
+    /**
+     * Return an Identifier object representing this REST resource.
+     * @return Identifier
+     */
+    public function getIdentifier()
+    {
+        $identifier = new Identifier($this->getResourceDefinition());
+        foreach ($this->getIdentifiers()->getValues() as $idValue) {
+            /** @var PropertyValue $idValue */
+            $identifier->setProperty($idValue->getField(), $idValue->getValue(), true);
+        }
+
+        return $identifier;
     }
 
     /**

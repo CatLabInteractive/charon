@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
+use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\IdentifierField;
 use CatLab\Charon\Models\Properties\RelationshipField;
@@ -210,6 +211,27 @@ class PropertyValueCollection extends Collection
         $out = [];
         foreach ($this->getValues() as $value) {
             $out[$value->getField()->getName()] = $value->getValue();
+        }
+
+        return $out;
+    }
+
+    /**
+     * Transform the value collection to its 'entry state' (using any field specified transformers that might be
+     * applicable) and return that as an array.
+     * @return array
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     */
+    public function transformToEntityValuesMap(Context $context)
+    {
+        $out = [];
+        foreach ($this->getValues() as $value) {
+            $v = $value->getValue();
+            if ($value->getField()->getTransformer()) {
+                $v = $value->getField()->getTransformer()->toEntityValue($v, $context);
+            }
+
+            $out[$value->getField()->getName()] = $v;
         }
 
         return $out;

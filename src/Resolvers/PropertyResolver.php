@@ -11,6 +11,7 @@ use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Interfaces\Context;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\RESTResource;
@@ -134,6 +135,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
      * @param RelationshipField $field
      * @param Context $context
      * @return \CatLab\Charon\Interfaces\ResourceCollection
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function resolveManyRelationshipInput(
         ResourceTransformer $transformer,
@@ -230,9 +232,9 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
      * @param ResourceTransformer $transformer
      * @param RelationshipField $field
      * @param mixed $parentEntity
-     * @param PropertyValueCollection $identifiers
+     * @param Identifier $identifier
      * @param Context $context
-     * @return mixed
+     * @return mixed|null
      * @throws InvalidPropertyException
      * @throws VariableNotFoundInContext
      */
@@ -240,15 +242,16 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         ResourceTransformer $transformer,
         RelationshipField $field,
         $parentEntity,
-        PropertyValueCollection $identifiers,
+        Identifier $identifier,
         Context $context
     ) {
         $entities = $this->resolveProperty($transformer, $parentEntity, $field, $context);
         foreach ($entities as $entity) {
-            if ($this->entityEquals($transformer, $entity, $identifiers, $context)) {
+            if ($this->entityEquals($transformer, $entity, $identifier, $context)) {
                 return $entity;
             }
         }
+        return null;
     }
 
     /**
@@ -266,7 +269,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         RESTResource $resource,
         Context $context
     ) : bool {
-        return $this->entityEquals($transformer, $entity, $resource->getProperties()->getIdentifiers(), $context);
+        return $this->entityEquals($transformer, $entity, $resource->getIdentifier(), $context);
     }
 
     /**

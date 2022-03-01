@@ -4,6 +4,7 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Base\Enum\Operator;
 use CatLab\Charon\Collections\PropertyValueCollection;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 
@@ -17,7 +18,7 @@ interface QueryAdapter
      * @param ResourceTransformer $transformer
      * @param RelationshipField $field
      * @param mixed $parentEntity
-     * @param PropertyValueCollection $identifiers
+     * @param Identifier $identifier,
      * @param Context $context
      * @return mixed
      */
@@ -25,7 +26,7 @@ interface QueryAdapter
         ResourceTransformer $transformer,
         RelationshipField $field,
         $parentEntity,
-        PropertyValueCollection $identifiers,
+        Identifier $identifier,
         Context $context
     );
 

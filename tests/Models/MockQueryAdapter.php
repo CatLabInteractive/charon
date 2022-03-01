@@ -11,6 +11,7 @@ use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
 use Countable;
@@ -30,7 +31,7 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
     /**
      * @inheritDoc
      */
-    public function getChildByIdentifiers(ResourceTransformer $transformer, RelationshipField $field, $parentEntity, PropertyValueCollection $identifiers, Context $context)
+    public function getChildByIdentifiers(ResourceTransformer $transformer, RelationshipField $field, $parentEntity, Identifier $identifier, Context $context)
     {
         // TODO: Implement getChildByIdentifiers() method.
     }
