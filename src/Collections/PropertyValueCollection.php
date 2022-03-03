@@ -222,16 +222,11 @@ class PropertyValueCollection extends Collection
      * @return array
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
-    public function transformToEntityValuesMap(Context $context)
+    public function transformToEntityValuesMap(Context $context = null)
     {
         $out = [];
         foreach ($this->getValues() as $value) {
-            $v = $value->getValue();
-            if ($value->getField()->getTransformer()) {
-                $v = $value->getField()->getTransformer()->toEntityValue($v, $context);
-            }
-
-            $out[$value->getField()->getName()] = $v;
+            $out[$value->getField()->getName()] = $value->getTransformedEntityValue($context);
         }
 
         return $out;

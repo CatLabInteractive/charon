@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Values;
 
+use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Models\Identifier;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Charon\Collections\PropertyValueCollection;
@@ -71,6 +72,28 @@ class ChildValue extends RelationshipValue
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTransformedEntityValue(Context $context = null, string $attribute = null)
+    {
+        if ($this->child === null) {
+            return null;
+        }
+
+        if ($attribute === null) {
+            return $this->child->getProperties()->transformToEntityValuesMap($context);
+        } else {
+            // For performance reasons, only process the field we actually want.
+            $field = $this->child->getProperties()->getFromName($attribute);
+            if (!$field) {
+                return null;
+            }
+
+            return $field->getTransformedEntityValue($context);
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function toArray()
@@ -81,11 +104,17 @@ class ChildValue extends RelationshipValue
         return $this->child->toArray();
     }
 
+    /**
+     * @return RESTResource[]
+     */
     public function getChildren()
     {
         return $this->getChildrenToProcess();
     }
 
+    /**
+     * @return RESTResource[]
+     */
     protected function getChildrenToProcess()
     {
         return [ $this->child ];

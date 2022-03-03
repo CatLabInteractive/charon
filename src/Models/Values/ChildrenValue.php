@@ -10,6 +10,7 @@ use CatLab\Charon\Interfaces\PropertySetter;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\RelationshipField;
+use CatLab\Charon\Models\RESTResource;
 use CatLab\Charon\Models\Values\Base\RelationshipValue;
 
 /**
@@ -42,12 +43,27 @@ class ChildrenValue extends RelationshipValue
     }
 
     /**
+     * @param string|null $path
      * @return array
      */
-    public function getValue()
+    public function getValue(string $path = null)
     {
         $items = $this->children->toArray();
         return $items[ResourceTransformer::RELATIONSHIP_ITEMS];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTransformedEntityValue(Context $context = null)
+    {
+        $out = [];
+        foreach ($this->children as $child) {
+            /** @var RESTResource $child */
+            $out[] = $child->getProperties()->transformToEntityValuesMap($context);
+        }
+
+        return $out;
     }
 
     /**

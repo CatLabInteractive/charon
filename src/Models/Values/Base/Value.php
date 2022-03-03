@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon\Models\Values\Base;
 
+use CatLab\Base\Helpers\ArrayHelper;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\EntityFactory;
 use CatLab\Charon\Interfaces\PropertyResolver;
@@ -9,10 +10,9 @@ use CatLab\Charon\Interfaces\PropertySetter;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
-use CatLab\Charon\Models\Properties\ResourceField;
 
 /**
- * Class PropertyValue
+ * Class Value
  * @package CatLab\RESTResource\Models\Values\Base
  */
 abstract class Value
@@ -57,6 +57,30 @@ abstract class Value
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * Return the transformed (entity) value of this field.
+     * This is a shortcut for $value->getTransformer()->toEntityValue($value->getValue()), with support for child
+     * relationships. As that logic gets pretty complicated quickly, this helper method aims to ease that pain.
+     * @param Context $context If not provided, use Transformer::toParameterValue instead.
+     * @return \CatLab\Charon\Interfaces\Transformer|mixed|null
+     * @throws \CatLab\Charon\Exceptions\InvalidTransformer
+     */
+    public function getTransformedEntityValue(Context $context = null)
+    {
+        $value = $this->getValue();
+
+        // Do we have a transformer?
+        if ($this->getField()->getTransformer()) {
+            if ($context === null) {
+                return $this->getField()->getTransformer()->toParameterValue($value);
+            } else {
+                return $this->getField()->getTransformer()->toEntityValue($value, $context);
+            }
+        } else {
+            return $value;
+        }
     }
 
     /**

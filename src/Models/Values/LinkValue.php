@@ -52,7 +52,7 @@ class LinkValue extends Value
     /**
      * @return string
      */
-    public function getValue()
+    public function getValue(string $path = null)
     {
         return $this->link;
     }
