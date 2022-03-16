@@ -155,13 +155,23 @@ class PaginationBuilderTest extends BaseTest
 
         $queryBuilder = new SelectQueryParameters();
 
-        $filters = $resourceTransformer->applyFilters(
+        $filters = $resourceTransformer->getFilters(
             [
                 'sort' => $sortOrder,
                 'after' => $afterCursor,
                 'before' => $beforeCursor
             ],
             $petDefinition,
+            $context
+        );
+
+        $filters = $resourceTransformer->applyFilters(
+            [
+                'sort' => $sortOrder,
+                'after' => $afterCursor,
+                'before' => $beforeCursor
+            ],
+            $filters,
             $context,
             $queryBuilder
         );

@@ -2,6 +2,7 @@
 
 namespace CatLab\Charon;
 
+use CatLab\Charon\Collections\FilterCollection;
 use CatLab\Charon\Collections\ResourceCollection;
 use CatLab\Charon\Exceptions\InvalidResourceDefinition;
 use CatLab\Charon\Interfaces\Context as ContextContract;
@@ -36,6 +37,7 @@ use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
 
 use CatLab\Charon\Models\CurrentPath;
+use CatLab\Charon\Models\Filter;
 use CatLab\Charon\Models\FilterResults;
 use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -159,7 +161,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RelationshipValue $parent = null,
         $parentEntity = null
     ) : \CatLab\Charon\Interfaces\ResourceCollection {
-        
+
         if (!ArrayHelper::isIterable($entities)) {
             throw InvalidEntityException::makeTranslatable('%s expects an iterable object of entities at %s.', [
                 __CLASS__ . '::toResources',
@@ -545,25 +547,21 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
-     * Apply any filterable/searchable fields
      * @param $request
-     * @param string|ResourceDefinitionContract $resourceDefinition
+     * @param $resourceDefinition
      * @param ContextContract $context
-     * @param $queryBuilder
-     * @return FilterResults
-     * @throws Exceptions\InvalidResourceDefinition
+     * @return FilterCollection
+     * @throws InvalidResourceDefinition
      */
-    public function applyFilters(
+    public function getFilters(
         $request,
         $resourceDefinition,
-        ContextContract $context,
-        $queryBuilder
+        ContextContract $context
     ) {
-        $filterResults = new FilterResults();
-        $filterResults->setQueryBuilder($queryBuilder);
-
         $resourceDefinitionFactory = $this->getResourceDefinitionFactory($resourceDefinition);
         $definition = $resourceDefinitionFactory->getDefault();
+
+        $filterCollection = new FilterCollection($definition);
 
         // First process all filtersable and searchable fields.
         foreach ($definition->getFields() as $field) {
@@ -575,18 +573,52 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 ) {
 
                     $value = $this->getRequestResolver()->getFilter($request, $field);
-                    $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::EQ);
+                    $filterCollection->add(new Filter($field, Operator::EQ, $value));
 
                 } elseif (
                     $field->isSearchable() &&
                     $this->getRequestResolver()->hasFilter($request, $field, Operator::SEARCH)
                 ) {
-
                     $value = $this->getRequestResolver()->getFilter($request, $field, Operator::SEARCH);
-                    $this->getQueryAdapter()->applyPropertyFilter($this, $definition, $context, $field, $queryBuilder, $value, Operator::SEARCH);
-
+                    $filterCollection->add(new Filter($field, Operator::SEARCH, $value));
                 }
             }
+        }
+
+        return $filterCollection;
+    }
+
+    /**
+     * Apply any filterable/searchable fields
+     * @param $request
+     * @param FilterCollection $filters
+     * @param ContextContract $context
+     * @param $queryBuilder
+     * @return FilterResults
+     * @throws InvalidResourceDefinition
+     */
+    public function applyFilters(
+        $request,
+        FilterCollection $filters,
+        ContextContract $context,
+        $queryBuilder
+    ) {
+        $filterResults = new FilterResults();
+        $filterResults->setQueryBuilder($queryBuilder);
+
+        $resourceDefinitionFactory = $this->getResourceDefinitionFactory($filters->getResourceDefinition());
+
+        foreach ($filters as $filter) {
+            /** @var Filter $filter */
+            $this->getQueryAdapter()->applyPropertyFilter(
+                $this,
+                $filters->getResourceDefinition(),
+                $context,
+                $filter->getField(),
+                $queryBuilder,
+                $filter->getValue(),
+                $filter->getOperator()
+            );
         }
 
         // Now go through all processors and apply any filters or parameters they might want to set.
