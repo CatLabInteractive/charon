@@ -201,7 +201,7 @@ abstract class RelationshipValue extends Value
         $childrenToEdit = [];
 
         /**
-         * Keep a list of all identifies we've touched, so we can removed those we haven't
+         * Keep a list of all identifies we've touched, so we can remove those we haven't
          * @var Identifier[] $identifiersToKeep
          */
         $identifiersToKeep = [];
@@ -268,7 +268,7 @@ abstract class RelationshipValue extends Value
      * @param Context $context
      * @param $childrenToAdd
      * @param $childrenToEdit
-     * @param $identifiersToKeep
+     * @param Identifier[] $identifiersToKeep
      * @throws EntityNotFoundException
      */
     private function childResourceToEntity(

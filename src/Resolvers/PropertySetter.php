@@ -2,14 +2,13 @@
 
 namespace CatLab\Charon\Resolvers;
 
-use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\PropertyResolver as PropertyResolverContract;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
+use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
 use CatLab\Charon\Models\Properties\RelationshipField;
-use CatLab\Charon\Models\Properties\ResourceField;
 
 /**
  * Class PropertySetter
@@ -18,14 +17,14 @@ use CatLab\Charon\Models\Properties\ResourceField;
 class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\PropertySetter
 {
     /***********************************************************
-     * Quick start: overwrite these to match your framework
+     * Quick start: override these to match your framework
      **********************************************************/
 
     /**
      * @param $entity
      * @param $name
      * @param array $childEntities
-     * @param $parameters
+     * @param array $parameters
      * @throws InvalidPropertyException
      */
     protected function addChildrenToEntity($entity, $name, array $childEntities, $parameters = [])
@@ -80,7 +79,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param $name
      * @param $value
      * @param array $setterParameters
-     * @return mixed
+     * @return void
      * @throws InvalidPropertyException
      */
     protected function setValueInEntity($entity, $name, $value, $setterParameters = [])
@@ -179,7 +178,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     }
 
     /**
-     * Edit a child to a colleciton
+     * Edit a child to a collection
      * @param ResourceTransformer $transformer
      * @param $entity
      * @param RelationshipField $field
@@ -201,7 +200,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     }
 
     /**
-     * Add a child to a colleciton
+     * Add a child to a collection
      * @param ResourceTransformer $transformer
      * @param $entity
      * @param RelationshipField $field
@@ -306,9 +305,9 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
      * @param PropertyResolverContract $propertyResolver
      * @param $entity
      * @param RelationshipField $field
-     * @param PropertyValueCollection[] $identifiers
+     * @param Identifier[] $identifiers
      * @param Context $context
-     * @return mixed
+     * @return void
      * @throws InvalidPropertyException
      * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
      */
