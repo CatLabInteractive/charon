@@ -5,24 +5,17 @@ namespace CatLab\Charon\Models\Routing\Parameters\Base;
 use CatLab\Base\Interfaces\Database\OrderParameter;
 use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Collections\ParameterCollection;
-use CatLab\Charon\Interfaces\Context;
-use CatLab\Charon\Interfaces\DescriptionBuilder;
 use CatLab\Charon\Interfaces\RouteMutator;
 use CatLab\Charon\Interfaces\Transformer;
 use CatLab\Charon\Library\TransformerLibrary;
 use CatLab\Charon\Models\Routing\ReturnValue;
 use CatLab\Charon\Models\Routing\Route;
-use CatLab\Charon\Transformers\ArrayTransformer;
-use CatLab\Charon\Transformers\BooleanTransformer;
 use CatLab\Charon\Transformers\ScalarTransformer;
 use CatLab\Charon\Transformers\TransformerQueue;
-use CatLab\Requirements\Exists;
 use CatLab\Requirements\InArray;
 use CatLab\Requirements\Interfaces\Property;
-use CatLab\Requirements\Interfaces\Requirement;
 use CatLab\Requirements\Enums\PropertyType;
 use CatLab\Requirements\Interfaces\Validator;
-use CatLab\Requirements\Traits\RequirementSetter;
 
 /**
  * Class Parameter
@@ -304,7 +297,7 @@ class Parameter implements RouteMutator, Property
     /**
      * Merge properties
      * @param Parameter $parameter
-     * @return $this
+     * @return static
      */
     public function merge(Parameter $parameter)
     {
@@ -326,8 +319,8 @@ class Parameter implements RouteMutator, Property
     }
 
     /**
-     * @param string $transformer
-     * @return $this
+     * @param Transformer|string $transformer
+     * @return static
      */
     public function transformer($transformer)
     {
