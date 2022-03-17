@@ -289,20 +289,30 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                             throw IterableExpected::make($field, $value);
                         }
 
-                        // Translate to regular array (otherwise we might get in trouble)
-                        $transformedValue = [];
-                        $transformer = $field->getTransformer();
-
-                        if ($transformer) {
-                            foreach ($value as $k => $v) {
-                                $transformedValue[$k] = $transformer->toResourceValue($v, $context);
+                        // no data? No processing.
+                        if (count($value) === 0) {
+                            // Is this field supposed to be a map? In that case use a stdClass
+                            if ($field->isMap()) {
+                                $value = new \stdClass();
                             }
                         } else {
-                            foreach ($value as $k => $v) {
-                                $transformedValue[$k] = $v;
+
+                            // Translate to regular array (otherwise we might get in trouble)
+                            $transformedValue = [];
+                            $transformer = $field->getTransformer();
+
+                            if ($transformer) {
+                                foreach ($value as $k => $v) {
+                                    $transformedValue[$k] = $transformer->toResourceValue($v, $context);
+                                }
+                            } else {
+                                foreach ($value as $k => $v) {
+                                    $transformedValue[$k] = $v;
+                                }
                             }
+                            $value = $transformedValue;
+
                         }
-                        $value = $transformedValue;
 
                     } else {
                         if ($transformer = $field->getTransformer()) {

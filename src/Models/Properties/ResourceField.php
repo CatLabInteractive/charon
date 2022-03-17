@@ -26,7 +26,7 @@ class ResourceField extends Field
      * @var bool
      */
     private $searchable;
-    
+
     /**
      * @var bool
      */
@@ -36,12 +36,18 @@ class ResourceField extends Field
      * @var bool
      */
     private $isArray;
-    
+
+    /**
+     * @var bool
+     */
+    private $isMap;
+
     public function __construct(ResourceDefinition $resourceDefinition, $fieldName)
     {
         parent::__construct($resourceDefinition, $fieldName);
 
         $this->isArray = false;
+        $this->isMap = false;
         $this->sortable = false;
     }
 
@@ -129,11 +135,29 @@ class ResourceField extends Field
     }
 
     /**
+     * @return $this
+     */
+    public function map()
+    {
+        $this->isArray = true;
+        $this->isMap = true;
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isArray()
     {
         return $this->isArray;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMap()
+    {
+        return $this->isMap;
     }
 
     /**
