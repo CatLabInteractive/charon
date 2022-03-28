@@ -272,7 +272,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
         }
 
         if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
-            $group->delete($path . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
+            $deleteRoute = $group->delete($path . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
                 ->summary(function () use ($resourceDefinitionFactory) {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
@@ -280,6 +280,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 })
                 ->parameters()->path($id)->string()->required()
             ;
+
+            $this->addIdParameterToRoutePath($deleteRoute, $id, $options);
         }
 
         return $group;
