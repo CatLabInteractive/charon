@@ -4,13 +4,14 @@ namespace Tests;
 
 use CatLab\Charon\Transformers\ScalarTransformer;
 use CatLab\Requirements\Enums\PropertyType;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 
 /**
  * Class ScalarTransformerTest
  * @package CatLab\RESTResource\Tests
  */
-class ScalarTransformerTest extends PHPUnit_Framework_TestCase
+class ScalarTransformerTest extends TestCase
 {
     /**
      *

@@ -3,3 +3,4 @@ vendor/
 composer.lock
 docs-html
 node_modules
+/.phpunit.result.cache
