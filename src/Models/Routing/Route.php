@@ -302,7 +302,7 @@ class Route extends RouteProperties implements RouteMutator
                     $visibleValues,
                     $expandValues,
                     $prefix . $field->getDisplayName() . '.',
-                    $currentDepth ++
+                    $currentDepth + 1
                 );
             }
         }
