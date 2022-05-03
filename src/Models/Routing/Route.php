@@ -18,6 +18,8 @@ use CatLab\Requirements\InArray;
  */
 class Route extends RouteProperties implements RouteMutator
 {
+    const MAX_EXPAND_DEPTH = 3;
+
     /**
      * @var string
      */
@@ -201,24 +203,7 @@ class Route extends RouteProperties implements RouteMutator
 
                     // Expandable field
                     if ($field instanceof RelationshipField) {
-                        if ($field->isViewable($returnValue->getContext()) && $field->isExpandable()) {
-                            $expandValues[] = $field->getDisplayName();
-                            $visibleValues[] = $field->getDisplayName() . '.*';
-
-                            // Also do sectond level expandable and filterable, but no further!
-                            $related = $field->getChildResource();
-                            foreach ($related->getFields() as $relatedField) {
-                                if ($relatedField->isVisible()) {
-                                    $visibleValues[] = $field->getDisplayName() . '.' . $relatedField->getDisplayName();
-                                }
-
-                                if ($relatedField instanceof RelationshipField) {
-                                    if ($relatedField->isExpandable()) {
-                                        $expandValues[] = $field->getDisplayName() . '.' . $relatedField->getDisplayName();
-                                    }
-                                }
-                            }
-                        }
+                        $this->addExpandableValues($field, $returnValue->getContext(), $visibleValues, $expandValues);
                     }
 
                     // Filterable fields
@@ -270,6 +255,57 @@ class Route extends RouteProperties implements RouteMutator
         }
 
         return $parameters;
+    }
+
+    /**
+     * @param RelationshipField $field
+     * @param string $context
+     * @param array $visibleValues
+     * @param array $expandValues
+     * @param string $prefix
+     * @param int $currentDepth
+     * @return void
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     */
+    protected function addExpandableValues(
+        RelationshipField $field,
+        string $context,
+        array &$visibleValues,
+        array &$expandValues,
+        $prefix = '',
+        $currentDepth = 0
+    ) {
+        $currentDepth ++;
+        if ($currentDepth > self::MAX_EXPAND_DEPTH) {
+            return;
+        }
+
+        if (!$field->isViewable($context) || !$field->isExpandable()) {
+            return;
+        }
+
+        $expandValues[] = $prefix . $field->getDisplayName();
+        $visibleValues[] = $prefix . $field->getDisplayName() . '.*';
+
+        // Also do second level expandable and filterable, but no further!
+        $related = $field->getChildResource();
+
+        foreach ($related->getFields() as $relatedField) {
+            if ($relatedField->isVisible()) {
+                $visibleValues[] = $prefix . $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+            }
+
+            if ($relatedField instanceof RelationshipField) {
+                $this->addExpandableValues(
+                    $relatedField,
+                    $context,
+                    $visibleValues,
+                    $expandValues,
+                    $prefix . $field->getDisplayName() . '.',
+                    $currentDepth ++
+                );
+            }
+        }
     }
 
     /**
