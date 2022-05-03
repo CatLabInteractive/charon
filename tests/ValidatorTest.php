@@ -45,10 +45,15 @@ class ValidatorTest extends BaseTest
     }
 
     /**
-     * @expectedException \CatLab\Requirements\Exceptions\ResourceValidationException
+     * @return void
+     * @throws \CatLab\Charon\Exceptions\InvalidContextAction
+     * @throws \CatLab\Charon\Exceptions\InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
     public function testPetNotEnoughPhotos()
     {
+        $this->expectException(\CatLab\Requirements\Exceptions\ResourceValidationException::class);
+
         $transformer = $this->getResourceTransformer();
         $context = new Context(Action::CREATE);
 
