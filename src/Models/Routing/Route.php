@@ -3,6 +3,7 @@
 namespace CatLab\Charon\Models\Routing;
 
 use CatLab\Charon\Collections\RouteCollection;
+use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Method;
 use CatLab\Charon\Interfaces\ResourceTransformer;
 use CatLab\Charon\Interfaces\RouteMutator;
@@ -18,8 +19,6 @@ use CatLab\Requirements\InArray;
  */
 class Route extends RouteProperties implements RouteMutator
 {
-    const MAX_EXPAND_DEPTH = 3;
-
     /**
      * @var string
      */
@@ -263,7 +262,7 @@ class Route extends RouteProperties implements RouteMutator
      * @param array $visibleValues
      * @param array $expandValues
      * @param string $prefix
-     * @param int $currentDepth
+     * @param array $path
      * @return void
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
@@ -272,15 +271,18 @@ class Route extends RouteProperties implements RouteMutator
         string $context,
         array &$visibleValues,
         array &$expandValues,
-        $prefix = '',
-        $currentDepth = 0
+        string $prefix = '',
+        array $path = []
     ) {
-        $currentDepth ++;
-        if ($currentDepth > self::MAX_EXPAND_DEPTH) {
+        if (count($path) >= $this->getMaxExpandDepth()) {
             return;
         }
 
-        if (!$field->isViewable($context) || !$field->isExpandable()) {
+        if (
+            !$field->isViewable($context) ||
+            !$field->isExpandable() ||
+            $field->getExpandAction() === Action::IDENTIFIER
+        ) {
             return;
         }
 
@@ -291,18 +293,29 @@ class Route extends RouteProperties implements RouteMutator
         $related = $field->getChildResource();
 
         foreach ($related->getFields() as $relatedField) {
-            if ($relatedField->isVisible()) {
-                $visibleValues[] = $prefix . $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+            /** @var Field $relatedField */
+            $alreadySelected = in_array($field->getDisplayName(), $path);
+            if ($alreadySelected) {
+                continue;
             }
 
+            // @todo do something differently here
+            if (!$relatedField->isViewable($field->getExpandAction())) {
+                continue;
+            }
+
+            $visibleValues[] = $prefix . $field->getDisplayName() . '.' . $relatedField->getDisplayName();
+
             if ($relatedField instanceof RelationshipField) {
+                $newPath = array_merge($path, [ $field->getDisplayName() ]);
+
                 $this->addExpandableValues(
                     $relatedField,
                     $context,
                     $visibleValues,
                     $expandValues,
                     $prefix . $field->getDisplayName() . '.',
-                    $currentDepth + 1
+                    $newPath
                 );
             }
         }

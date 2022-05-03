@@ -20,6 +20,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     const OPTIONS_PARENT_IDENTIFIER_NAME = 'parentId';
     const OPTIONS_IDENTIFIER_TRANSFORMER = 'identifier_transformer';
     const OPTIONS_ONLY_INCLUDE_METHODS = 'only';
+    const OPTIONS_MAX_EXPAND_DEPTH = 'maxExpandDepth';
 
     // 'index', 'view', 'store', 'edit', 'destroy'
     const OPTIONS_METHOD_INDEX = 'index';
@@ -210,6 +211,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
         ];
 
         $id = $options[self::OPTIONS_IDENTIFIER_NAME] ?? 'id';
+        $maxExpandDepth = $options[self::OPTIONS_MAX_EXPAND_DEPTH] ?? 2;
 
         $group = $this->group([]);
 
@@ -219,7 +221,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
-                ->returns()->statusCode(200)->many($resourceDefinitionFactory->getDefault());
+                ->returns()->statusCode(200)->many($resourceDefinitionFactory->getDefault())
+                ->maxExpandDepth($maxExpandDepth);
         }
 
         if (in_array(self::OPTIONS_METHOD_VIEW, $only)) {
@@ -229,7 +232,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
                     return 'View a single ' . $entityName;
                 })
-                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault())
+                ->maxExpandDepth($maxExpandDepth);
 
             $this->addIdParameterToRoutePath($viewRoute, $id, $options);
         }
@@ -242,7 +246,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     return 'Create a new ' . $entityName;
                 })
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
-                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault())
+                ->maxExpandDepth($maxExpandDepth);
         }
 
         if (in_array(self::OPTIONS_METHOD_EDIT, $only)) {
@@ -253,7 +258,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     return 'Update an existing ' . $entityName;
                 })
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
-                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault())
+                ->maxExpandDepth($maxExpandDepth);
 
             $this->addIdParameterToRoutePath($editRoute, $id, $options);
         }
@@ -266,7 +272,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                     return 'Patch an existing ' . $entityName;
                 })
                 ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
-                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault())
+                ->maxExpandDepth($maxExpandDepth);
 
             $this->addIdParameterToRoutePath($patchRoute, $id, $options);
         }

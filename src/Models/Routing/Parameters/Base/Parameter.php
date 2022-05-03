@@ -295,6 +295,15 @@ class Parameter implements RouteMutator, Property
     }
 
     /**
+     * @param int $maxDepth
+     * @return RouteMutator
+     */
+    public function maxExpandDepth(int $maxDepth) : RouteMutator
+    {
+        return $this->route->maxExpandDepth($maxDepth);
+    }
+
+    /**
      * Merge properties
      * @param Parameter $parameter
      * @return static

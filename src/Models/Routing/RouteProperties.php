@@ -55,6 +55,12 @@ abstract class RouteProperties implements RouteMutator
      */
     private $defaultOrder;
 
+
+    /**
+     * @var int
+     */
+    private $maxExpandDepth = 2;
+
     /**
      * RouteCollection constructor.
      * @param array $options
@@ -248,6 +254,24 @@ abstract class RouteProperties implements RouteMutator
     public function getDefaultOrder()
     {
         return $this->defaultOrder;
+    }
+
+    /**
+     * @param int $maxExpandDepth
+     * @return $this
+     */
+    public function maxExpandDepth(int $maxExpandDepth): RouteMutator
+    {
+        $this->maxExpandDepth = $maxExpandDepth;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxExpandDepth()
+    {
+        return $this->maxExpandDepth;
     }
 
     /**

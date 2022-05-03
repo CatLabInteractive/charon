@@ -48,4 +48,10 @@ interface RouteMutator
      * @return mixed
      */
     public function defaultOrder(string $order, $direction = OrderParameter::ASC) : RouteMutator;
+
+    /**
+     * @param int $maxDepth
+     * @return RouteMutator
+     */
+    public function maxExpandDepth(int $maxDepth): RouteMutator;
 }

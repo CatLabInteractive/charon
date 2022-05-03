@@ -354,4 +354,13 @@ class ReturnValue implements RouteMutator
     {
         return $this->description;
     }
+
+    /**
+     * @param int $maxDepth
+     * @return RouteMutator
+     */
+    public function maxExpandDepth(int $maxDepth) : RouteMutator
+    {
+        return $this->parent->maxExpandDepth($maxDepth);
+    }
 }
