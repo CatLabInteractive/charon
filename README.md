@@ -26,21 +26,21 @@ https://github.com/CatLabInteractive/laravel-charon
 Why?
 ====
 When building a RESTful API there are a few things that keep coming back:
-* Entity to resource transformation
-* API description
-* Resource field filtering
-* Relationship and expanding these relationships
-* Filtering
-* Sorting
-* Pagination
+ * Entity to resource transformation
+ * API description
+ * Resource field filtering
+ * Relationship and expanding these relationships
+ * Filtering
+ * Sorting
+ * Pagination
 
 Charon tries to take some of this work away by providing a 
 framework that takes care of most of these features.
-* Instead of transformers, write definitions
-* Filter and sort based on these definitions
-* Allow clients to choose fields that should be returned
-* Expand relationships in a single request
-* Handle all pagination in one single middleware
+ * Instead of transformers, write definitions
+ * Filter and sort based on these definitions
+ * Allow clients to choose fields that should be returned
+ * Expand relationships in a single request
+ * Handle all pagination in one single middleware
 
 Documentation
 =============
