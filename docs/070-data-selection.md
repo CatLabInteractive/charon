@@ -19,6 +19,12 @@ included in the `Resource`.
 To return all fields that are loaded by default, use an asterix ('*'). In general use this won't be needed, but 
 in case you expand relationships it could be handy (ie: `?expand=owner&fields=name,owner.*`)
 
+Input transformation
+--------------------
+Note that the filter values are automatically transformed to the expected datatype (as defined by the resource definition) 
+in a Laravel middleware. That means that when you access those fields through 'normal' ways (like `\Request::query()`),
+you will also get the transformed values back.
+
 Expanded relationships
 ----------------------
 Relationship fields can be marked as `expendable`, in which case it is possible to include the content of the relationship 
@@ -74,3 +80,6 @@ notation. `?expand=user.company.address` for example would expand the address fi
   }
 }
 ```
+
+For complex filters it is possible to declare a static method that handles the filtering. In order to do so, declare a 
+static method on your entity called `filter{FieldName}()`.
