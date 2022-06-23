@@ -16,7 +16,7 @@ function HomepageHeader() {
 
          <div>
              <img src="/img/charon-big.jpg" /> <br />
-             <p><small>Charons boat in The Last Judgment - Michelangelo</small></p>
+             <p><small>Charons boat in 'The Last Judgment' - Michelangelo</small></p>
          </div>
 
         <div className={styles.buttons}>

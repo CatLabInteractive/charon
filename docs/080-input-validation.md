@@ -16,45 +16,45 @@ The `validate()` method takes a `Context` object to specify which validation rul
 method throws a `ResourceValidationException` that can be transformed in an array of validation error messages.
 
 ```php
-    public function store(Request $request)
-    {
-        $writeContext = $this->getContext(Action::CREATE);
-        $inputResource = $this->bodyToResource($writeContext);
-    
-        try {
-            $inputResource->validate($writeContext);
-    
-            // also see if we can create this entity.
-            $this->authorizeCreateFromResource($request, $inputResource);
-    
-        } catch (ResourceValidationException $e) {
-            return $this->getValidationErrorResponse($e);
-        }
-    
-        [...]
+public function store(Request $request)
+{
+    $writeContext = $this->getContext(Action::CREATE);
+    $inputResource = $this->bodyToResource($writeContext);
+
+    try {
+        $inputResource->validate($writeContext);
+
+        // also see if we can create this entity.
+        $this->authorizeCreateFromResource($request, $inputResource);
+
+    } catch (ResourceValidationException $e) {
+        return $this->getValidationErrorResponse($e);
     }
 
-    /**
-     * @param ResourceValidationException $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function getValidationErrorResponse(ResourceValidationException $e)
-    {
-        $errors = [];
-        foreach ($e->getMessages()->toMap() as $fieldErrorMessages) {
-            foreach ($fieldErrorMessages as $fieldErrorMessage) {
+    [...]
+}
 
-                $errors[] = [
-                    'title' => 'Could not decode resource.',
-                    'detail' => $fieldErrorMessage
-                ];
-            }
+/**
+ * @param ResourceValidationException $e
+ * @return \Symfony\Component\HttpFoundation\Response
+ */
+protected function getValidationErrorResponse(ResourceValidationException $e)
+{
+    $errors = [];
+    foreach ($e->getMessages()->toMap() as $fieldErrorMessages) {
+        foreach ($fieldErrorMessages as $fieldErrorMessage) {
+
+            $errors[] = [
+                'title' => 'Could not decode resource.',
+                'detail' => $fieldErrorMessage
+            ];
         }
-
-        return Response::json([ 'errors' => $errors ])
-            ->header('Content-type', 'application/vnd.api+json')
-            ->setStatusCode(422);
     }
+
+    return Response::json([ 'errors' => $errors ])
+        ->header('Content-type', 'application/vnd.api+json')
+        ->setStatusCode(422);
+}
 
 ```
 
