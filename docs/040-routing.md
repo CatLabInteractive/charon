@@ -98,5 +98,13 @@ request content type to select an InputParser.
 Enum and allowMultiple
 ----------------------
 On post and query parameters you can define a list of allowed values (`enum()`)
-and check if multiple values are allowed (`allowMultiple()`). By default comma separated
+and check if multiple values are allowed (`allowMultiple()`). By default, comma separated
 values are expected, but you can handle the input however you want.
+
+Default resource routes
+-----------------------
+`CatLab\Charon\Collections\RouteCollection` has a method `resource` that defines a default set of CRUD endpoints. 
+Additional configuration properties can be set to change the behaviour of this method.
+
+This method is also used by the `CrudController` trait that contains basic implementation for this endpoints.
+

@@ -21,7 +21,7 @@ Installation
 Configuration
 -------------
 Please follow the instructions on 
-https://github.com/CatLabInteractive/laravel-charon
+https://github.com/CatLabInteractive/laravel-charon-template
 
 Why?
 ====

@@ -107,3 +107,6 @@ class SimplePetController
 In our [Laravel package](https://github.com/catlabinteractive/charon-laravel) you can find our CrudController trait 
 that implements all this functionality by default. This implements a default method for all CRUD methods and also 
 implements Laravel policy checks.
+
+Our CrudController also has a method `applyGlobalFilters()` that can be used to define filters that will be called 
+for every collection.
