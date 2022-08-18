@@ -48,6 +48,12 @@ class Field implements Property, ResourceDefinitionManipulator
     protected $displayName;
 
     /**
+     * Specify a human readable name to show in a potential editor.
+     * @var string
+     */
+    protected $labelName;
+
+    /**
      * @var ResourceDefinition
      */
     protected $resourceDefinition;
@@ -168,6 +174,36 @@ class Field implements Property, ResourceDefinitionManipulator
     public function display($name)
     {
         return $this->setDisplayName($name);
+    }
+
+    /**
+     * @param $name
+     * @return $this
+     */
+    public function setLabel($name)
+    {
+        $this->labelName = $name;
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return $this
+     */
+    public function label($name)
+    {
+        return $this->setLabel($name);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        if ($this->labelName) {
+            return $this->labelName;
+        }
+        return $this->getDisplayName();
     }
 
     /**
