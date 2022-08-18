@@ -54,6 +54,11 @@ class Field implements Property, ResourceDefinitionManipulator
     protected $labelName;
 
     /**
+     * @var string
+     */
+    protected $description;
+
+    /**
      * @var ResourceDefinition
      */
     protected $resourceDefinition;
@@ -203,7 +208,7 @@ class Field implements Property, ResourceDefinitionManipulator
         if ($this->labelName) {
             return $this->labelName;
         }
-        return $this->getDisplayName();
+        return ucfirst($this->getDisplayName());
     }
 
     /**
@@ -431,6 +436,24 @@ class Field implements Property, ResourceDefinitionManipulator
     public function isSearchable()
     {
         return false;
+    }
+
+    /**
+     * @param string $description
+     * @return $this
+     */
+    public function describe(string $description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
