@@ -15,7 +15,7 @@ abstract class Singleton
     }
 
     /**
-     * @return mixed
+     * @return static
      */
     final public static function instance()
     {

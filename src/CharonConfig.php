@@ -5,6 +5,10 @@ namespace CatLab\Charon;
 use CatLab\Charon\Models\Singleton;
 use CatLab\Charon\Transformers\ArrayTransformer;
 
+// Optional library
+use HTMLPurifier;
+use HTMLPurifier_Config;
+
 /**
  * Class CharonConfig
  * @package CatLab\Charon
@@ -17,10 +21,48 @@ class CharonConfig extends Singleton
     public $defaultArrayTransformer = ArrayTransformer::class;
 
     /**
+     * @var HTMLPurifier
+     */
+    private $htmlPurifier;
+
+    /**
+     * @var callable
+     */
+    private $htmlPurifierFactory;
+
+    /**
      * @return string
      */
     public function getDefaultArrayTransformer()
     {
         return $this->defaultArrayTransformer;
+    }
+
+    /**
+     * @param HTMLPurifier $purifier
+     * @return $this
+     */
+    public function setHtmlPurifierFactory(callable $factory)
+    {
+        $this->htmlPurifierFactory = $factory;
+        return $this;
+    }
+
+    /**
+     * @return HTMLPurifier
+     */
+    public function getHtmlPurifier()
+    {
+        if (!isset($this->htmlPurifier)) {
+
+            if (isset($this->htmlPurifierFactory)) {
+                $this->htmlPurifier = call_user_func($this->htmlPurifierFactory);
+            } else {
+                $config = HTMLPurifier_Config::createDefault();
+                $this->htmlPurifier = new HTMLPurifier($config);
+            }
+        }
+
+        return $this->htmlPurifier;
     }
 }

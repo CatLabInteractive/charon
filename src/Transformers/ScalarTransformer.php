@@ -121,6 +121,7 @@ class ScalarTransformer implements Transformer
                 return floatval($value);
 
             case PropertyType::STRING:
+            case PropertyType::HTML:
                 return strval($value);
 
             default:

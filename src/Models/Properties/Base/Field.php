@@ -14,7 +14,9 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use CatLab\Charon\Models\Properties\ResourceField;
 use CatLab\Charon\Models\ResourceDefinition;
 use CatLab\Charon\Transformers\DateTransformer;
+use CatLab\Charon\Transformers\HtmlTransformer;
 use CatLab\Charon\Transformers\ScalarTransformer;
+use CatLab\Charon\Validation\HtmlValidator;
 use CatLab\Requirements\Enums\PropertyType;
 use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Interfaces\Property;
@@ -485,6 +487,17 @@ class Field implements Property, ResourceDefinitionManipulator
     public function datetime($transformer = DateTransformer::class)
     {
         $this->type = PropertyType::DATETIME;
+        $this->transformer($transformer);
+        return $this;
+    }
+
+    /**
+     * @param $transformer
+     * @return $this
+     */
+    public function html($transformer = HtmlTransformer::class)
+    {
+        $this->type = PropertyType::HTML;
         $this->transformer($transformer);
         return $this;
     }
