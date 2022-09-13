@@ -6,6 +6,7 @@ use CatLab\Base\Interfaces\Database\SelectQueryParameters;
 use CatLab\Base\Interfaces\Pagination\PaginationBuilder;
 use CatLab\Base\Models\Database\OrderParameter;
 use CatLab\Base\Models\Database\DB;
+use CatLab\Charon\CharonConfig;
 use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\ResourceCollection;
@@ -76,7 +77,7 @@ class PaginationProcessor implements Processor
         // the amount of records we want.
         $records = intval($transformer->getRequestResolver()->getRecords($request));
         if ($records < 1) {
-            $records = 10;
+            $records = CharonConfig::instance()->getDefaultRecordCount();
         }
         $builder->limit($records);
 

@@ -31,6 +31,11 @@ class CharonConfig extends Singleton
     private $htmlPurifierFactory;
 
     /**
+     * @var int
+     */
+    private $defaultRecordCount = 25;
+
+    /**
      * @return string
      */
     public function getDefaultArrayTransformer()
@@ -64,5 +69,23 @@ class CharonConfig extends Singleton
         }
 
         return $this->htmlPurifier;
+    }
+
+    /**
+     * @param int $records
+     * @return $this
+     */
+    public function setDefaultRecordCount(int $records)
+    {
+        $this->defaultRecordCount = $records;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultRecordCount()
+    {
+        return $this->defaultRecordCount;
     }
 }
