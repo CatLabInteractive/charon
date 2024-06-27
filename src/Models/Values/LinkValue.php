@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values;
 
 use CatLab\Charon\Models\CurrentPath;
@@ -23,7 +25,7 @@ class LinkValue extends Value
      * @param $link
      * @return $this
      */
-    public function setLink($link)
+    public function setLink($link): static
     {
         $this->link = $link;
         return $this;
@@ -60,7 +62,7 @@ class LinkValue extends Value
     /**
      * @return mixed
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             ResourceTransformer::RELATIONSHIP_LINK => $this->link
@@ -73,7 +75,7 @@ class LinkValue extends Value
      * @param bool $validateNonProvidedFields
      * @throws PropertyValidationException
      */
-    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true)
+    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true): void
     {
         $this->getField()->validate($this->value, $path, $validateNonProvidedFields);
     }

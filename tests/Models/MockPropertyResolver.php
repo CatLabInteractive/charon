@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Models;
 
 class MockPropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
@@ -8,7 +10,7 @@ class MockPropertyResolver extends \CatLab\Charon\Resolvers\PropertyResolver
      * @param string $path
      * @return mixed
      */
-    public function splitPathParameters(string $path)
+    protected function splitPathParameters(string $path)
     {
         return parent::splitPathParameters($path);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Exceptions;
 
 use CatLab\Charon\Interfaces\ErrorMessage;
@@ -17,7 +19,7 @@ class TranslatableErrorMessage implements ErrorMessage
     /**
      * @var mixed[]
      */
-    private $values;
+    private array $values;
 
     /**
      * @param $template
@@ -57,7 +59,7 @@ class TranslatableErrorMessage implements ErrorMessage
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getMessage();
     }

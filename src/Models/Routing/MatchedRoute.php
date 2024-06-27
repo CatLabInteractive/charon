@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 
@@ -12,15 +14,12 @@ use CatLab\Charon\Exceptions\InvalidPropertyException;
  */
 class MatchedRoute
 {
-    /**
-     * @var Route
-     */
-    private $route;
+    private \CatLab\Charon\Models\Routing\Route $route;
 
     /**
      * @var mixed[]
      */
-    private $parameters;
+    private array $parameters;
 
     /**
      * MatchedRoute constructor.
@@ -38,12 +37,13 @@ class MatchedRoute
      * @return mixed
      * @throws InvalidPropertyException
      */
-    public function getControllerClass()
+    public function getControllerClass(): string
     {
         $action = explode('@', $this->route->getAction());
         if (count($action) !== 2) {
             throw InvalidPropertyException::makeTranslatable('Route action must be of type ClassName@action');
         }
+
         return $action[0];
     }
 
@@ -51,12 +51,13 @@ class MatchedRoute
      * @return mixed
      * @throws InvalidPropertyException
      */
-    public function getControllerAction()
+    public function getControllerAction(): string
     {
         $action = explode('@', $this->route->getAction());
         if (count($action) !== 2) {
             throw InvalidPropertyException::makeTranslatable('Route action must be of type ClassName@action.');
         }
+
         return $action[1];
     }
 

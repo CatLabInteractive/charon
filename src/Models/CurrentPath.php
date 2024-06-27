@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -15,17 +17,15 @@ class CurrentPath implements Countable
     /**
      * @var Field[]
      */
-    private $fields;
+    private array $fields = [];
 
     /**
      * @var string[]
      */
-    private $displayNames;
+    private array $displayNames = [];
 
     public function __construct()
     {
-        $this->fields = [];
-        $this->displayNames = [];
     }
 
     /**
@@ -33,22 +33,23 @@ class CurrentPath implements Countable
      * @param string[] $displayNames
      * @return array|CurrentPath
      */
-    public static function fromArray(array $displayNames)
+    public static function fromArray(array $displayNames): self
     {
         $path = new self();
         foreach ($displayNames as $v) {
             $path->push(new ResourceField(new ResourceDefinition(null), $v));
         }
+
         return $path;
     }
 
-    public function push(Field $field)
+    public function push(Field $field): void
     {
         $this->fields[] = $field;
         $this->displayNames[] = $field->getDisplayName();
     }
 
-    public function pop()
+    public function pop(): ?\CatLab\Charon\Models\Properties\Base\Field
     {
         array_pop($this->displayNames);
         return array_pop($this->fields);
@@ -58,7 +59,7 @@ class CurrentPath implements Countable
      * @param Field $field
      * @return CurrentPath
      */
-    public function clonePush(Field $field)
+    public function clonePush(Field $field): static
     {
         $path = clone $this;
         $path->push($field);
@@ -92,14 +93,15 @@ class CurrentPath implements Countable
      * @param Field $field
      * @return int
      */
-    public function countSame(Field $field)
+    public function countSame(Field $field): int
     {
         $sum = 0;
         foreach ($this->fields as $v) {
             if ($v === $field) {
-                $sum ++;
+                ++$sum;
             }
         }
+
         return $sum;
     }
 
@@ -116,7 +118,7 @@ class CurrentPath implements Countable
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $displayNames = $this->toArray();
         if (!is_array($displayNames)) {

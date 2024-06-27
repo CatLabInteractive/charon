@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
@@ -19,16 +21,13 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  */
 class ChildrenValue extends RelationshipValue
 {
-    /**
-     * @var ResourceCollection
-     */
-    private $children;
+    private ?\CatLab\Charon\Collections\ResourceCollection $children = null;
 
     /**
      * @param ResourceCollection $children
      * @return $this
      */
-    public function setChildren(ResourceCollection $children)
+    public function setChildren(ResourceCollection $children): static
     {
         $this->children = $children;
         return $this;
@@ -54,8 +53,9 @@ class ChildrenValue extends RelationshipValue
 
     /**
      * @inheritDoc
+     * @return mixed[]
      */
-    public function getTransformedEntityValue(Context $context = null)
+    public function getTransformedEntityValue(Context $context = null): array
     {
         $out = [];
         foreach ($this->children as $child) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values;
 
 use CatLab\Charon\Interfaces\Context;
@@ -17,7 +19,7 @@ class PropertyValue extends \CatLab\Charon\Models\Values\Base\Value
      * @param bool $validateNonProvidedFields
      * @throws \CatLab\Requirements\Exceptions\PropertyValidationException
      */
-    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true)
+    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true): void
     {
         $this->getField()->validate($this->value, $path, $validateNonProvidedFields);
     }

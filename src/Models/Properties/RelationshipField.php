@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
@@ -19,25 +21,16 @@ use CatLab\Charon\Validation\Requirements\RelationshipExists;
  */
 class RelationshipField extends Field
 {
-    /**
-     * @var string
-     */
-    private $cardinality;
+    private string $cardinality = Cardinality::MANY;
 
     /**
      * @var ResourceDefinitionContract
      */
     private $childResource;
 
-    /**
-     * @var bool
-     */
-    private $expandable;
+    private bool $expandable = false;
 
-    /**
-     * @var bool
-     */
-    private $expanded;
+    private bool $expanded = false;
 
     /**
      * @var string
@@ -47,22 +40,19 @@ class RelationshipField extends Field
     /**
      * @var string[]
      */
-    private $linkActions;
+    private array $linkActions = [];
 
     /**
      * @var string[]
      */
-    private $createActions;
+    private array $createActions = [];
 
     /**
      * @var string
      */
     private $expandContext;
 
-    /**
-     * @var string
-     */
-    private $defaultExpandContext = Action::IDENTIFIER;
+    private string $defaultExpandContext = Action::IDENTIFIER;
 
     /**
      * @var int
@@ -72,17 +62,14 @@ class RelationshipField extends Field
     /**
      * @var mixed
      */
-    private $meta;
+    private array $meta = [];
 
-    /**
-     * @var int
-     */
-    private $maxDepth = 1;
+    private int $maxDepth = 1;
 
     /**
      * @var array[]
      */
-    private $sortBy = [];
+    private array $sortBy = [];
 
     /**
      * RelationshipField constructor.
@@ -97,20 +84,13 @@ class RelationshipField extends Field
     ) {
         parent::__construct($resourceDefinition, $fieldName);
 
-        $this->linkActions = [];
-        $this->createActions = [];
-
         $this->childResource = $childResource;
-        $this->cardinality = Cardinality::MANY;
-        $this->expandable = false;
-        $this->expanded = false;
-        $this->meta = [];
     }
 
     /**
      * @return $this
      */
-    public function one()
+    public function one(): static
     {
         $this->cardinality = Cardinality::ONE;
         return $this;
@@ -119,7 +99,7 @@ class RelationshipField extends Field
     /**
      * @return $this
      */
-    public function many()
+    public function many(): static
     {
         $this->cardinality = Cardinality::MANY;
         return $this;
@@ -129,7 +109,7 @@ class RelationshipField extends Field
      * @param $records
      * @return $this
      */
-    public function records($records)
+    public function records($records): static
     {
         $this->records = $records;
         return $this;
@@ -154,7 +134,7 @@ class RelationshipField extends Field
     public function expandable(
         $expandContextAction = Action::INDEX,
         $defaultExpandContext = null
-    ) {
+    ): static {
         if (isset($defaultExpandContext)) {
             $this->expanded($defaultExpandContext, $expandContextAction);
             return $this;
@@ -174,13 +154,9 @@ class RelationshipField extends Field
     public function expanded(
         $expandContextAction = Action::INDEX,
         $explicitExpandContextAction = null
-    ) {
+    ): static {
         if ($explicitExpandContextAction === null) {
-            if (!isset($this->expandContext)) {
-                $explicitExpandContextAction = $expandContextAction;
-            } else {
-                $explicitExpandContextAction = $this->expandContext;
-            }
+            $explicitExpandContextAction = $this->expandContext ?? $expandContextAction;
         }
 
         $this->defaultExpandContext = $expandContextAction;
@@ -194,7 +170,7 @@ class RelationshipField extends Field
      * @param $url
      * @return $this
      */
-    public function url($url)
+    public function url($url): static
     {
         $this->relationUrl = $url;
         return $this;
@@ -293,7 +269,7 @@ class RelationshipField extends Field
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldExpand(Context $context, CurrentPath $currentPath)
+    public function shouldExpand(Context $context, CurrentPath $currentPath): bool
     {
         return $this->getExpandContext($context, $currentPath) !== false;
     }
@@ -307,8 +283,8 @@ class RelationshipField extends Field
     {
         // is requested by the context?
         if (
-            $context &&
-            $path &&
+            $context instanceof \CatLab\Charon\Interfaces\Context &&
+            $path instanceof \CatLab\Charon\Models\CurrentPath &&
             $this->isExpandable() && $context->shouldExpandField($path)
         ) {
             return $this->expandContext;
@@ -369,7 +345,7 @@ class RelationshipField extends Field
     /**
      * @return bool
      */
-    public function canSetProperty()
+    public function canSetProperty(): bool
     {
         return false;
     }
@@ -379,7 +355,7 @@ class RelationshipField extends Field
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function canCreateNewChildren(Context $context)
+    public function canCreateNewChildren(Context $context): bool
     {
         $action = $context->getAction();
         return isset($this->createActions[$action]) && $this->createActions[$action];
@@ -388,7 +364,7 @@ class RelationshipField extends Field
     /**
      * @return bool
      */
-    public function canLinkExistingEntities(Context $context)
+    public function canLinkExistingEntities(Context $context): bool
     {
         $action = $context->getAction();
         return isset($this->linkActions[$action]) && $this->linkActions[$action];
@@ -399,7 +375,7 @@ class RelationshipField extends Field
      * @param mixed $value
      * @return $this
      */
-    public function addMeta(string $key, $value)
+    public function addMeta(string $key, $value): static
     {
         $this->meta = array_merge($this->meta, [ $key => $value ]);
         return $this;
@@ -409,7 +385,7 @@ class RelationshipField extends Field
      * @param int $depth
      * @return $this
      */
-    public function maxDepth(int $depth)
+    public function maxDepth(int $depth): static
     {
         $this->maxDepth = $depth;
         return $this;
@@ -428,7 +404,7 @@ class RelationshipField extends Field
      * @param string $direction
      * @return $this
      */
-    public function orderBy($field, $direction = OrderParameter::ASC)
+    public function orderBy($field, $direction = OrderParameter::ASC): static
     {
         $this->sortBy[] = [ $field, $direction ];
         return $this;
@@ -445,7 +421,7 @@ class RelationshipField extends Field
     /**
      * @return Field|void
      */
-    public function required()
+    public function required(): static
     {
         $this->addRequirement(new RelationshipExists());
         return $this;

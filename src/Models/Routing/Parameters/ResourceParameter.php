@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing\Parameters;
 
 use CatLab\Charon\Enums\Action;
@@ -18,10 +20,7 @@ class ResourceParameter extends Parameter
      */
     private $resourceDefinition;
 
-    /**
-     * @var string
-     */
-    private $cardinality = Cardinality::ONE;
+    private string $cardinality = Cardinality::ONE;
 
     /**
      * @var Action
@@ -41,7 +40,7 @@ class ResourceParameter extends Parameter
     /**
      * @return $this
      */
-    public function one()
+    public function one(): static
     {
         $this->cardinality = Cardinality::ONE;
         return $this;
@@ -50,7 +49,7 @@ class ResourceParameter extends Parameter
     /**
      * @return $this
      */
-    public function many()
+    public function many(): static
     {
         $this->cardinality = Cardinality::MANY;
         return $this;
@@ -69,7 +68,7 @@ class ResourceParameter extends Parameter
      * @return $this
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function setAction($action)
+    public function setAction($action): static
     {
         Action::checkValid($action);
 

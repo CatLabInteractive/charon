@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Enums;
 
 /**
@@ -8,13 +10,19 @@ namespace CatLab\Charon\Enums;
  */
 class Method
 {
-    const GET = 'get';
-    const POST = 'post';
-    const PUT = 'put';
-    const DELETE = 'delete';
-    const HEAD = 'head';
-    const LINK = 'link';
-    const UNLINK = 'unlink';
+    public const GET = 'get';
+
+    public const POST = 'post';
+
+    public const PUT = 'put';
+
+    public const DELETE = 'delete';
+
+    public const HEAD = 'head';
+
+    public const LINK = 'link';
+
+    public const UNLINK = 'unlink';
 
     /**
      * @param string $method

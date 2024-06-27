@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values\Base;
 
 use CatLab\Charon\Exceptions\EntityNotFoundException;
@@ -33,15 +35,9 @@ use CatLab\Requirements\Models\TranslatableMessage;
  */
 abstract class RelationshipValue extends Value
 {
-    /**
-     * @var string
-     */
-    private $url;
+    private ?string $url = null;
 
-    /**
-     * @var Context
-     */
-    private $context;
+    private ?\CatLab\Charon\Interfaces\Context $context = null;
 
     /**
      * @return RESTResource[]
@@ -194,7 +190,7 @@ abstract class RelationshipValue extends Value
         PropertySetter $propertySetter,
         EntityFactory $factory,
         Context $context
-    ) {
+    ): void {
         $children = $this->getChildrenToProcess();
 
         $childrenToAdd = [];
@@ -281,7 +277,7 @@ abstract class RelationshipValue extends Value
         &$childrenToAdd,
         &$childrenToEdit,
         &$identifiersToKeep
-    ) {
+    ): void {
         /** @var RelationshipField $field */
         $field = $this->getField();
 
@@ -363,7 +359,7 @@ abstract class RelationshipValue extends Value
      * @throws ResourceException
      * @throws \CatLab\Requirements\Exceptions\ValidationException
      */
-    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true)
+    public function validate(Context $context, CurrentPath $path, $validateNonProvidedFields = true): void
     {
         $messages = new MessageCollection();
 

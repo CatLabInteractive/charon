@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
@@ -19,7 +21,7 @@ class ResourceFieldCollection extends Collection
     /**
      * @return ResourceFieldCollection
      */
-    public function getIdentifiers()
+    public function getIdentifiers(): self
     {
         $out = new self();
         foreach ($this as $v) {
@@ -27,6 +29,7 @@ class ResourceFieldCollection extends Collection
                 $out->add($v);
             }
         }
+
         return $out;
     }
 
@@ -42,6 +45,7 @@ class ResourceFieldCollection extends Collection
                 return $v;
             }
         }
+
         return null;
     }
 
@@ -57,13 +61,14 @@ class ResourceFieldCollection extends Collection
                 return $v;
             }
         }
+
         return null;
     }
 
     /**
      * @return array|ResourceFieldCollection
      */
-    public function getSortable()
+    public function getSortable(): self
     {
         $out = new self();
         foreach ($this as $v) {
@@ -79,7 +84,7 @@ class ResourceFieldCollection extends Collection
     /**
      * @return array|ResourceFieldCollection
      */
-    public function getExpendable()
+    public function getExpendable(): self
     {
         $out = new self();
         foreach ($this as $v) {
@@ -96,7 +101,7 @@ class ResourceFieldCollection extends Collection
      * @param $action
      * @return array|ResourceFieldCollection
      */
-    public function getWithAction($action)
+    public function getWithAction($action): self
     {
         $out = new self();
         foreach ($this as $v) {
@@ -115,7 +120,7 @@ class ResourceFieldCollection extends Collection
      * @param CurrentPath|null $path
      * @return array|ResourceFieldCollection
      */
-    public function getIncludedInContext(Context $context, CurrentPath $path = null)
+    public function getIncludedInContext(Context $context, CurrentPath $path = null): self
     {
         if (!isset($path)) {
             $path = new CurrentPath();
@@ -135,7 +140,7 @@ class ResourceFieldCollection extends Collection
     /**
      * @return ResourceFieldCollection
      */
-    public function getRelationships()
+    public function getRelationships(): self
     {
         $out = new self();
         foreach ($this as $v) {
@@ -143,6 +148,7 @@ class ResourceFieldCollection extends Collection
                 $out->add($v);
             }
         }
+
         return $out;
     }
 }

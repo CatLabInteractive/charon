@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing\Parameters;
 
 use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
@@ -19,7 +21,7 @@ class HeaderParameter extends Parameter
         parent::__construct($name, self::IN_FORM);
     }
 
-    public function getIn()
+    public function getIn(): string
     {
         return 'header';
     }

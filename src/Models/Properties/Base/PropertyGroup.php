@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Properties\Base;
 
 use CatLab\Charon\Interfaces\ResourceDefinitionManipulator;
@@ -17,15 +19,12 @@ use CatLab\Requirements\Interfaces\Validator;
  */
 class PropertyGroup implements ResourceDefinitionManipulator
 {
-    /**
-     * @var ResourceDefinition
-     */
-    private $resourceDefinition;
+    private \CatLab\Charon\Models\ResourceDefinition $resourceDefinition;
 
     /**
      * @var Field[]
      */
-    private $properties;
+    private array $properties;
 
     /**
      * PropertyGroup constructor.

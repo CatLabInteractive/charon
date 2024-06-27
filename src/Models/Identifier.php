@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 /**
@@ -14,7 +16,7 @@ class Identifier extends RESTResource
     /**
      *
      */
-    public static function fromArray(\CatLab\Charon\Interfaces\ResourceDefinition $resourceDefinition, array $data)
+    public static function fromArray(\CatLab\Charon\Interfaces\ResourceDefinition $resourceDefinition, array $data): self
     {
         $identifier = new self($resourceDefinition);
         foreach ($data as $k => $v) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
@@ -19,26 +21,31 @@ use InvalidArgumentException;
  */
 class ResolverBase
 {
-    const CHILDPATH_PATH_SEPARATOR = '.';
-    const CHILDPATH_PARAMETER_SEPARATOR = ':';
-    const CHILDPATH_VARIABLE_OPEN = '{';
-    const CHILDPATH_VARIABLE_CLOSE = '}';
+    public const CHILDPATH_PATH_SEPARATOR = '.';
 
-    const NAMESPACE_MODEL = 'model';
-    const NAMESPACE_CONTEXT = 'context';
-    const NAMESPACE_PARENT = 'parent';
+    public const CHILDPATH_PARAMETER_SEPARATOR = ':';
 
-    const REGEX_ACCOLADE_PARAMETER = '\{(?:[^{}]|(?R))+\}';
-    const REGEX_REGULAR_PARAMETER = '[^{}.\s]+';
+    public const CHILDPATH_VARIABLE_OPEN = '{';
 
-    const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
-    const FILTER_METHOD_PREFIX = 'filter';
-    const SORT_METHOD_PREFIX = 'sort';
+    public const CHILDPATH_VARIABLE_CLOSE = '}';
 
-    /**
-     * @var array
-     */
-    private $methodSniffer = [];
+    public const NAMESPACE_MODEL = 'model';
+
+    public const NAMESPACE_CONTEXT = 'context';
+
+    public const NAMESPACE_PARENT = 'parent';
+
+    public const REGEX_ACCOLADE_PARAMETER = '\{(?:[^{}]|(?R))+\}';
+
+    public const REGEX_REGULAR_PARAMETER = '[^{}.\s]+';
+
+    public const EAGER_LOAD_METHOD_PREFIX = 'eagerLoad';
+
+    public const FILTER_METHOD_PREFIX = 'filter';
+
+    public const SORT_METHOD_PREFIX = 'sort';
+
+    private array $methodSniffer = [];
 
     /**
      * @param ResourceTransformer $transformer
@@ -53,7 +60,7 @@ class ResolverBase
         $entity,
         $path,
         Context $context
-    ) {
+    ): string|array|null {
         $self = $this;
         return preg_replace_callback(
             '/' . self::REGEX_ACCOLADE_PARAMETER . '/',
@@ -63,6 +70,7 @@ class ResolverBase
                         return $this->parseParameter($transformer, $paramName, $context, $entity);
                     }
                 }
+
                 return null;
             },
             $path
@@ -73,7 +81,7 @@ class ResolverBase
      * @param string $path
      * @return mixed
      */
-    protected function splitPathParameters(string $path)
+    protected function splitPathParameters(string $path): array
     {
         // can we do this easier?
         if (strpos($path, self::CHILDPATH_VARIABLE_OPEN) === false) {
@@ -94,7 +102,7 @@ class ResolverBase
 
         foreach ($matches[0] as $v) {
             if ($v == self::CHILDPATH_PARAMETER_SEPARATOR) {
-                $curI --;
+                --$curI;
             }
 
             if (!isset($out[$curI])) {
@@ -105,7 +113,7 @@ class ResolverBase
 
             $lastChar = mb_substr($v, -1);
             if ($lastChar !== self::CHILDPATH_PARAMETER_SEPARATOR) {
-                $curI ++;
+                ++$curI;
             }
         }
 
@@ -127,7 +135,7 @@ class ResolverBase
         Context $context,
         Field $field = null,
         $entity = null
-    ) {
+    ): array {
         $out = [];
         foreach ($parameters as $v) {
             if ($parameter = $this->getParameter($v)) {
@@ -136,28 +144,27 @@ class ResolverBase
                     $out[] = $value;
                 } elseif ($this->isOptionalParameter($v)) {
                     $out[] = null;
+                } elseif ($field) {
+                    throw VariableNotFoundInContext::makeTranslatable(
+                        'Field %s requires a parameter %s to be set in the context, but no such parameter was defined.',
+                        [
+                            $field->getName(),
+                            '$' . $parameter
+                        ]
+                    );
                 } else {
-                    if ($field) {
-                        throw VariableNotFoundInContext::makeTranslatable(
-                            'Field %s requires a parameter %s to be set in the context, but no such parameter was defined.',
-                            [
-                                $field->getName(),
-                                '$' . $parameter
-                            ]
-                        );
-                    } else {
-                        throw VariableNotFoundInContext::makeTranslatable(
-                            'A parameter %s is required to be set in the context, but no such parameter was defined.',
-                            [
-                                '$' . $parameter
-                            ]
-                        );
-                    }
+                    throw VariableNotFoundInContext::makeTranslatable(
+                        'A parameter %s is required to be set in the context, but no such parameter was defined.',
+                        [
+                            '$' . $parameter
+                        ]
+                    );
                 }
             } else {
                 $out[] = $v;
             }
         }
+
         return $out;
     }
 
@@ -172,28 +179,23 @@ class ResolverBase
     {
         // Check for get method
         if ($this->methodExists($entity, 'get'.ucfirst($name))) {
-            return call_user_func_array(array($entity, 'get'.ucfirst($name)), $getterParameters);
+            return call_user_func_array([$entity, 'get'.ucfirst($name)], $getterParameters);
         }
-
-        elseif ($this->methodExists($entity, 'is'.ucfirst($name))) {
-            return call_user_func_array(array($entity, 'is'.ucfirst($name)), $getterParameters);
+        if ($this->methodExists($entity, 'is'.ucfirst($name))) {
+            return call_user_func_array([$entity, 'is'.ucfirst($name)], $getterParameters);
         }
-
-        elseif (
-            is_object($entity) &&
-            property_exists($entity, $name)
-        ) {
+        if (is_object($entity) &&
+        property_exists($entity, $name)) {
             return $entity->$name;
         }
-
-        elseif (isset($entity->$name)) {
+        if (isset($entity->$name)) {
             return $entity->$name;
         }
-
         else {
             //throw new InvalidPropertyException;
             return null;
         }
+        return null;
     }
 
     /**
@@ -215,26 +217,26 @@ class ResolverBase
     ) {
         $name = array_pop($path);
 
-        if (count($path) > 0) {
+        if ($path !== []) {
             $entity = $this->resolveChildPath($transformer, $entity, $path, $field, $context);
             if (!$entity) {
                 return null;
             }
         }
 
-        list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $name, $context, $field, $entity);
+        [$name, $parameters] = $this->getPropertyNameAndParameters($transformer, $name, $context, $field, $entity);
 
         try {
             return $this->getValueFromEntity($entity, $name, $parameters, $context);
-        } catch (InvalidPropertyException $e) {
+        } catch (InvalidPropertyException $invalidPropertyException) {
             throw InvalidPropertyException::makeTranslatable(
                 "Property %s could not be found in %s.",
                 [
                     $name,
                     $field->getResourceDefinition()->getEntityClassName()
                 ],
-                $e->getCode(),
-                $e
+                $invalidPropertyException->getCode(),
+                $invalidPropertyException
             );
         }
     }
@@ -254,12 +256,12 @@ class ResolverBase
         Context $context,
         Field $field,
         $entity = null
-    ) {
+    ): array {
         $parameters = explode(self::CHILDPATH_PARAMETER_SEPARATOR, $name);
         $name = array_shift($parameters);
 
         // Parse the parameters
-        if (count($parameters) > 0) {
+        if ($parameters !== []) {
             $parameters = $this->parseParameters($transformer, $parameters, $context, $field, $entity);
         }
 
@@ -280,7 +282,7 @@ class ResolverBase
         $original,
         Identifier $identifier,
         Context $context
-    ) {
+    ): bool {
         $identifiers = $identifier->getIdentifiers();
 
         if (count($identifiers->getValues()) === 0) {
@@ -303,6 +305,7 @@ class ResolverBase
                 return false;
             }
         }
+
         return true;
     }
 
@@ -320,7 +323,7 @@ class ResolverBase
         $original,
         ResourceFieldCollection $identifiers,
         Context $context
-    ) {
+    ): bool {
         if (count($identifiers) === 0) {
             return false;
         }
@@ -333,6 +336,7 @@ class ResolverBase
                 return false;
             }
         }
+
         return true;
     }
 
@@ -342,7 +346,7 @@ class ResolverBase
      * @param $method
      * @return mixed
      */
-    protected function methodExists($model, $method)
+    protected function methodExists($model, $method): bool
     {
         return method_exists($model, $method);
     }
@@ -351,15 +355,15 @@ class ResolverBase
      * @param $parameter
      * @return null
      */
-    private function getParameter($parameter)
+    private function getParameter($parameter): ?string
     {
         if (mb_substr($parameter, 0, 1) === '{') {
             if (mb_substr($parameter, -2, 1) === '?') {
                 return mb_substr($parameter, 1, -2);
-            } else {
-                return mb_substr($parameter, 1, -1);
             }
+            return mb_substr($parameter, 1, -1);
         }
+
         return null;
     }
 
@@ -367,11 +371,12 @@ class ResolverBase
      * @param $parameter
      * @return bool
      */
-    private function isOptionalParameter($parameter)
+    private function isOptionalParameter($parameter): ?bool
     {
         if (mb_substr($parameter, 0, 1) === '{') {
             return mb_substr($parameter, -2, 1) === '?';
         }
+
         return null;
     }
 
@@ -383,7 +388,7 @@ class ResolverBase
      * @return mixed
      * @throws VariableNotFoundInContext
      */
-    private function parseParameter(ResourceTransformer $transformer, $parameter, Context $context, $entity = null)
+    private function parseParameter(ResourceTransformer $transformer, string $parameter, Context $context, $entity = null)
     {
         $path = explode(self::CHILDPATH_PATH_SEPARATOR, $parameter);
         $namespace = array_shift($path);
@@ -398,9 +403,9 @@ class ResolverBase
             case self::NAMESPACE_MODEL:
                 if ($entity) {
                     return $this->descentIntoParameter($path, $this->getValueFromEntity($entity, $parameterName, $parameters, $context), $context);
-                } else {
-                    return null;
                 }
+                return null;
+
                 break;
 
             case self::NAMESPACE_CONTEXT:
@@ -411,15 +416,15 @@ class ResolverBase
                 $parent = $transformer->getParentEntity();
                 if ($parent) {
                     return $this->descentIntoParameter($path, $this->getValueFromEntity($parent, $parameterName, $parameters, $context), $context);
-                } else {
-                    return null;
                 }
+                return null;
+
                 break;
 
             default:
                 throw new InvalidArgumentException(
                     'Getter parameter ' . $parameter . ' does not have a valid namespace. ' .
-                    '\'' . self::NAMESPACE_MODEL . '\' or \'' . self::NAMESPACE_CONTEXT . '\' expected');
+                    "'" . self::NAMESPACE_MODEL . "' or '" . self::NAMESPACE_CONTEXT . "' expected");
         }
     }
 
@@ -436,17 +441,17 @@ class ResolverBase
         ResourceTransformer $transformer,
         Field $field,
         Context $context,
-        $methodPrefix,
+        string $methodPrefix,
         $additionalParameters = []
-    ) {
+    ): bool {
         $path = $this->splitPathParameters($field->getName());
 
         // Child field
         $fieldName = array_shift($path);
 
         try {
-            list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
-        } catch (VariableNotFoundInContext $e) {
+            [$name, $parameters] = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+        } catch (VariableNotFoundInContext $variableNotFoundInContext) {
             return false;
         }
 
@@ -472,7 +477,7 @@ class ResolverBase
      */
     private function descentIntoParameter(array $path, $parameter, Context $context)
     {
-        if (count($path) === 0) {
+        if ($path === []) {
             return $parameter;
         }
 

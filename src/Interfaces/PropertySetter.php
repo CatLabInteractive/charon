@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\PropertyValueCollection;

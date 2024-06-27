@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Validation;
 
 use CatLab\Requirements\Interfaces\Validator;
@@ -20,7 +22,7 @@ abstract class ResourceValidator implements Validator
      */
     public function isNew()
     {
-        return !isset($this->original);
+        return $this->original === null;
     }
 
     /**

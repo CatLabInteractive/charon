@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Enums\Method;
@@ -16,35 +18,43 @@ use CatLab\Charon\Models\StaticResourceDefinitionFactory;
  */
 class RouteCollection extends RouteProperties implements \ArrayAccess
 {
-    const OPTIONS_IDENTIFIER_NAME = 'id';
-    const OPTIONS_PARENT_IDENTIFIER_NAME = 'parentId';
-    const OPTIONS_IDENTIFIER_TRANSFORMER = 'identifier_transformer';
-    const OPTIONS_ONLY_INCLUDE_METHODS = 'only';
-    const OPTIONS_MAX_EXPAND_DEPTH = 'maxExpandDepth';
+    public const OPTIONS_IDENTIFIER_NAME = 'id';
+
+    public const OPTIONS_PARENT_IDENTIFIER_NAME = 'parentId';
+
+    public const OPTIONS_IDENTIFIER_TRANSFORMER = 'identifier_transformer';
+
+    public const OPTIONS_ONLY_INCLUDE_METHODS = 'only';
+
+    public const OPTIONS_MAX_EXPAND_DEPTH = 'maxExpandDepth';
 
     // 'index', 'view', 'store', 'edit', 'destroy'
-    const OPTIONS_METHOD_INDEX = 'index';
-    const OPTIONS_METHOD_VIEW = 'view';
-    const OPTIONS_METHOD_STORE = 'store';
-    const OPTIONS_METHOD_EDIT = 'edit';
-    const OPTIONS_METHOD_DESTROY = 'destroy';
-    const OPTIONS_METHOD_PATCH = 'patch';
+    public const OPTIONS_METHOD_INDEX = 'index';
+
+    public const OPTIONS_METHOD_VIEW = 'view';
+
+    public const OPTIONS_METHOD_STORE = 'store';
+
+    public const OPTIONS_METHOD_EDIT = 'edit';
+
+    public const OPTIONS_METHOD_DESTROY = 'destroy';
+
+    public const OPTIONS_METHOD_PATCH = 'patch';
 
     /**
      * @var Route[]
      */
-    private $routes;
+    private array $routes = [];
 
     /**
      * @var RouteCollection[]
      */
-    private $children;
+    private array $children = [];
 
     /**
      * Helper to access routes in a collection more dynamically.
-     * @var array
      */
-    private $namedRoutesMap;
+    private array $namedRoutesMap = [];
 
     /**
      * RouteCollection constructor.
@@ -53,10 +63,6 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-
-        $this->routes = [];
-        $this->children = [];
-        $this->namedRoutesMap = [];
     }
 
     /**
@@ -198,7 +204,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function resource($resourceDefinition, $path, $controller, $options)
+    public function resource($resourceDefinition, string $path, string $controller, array $options)
     {
         $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
 
@@ -217,7 +223,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_INDEX, $only)) {
             $group->get($path, $controller . '@index', [], 'index')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
@@ -227,7 +233,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_VIEW, $only)) {
             $viewRoute = $group->get($path . '/{' . $id . '}', $controller . '@view', [], 'view')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'View a single ' . $entityName;
@@ -240,7 +246,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_STORE, $only)) {
             $group->post($path, $controller . '@store', [], 'store')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Create a new ' . $entityName;
@@ -252,7 +258,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_EDIT, $only)) {
             $editRoute = $group->put($path . '/{' . $id . '}', $controller . '@edit', [], 'edit')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Update an existing ' . $entityName;
@@ -266,7 +272,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_PATCH, $only)) {
             $patchRoute = $group->patch($path . '/{' . $id . '}', $controller . '@patch', [], 'patch')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Patch an existing ' . $entityName;
@@ -280,7 +286,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
             $deleteRoute = $group->delete($path . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Delete a ' . $entityName;
@@ -300,7 +306,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param array $options
      * @return void
      */
-    private function addIdParameterToRoutePath(RouteMutator $route, $idName, array $options)
+    private function addIdParameterToRoutePath(RouteMutator $route, $idName, array $options): void
     {
         $idParameter = $route->parameters()->path($idName)->string()->required();
         if (isset($options[self::OPTIONS_IDENTIFIER_TRANSFORMER])) {
@@ -319,7 +325,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @return RouteCollection
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function childResource($resourceDefinition, $parentPath, $childPath, $controller, $options)
+    public function childResource($resourceDefinition, $parentPath, string $childPath, string $controller, array $options)
     {
         $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
 
@@ -339,7 +345,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_INDEX, $only)) {
             $indexRoute = $group->get($parentPath, $controller . '@index', [], 'index')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
                     return 'Returns all ' . $entityName;
                 })
@@ -350,7 +356,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_VIEW, $only)) {
             $viewRoute = $group->get($childPath . '/{' . $id . '}', $controller . '@view', [], 'view')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'View a single ' . $entityName;
@@ -362,7 +368,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_STORE, $only)) {
             $storeRoute = $group->post($parentPath, $controller . '@store', [], 'store')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Create a new ' . $entityName;
@@ -375,7 +381,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_EDIT, $only)) {
             $editRoute = $group->put($childPath . '/{' . $id . '}', $controller . '@edit', [], 'edit')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Update an existing ' . $entityName;
@@ -388,7 +394,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
 
         if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
             $destroyRoute = $group->delete($childPath . '/{' . $id . '}', $controller . '@destroy', [], 'destroy')
-                ->summary(function () use ($resourceDefinitionFactory) {
+                ->summary(function () use ($resourceDefinitionFactory): string {
                     $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
 
                     return 'Delete a ' . $entityName;
@@ -407,9 +413,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     public function getRoutes()
     {
         $out = [];
-        foreach($this->routes as $route) {
-            $out[] = $route;
-        }
+        $out = $this->routes;
 
         foreach ($this->children as $child) {
             foreach ($child->getRoutes() as $route) {
@@ -425,7 +429,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param $action
      * @return array
      */
-    public function getFromAction($action)
+    public function getFromAction($action): array
     {
         $out = [];
         foreach ($this->routes as $route) {
@@ -433,6 +437,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 $out[] = $route;
             }
         }
+
         return $out;
     }
 
@@ -444,13 +449,15 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     public function getFromPath($path, $method)
     {
         foreach ($this->routes as $route) {
-            if (
-                $route->getPath() === $path &&
-                strtoupper($route->getMethod()) === strtoupper($method)
-            ) {
-                return $route;
+            if ($route->getPath() !== $path) {
+                continue;
             }
+            if (strtoupper($route->getMethod()) !== strtoupper($method)) {
+                continue;
+            }
+            return $route;
         }
+
         return null;
     }
 
@@ -467,13 +474,14 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 return $matchedRoute;
             }
         }
+
         return null;
     }
 
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $out = "";
         foreach ($this->getRoutes() as $route) {
@@ -494,7 +502,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param $options
      * @return Route
      */
-    protected function createRoute($method, $path, $action, $options)
+    protected function createRoute($method, $path, $action, $options): \CatLab\Charon\Models\Routing\Route
     {
         return new Route($this, $method, $path, $action, $options);
     }
@@ -503,7 +511,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param $options
      * @return $this
      */
-    protected function createRouteCollection($options)
+    protected function createRouteCollection($options): static
     {
         return new static($options);
     }
@@ -512,13 +520,12 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if (is_string($offset)) {
             return isset($this->namedRoutesMap[$offset]);
-        } else {
-            return isset($this->routes[$offset]);
         }
+        return isset($this->routes[$offset]);
     }
 
     /**
@@ -530,9 +537,8 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
     {
         if (is_string($offset)) {
             return $this->namedRoutesMap[$offset];
-        } else {
-            return $this->routes[$offset];
         }
+        return $this->routes[$offset];
     }
 
     /**
@@ -540,7 +546,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param mixed $value
      * @throws NotImplementedException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw NotImplementedException::makeTranslatable('Cannot set routes this way; use action()');
     }
@@ -549,7 +555,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param mixed $offset
      * @throws NotImplementedException
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw NotImplementedException::makeTranslatable('Cannot unset routes.');
     }

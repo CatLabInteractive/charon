@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use Tests\Models\MockEntityModel;
@@ -8,12 +10,12 @@ use Tests\Models\MockPropertyResolver;
 /**
  * Class PropertyResolverTest
  */
-class PropertyResolverTest extends BaseTest
+final class PropertyResolverTest extends BaseTest
 {
     /**
      *
      */
-    public function testPathParameters()
+    public function testPathParameters(): void
     {
         $propertyResolver = new MockPropertyResolver();
 
@@ -46,7 +48,7 @@ class PropertyResolverTest extends BaseTest
     /**
      *
      */
-    public function testPathParametersWithSubtypes()
+    public function testPathParametersWithSubtypes(): void
     {
         $propertyResolver = new MockPropertyResolver();
 
@@ -64,7 +66,7 @@ class PropertyResolverTest extends BaseTest
     /**
      *
      */
-    public function testResolvePathParameters()
+    public function testResolvePathParameters(): void
     {
         $transformer = $this->getResourceTransformer();
         $propertyResolver = $transformer->getPropertyResolver();

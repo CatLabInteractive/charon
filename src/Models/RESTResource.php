@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Interfaces\Context as ContextContract;
@@ -28,12 +30,9 @@ class RESTResource implements ResourceContract
     /**
      * @var ResourceDefinitionContract
      */
-    private $resourceDefinition;
+    private ResourceDefinitionContract $resourceDefinition;
 
-    /**
-     * @var PropertyValueCollection
-     */
-    private $properties;
+    private \CatLab\Charon\Collections\PropertyValueCollection $properties;
 
     /**
      * @var mixed
@@ -56,7 +55,7 @@ class RESTResource implements ResourceContract
      * @param bool $visible
      * @return $this
      */
-    public function setProperty(Field $field, $value, $visible)
+    public function setProperty(Field $field, $value, $visible): static
     {
         $this->properties->touchProperty($field)->setValue($value)->setVisible($visible);
         return $this;
@@ -69,7 +68,7 @@ class RESTResource implements ResourceContract
      * @param bool $visible
      * @return $this;
      */
-    public function setLink(Context $context, Field $field, $link, $visible)
+    public function setLink(Context $context, Field $field, $link, $visible): static
     {
         $this->properties
             ->getLink($field)
@@ -101,7 +100,7 @@ class RESTResource implements ResourceContract
      * @param Field $field
      * @return $this
      */
-    public function clearProperty(Field $field, $url)
+    public function clearProperty(Field $field, $url): static
     {
         $this->properties->clear($field);
         return $this;
@@ -121,7 +120,7 @@ class RESTResource implements ResourceContract
         $url,
         ResourceCollection $children,
         $visible
-    ) {
+    ): static {
         $childProperty = $this->properties->getChildren($field);
 
         if ($url) {
@@ -149,7 +148,7 @@ class RESTResource implements ResourceContract
         $url,
         ResourceContract $child = null,
         $visible = true
-    ) {
+    ): static {
         $childProperty = $this->properties->getChild($field);
         $childProperty->setVisible($visible);
         $childProperty->setContext($context);
@@ -158,7 +157,7 @@ class RESTResource implements ResourceContract
             $childProperty->setUrl($url);
         }
 
-        if ($child) {
+        if ($child instanceof \CatLab\Charon\Interfaces\RESTResource) {
             $childProperty->setChild($child);
         }
 
@@ -200,7 +199,7 @@ class RESTResource implements ResourceContract
     /**
      * @return bool
      */
-    public function isNew()
+    public function isNew(): bool
     {
         // No identifiers found? Then all entries are always new... unless the field is linkable.
         if ($identifiers = $this->getProperties()->getIdentifiers()->count() === 0) {
@@ -213,6 +212,7 @@ class RESTResource implements ResourceContract
                 return true;
             }
         }
+
         return false;
     }
 
@@ -229,7 +229,7 @@ class RESTResource implements ResourceContract
      * Return an Identifier object representing this REST resource.
      * @return Identifier
      */
-    public function getIdentifier()
+    public function getIdentifier(): \CatLab\Charon\Models\Identifier
     {
         $identifier = new Identifier($this->getResourceDefinition());
         foreach ($this->getIdentifiers()->getValues() as $idValue) {
@@ -244,7 +244,7 @@ class RESTResource implements ResourceContract
      * @param $source
      * @return $this
      */
-    public function setSource(&$source)
+    public function setSource(&$source): static
     {
         $this->source = $source;
         return $this;
@@ -284,8 +284,8 @@ class RESTResource implements ResourceContract
         $original = null,
         CurrentPath $path = null,
         bool $validateNonProvidedFields = true
-    ) {
-        if ($path === null) {
+    ): void {
+        if (!$path instanceof \CatLab\Charon\Models\CurrentPath) {
             $path = new CurrentPath();
         }
 
@@ -301,12 +301,14 @@ class RESTResource implements ResourceContract
                 if ($validator instanceof ResourceValidator) {
                     $validator->setOriginal($original);
                 }
+
                 $validator->validate($this);
             } catch(ValidatorValidationException $e) {
                 $validator = $e->getValidator();
                 if (!$validator) {
                     throw new ValidationException('ValidatorValidationException thrown without validator attached.', 400, $e);
                 }
+
                 $messages->add($validator->getErrorMessage($e));
             } catch(RequirementValidationException $e) {
                 throw $e;
@@ -349,8 +351,8 @@ class RESTResource implements ResourceContract
             } else {
                 $value->validate($context, $path, $validateNonProvidedFields);
             }
-        } catch(PropertyValidationException $e) {
-            $messages->merge($e->getMessages());
+        } catch(PropertyValidationException $propertyValidationException) {
+            $messages->merge($propertyValidationException->getMessages());
         }
     }
 }

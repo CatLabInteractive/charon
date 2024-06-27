@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -27,35 +29,22 @@ class ResourceField extends Field
      */
     private $searchable;
 
-    /**
-     * @var bool
-     */
-    private $sortable;
+    private bool $sortable = false;
 
-    /**
-     * @var bool
-     */
-    private $isArray;
+    private bool $isArray = false;
 
-    /**
-     * @var bool
-     */
-    private $isMap;
+    private bool $isMap = false;
 
     public function __construct(ResourceDefinition $resourceDefinition, $fieldName)
     {
         parent::__construct($resourceDefinition, $fieldName);
-
-        $this->isArray = false;
-        $this->isMap = false;
-        $this->sortable = false;
     }
 
     /**
      * @param bool $filterable
      * @return $this
      */
-    public function filterable($filterable = true)
+    public function filterable($filterable = true): static
     {
         $this->filterable = $filterable;
         return $this;
@@ -74,7 +63,7 @@ class ResourceField extends Field
      * @param bool $searchable
      * @return $this
      */
-    public function searchable($searchable = true)
+    public function searchable($searchable = true): static
     {
         $this->searchable = $searchable;
         return $this;
@@ -92,7 +81,7 @@ class ResourceField extends Field
      * @param bool $sortable
      * @return $this
      */
-    public function sortable($sortable = true)
+    public function sortable($sortable = true): static
     {
         $this->sortable = $sortable;
 
@@ -114,7 +103,7 @@ class ResourceField extends Field
     public function getAllowedValues()
     {
         $inArrayFilters = $this->getRequirements()->filter(
-            function($value) {
+            function($value): bool {
                 return $value instanceof InArray;
             }
         );
@@ -122,13 +111,14 @@ class ResourceField extends Field
         if (count($inArrayFilters) > 0) {
             return $inArrayFilters->first()->getValues();
         }
+
         return [];
     }
 
     /**
      * @return $this
      */
-    public function array()
+    public function array(): static
     {
         $this->isArray = true;
         return $this;
@@ -137,7 +127,7 @@ class ResourceField extends Field
     /**
      * @return $this
      */
-    public function map()
+    public function map(): static
     {
         $this->isArray = true;
         $this->isMap = true;
@@ -176,7 +166,7 @@ class ResourceField extends Field
             }
 
             if (!is_array($value)) {
-                throw new ValidationException(($path ? $path . '.' : '') . $this->getDisplayName() . ' must be of type array.');
+                throw new ValidationException(($path !== '' && $path !== '0' ? $path . '.' : '') . $this->getDisplayName() . ' must be of type array.');
             }
 
             foreach ($value as $v) {
@@ -185,5 +175,6 @@ class ResourceField extends Field
         } else {
             return parent::validate($value, $path, $validateNonProvidedFields);
         }
+        return null;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Processors;
 
 use CatLab\Base\Interfaces\Database\SelectQueryParameters;
@@ -32,17 +34,15 @@ class PaginationProcessor implements Processor
     /**
      * @var PaginationBuilder
      */
-    private $paginationBuilders;
+    private array $paginationBuilders = [];
 
-    /**
-     * @var string
-     */
-    private $paginationClass;
+    private string $paginationClass;
 
-    const RANDOM = 'random';
-    const RANDOM_SEED_QUERY = 'seed';
+    public const RANDOM = 'random';
 
-    const MAX_INT = 2147483647;
+    public const RANDOM_SEED_QUERY = 'seed';
+
+    public const MAX_INT = 2147483647;
 
     /**
      * PaginationProcessor constructor.
@@ -51,7 +51,6 @@ class PaginationProcessor implements Processor
     public function __construct(string $builder)
     {
         $this->paginationClass = $builder;
-        $this->paginationBuilders = [];
     }
 
     /**
@@ -71,14 +70,15 @@ class PaginationProcessor implements Processor
         ResourceDefinition $definition,
         Context $context,
         FilterResults $filterResults
-    ) {
+    ): void {
         $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, $request);
 
         // the amount of records we want.
-        $records = intval($transformer->getRequestResolver()->getRecords($request));
+        $records = (int) $transformer->getRequestResolver()->getRecords($request);
         if ($records < 1) {
             $records = CharonConfig::instance()->getDefaultRecordCount();
         }
+
         $builder->limit($records);
 
         // First count the total amount of records
@@ -192,8 +192,8 @@ class PaginationProcessor implements Processor
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
-    ) {
-        list ($url, $cursor) = $this->prepareCursor(
+    ): void {
+        [$url, $cursor] = $this->prepareCursor(
             $transformer,
             $collection,
             $definition->getDefault(),
@@ -228,7 +228,7 @@ class PaginationProcessor implements Processor
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
-    ) {
+    ): ?array {
         $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, null);
 
         if (
@@ -244,7 +244,7 @@ class PaginationProcessor implements Processor
         }
 
         // Register all identifiers if parent is present
-        if ($parent) {
+        if ($parent instanceof \CatLab\Charon\Models\Values\Base\RelationshipValue) {
             foreach ($definition->getFields()->getIdentifiers() as $field) {
                 $this->registerPropertyName($builder, $field, $context);
                 $registeredFields[$field->getDisplayName()] = $field;
@@ -267,7 +267,7 @@ class PaginationProcessor implements Processor
 
         $cursor = $builder->getNavigation();
 
-        if ($parent) {
+        if ($parent instanceof \CatLab\Charon\Models\Values\Base\RelationshipValue) {
             $url = $parent->getField()->getUrl();
         } elseif($context->getUrl()) {
             $url = $context->getUrl();
@@ -290,14 +290,14 @@ class PaginationProcessor implements Processor
      * @param PaginationBuilder $builder
      * @param Context $context
      * @param RESTResource $resource
-     * @return mixed
+     * @return mixed[]
      */
     private function transformResource(
         ResourceTransformer $transformer,
         PaginationBuilder $builder,
         Context $context,
         RESTResource $resource
-    ) {
+    ): array {
         $sortOrder = $builder->getOrderBy();
         $properties = $resource->getProperties();
 
@@ -338,7 +338,7 @@ class PaginationProcessor implements Processor
         Context $context,
         RelationshipValue $parent = null,
         $parentEntity = null
-    ) {
+    ): void {
         // Nothing to do here...
     }
 
@@ -434,7 +434,7 @@ class PaginationProcessor implements Processor
 
                 $field = $registeredFields[$sortField] ?? null;
 
-                if ($field) {
+                if ($field instanceof \CatLab\Charon\Models\Properties\ResourceField) {
                     if ($field->isSortable()) {
                         $sortedOn[$field->getName()] = true;
                         $sortDirections[] = $direction;
@@ -447,21 +447,13 @@ class PaginationProcessor implements Processor
                             )
                         );
                     }
-                } else {
-                    // Check sortable
-                    switch($sortField) {
-
-                        case self::RANDOM:
-                            $this->handleRandomOrder(
-                                $builder,
-                                $definition,
-                                $direction,
-                                $request
-                            );
-
-                            break;
-
-                    }
+                } elseif ($sortField === self::RANDOM) {
+                    $this->handleRandomOrder(
+                        $builder,
+                        $definition,
+                        $direction,
+                        $request
+                    );
                 }
             }
         }
@@ -470,7 +462,7 @@ class PaginationProcessor implements Processor
         foreach ($definition->getFields() as $field) {
             if ($field instanceof IdentifierField && !isset($sortedOn[$field->getName()])) {
 
-                $defaultSortDirection = isset($sortDirections[0]) ? $sortDirections[0] : OrderParameter::ASC;
+                $defaultSortDirection = $sortDirections[0] ?? OrderParameter::ASC;
 
                 $builder->orderBy(
                     new OrderParameter(
@@ -504,9 +496,8 @@ class PaginationProcessor implements Processor
                 $transformer = $field->getTransformer();
                 if ($transformer) {
                     return $field->getTransformer()->toEntityValue($value, $context);
-                } else {
-                    return $value;
                 }
+                return $value;
             });
     }
 
@@ -516,10 +507,10 @@ class PaginationProcessor implements Processor
      * @param $direction
      * @param $request
      */
-    private function handleRandomOrder(PaginationBuilder $builder, ResourceDefinition $definition, $direction, &$request)
+    private function handleRandomOrder(PaginationBuilder $builder, ResourceDefinition $definition, string $direction, array &$request): void
     {
         if (isset($request) && isset($request[self::RANDOM_SEED_QUERY])) {
-            $random = intval($request[self::RANDOM_SEED_QUERY]);
+            $random = (int) $request[self::RANDOM_SEED_QUERY];
         } else {
             $random = mt_rand(0, self::MAX_INT);
         }

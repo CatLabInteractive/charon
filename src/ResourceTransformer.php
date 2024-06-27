@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon;
 
 use CatLab\Charon\Collections\FilterCollection;
@@ -59,50 +61,29 @@ use CatLab\Charon\SimpleResolvers\SimpleResourceFactory;
  */
 abstract class ResourceTransformer implements ResourceTransformerContract
 {
-    /**
-     * @var PropertyResolverContract
-     */
-    protected $propertyResolver;
+    protected \CatLab\Charon\Interfaces\PropertyResolver $propertyResolver;
 
-    /**
-     * @var PropertySetterContract
-     */
-    protected $propertySetter;
+    protected \CatLab\Charon\Interfaces\PropertySetter $propertySetter;
 
-    /**
-     * @var RequestResolverContract
-     */
-    protected $requestResolver;
+    protected \CatLab\Charon\Interfaces\RequestResolver $requestResolver;
 
-    /**
-     * @var QueryAdapterContract
-     */
-    protected $queryAdapter;
+    protected \CatLab\Charon\Interfaces\QueryAdapter $queryAdapter;
 
-    /**
-     * @var ResourceFactoryContract
-     */
-    protected $resourceFactory;
+    protected \CatLab\Charon\Interfaces\ResourceFactory $resourceFactory;
 
-    /**
-     * @var CurrentPath
-     */
-    protected $currentPath;
+    protected \CatLab\Charon\Models\CurrentPath $currentPath;
 
     /**
      * @var mixed[]
      */
-    protected $parents;
+    protected \CatLab\Charon\Collections\ParentEntityCollection $parents;
 
     /**
      * @var int
      */
     protected $maxDepth = 50;
 
-    /**
-     * @var InputParserCollection
-     */
-    protected $inputParsers;
+    protected \CatLab\Charon\Collections\InputParserCollection $inputParsers;
 
     /**
      * ResourceTransformer constructor.
@@ -164,7 +145,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
         if (!ArrayHelper::isIterable($entities)) {
             throw InvalidEntityException::makeTranslatable('%s expects an iterable object of entities at %s.', [
-                __CLASS__ . '::toResources',
+                self::class . '::toResources',
                 $this->currentPath
             ]);
         }
@@ -179,7 +160,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
             $resource = $this->toResource($entityResDef, $entity, $context, $parent, $parentEntity);
 
             $out->add($resource);
-            $index ++;
+            ++$index;
         }
 
         $context->getProcessors()->processCollection(
@@ -284,11 +265,9 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                         if ($value === null) {
                             $value = [];
                         }
-
                         if (!ArrayHelper::isIterable($value)) {
                             throw IterableExpected::make($field, $value);
                         }
-
                         // no data? No processing.
                         if (count($value) === 0) {
                             // Is this field supposed to be a map? In that case use a stdClass
@@ -310,14 +289,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                                     $transformedValue[$k] = $v;
                                 }
                             }
+
                             $value = $transformedValue;
 
                         }
-
-                    } else {
-                        if ($transformer = $field->getTransformer()) {
-                            $value = $transformer->toResourceValue($value, $context);
-                        }
+                    } elseif ($transformer = $field->getTransformer()) {
+                        $value = $transformer->toResourceValue($value, $context);
                     }
 
                     $resource->setProperty(
@@ -329,6 +306,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                     throw new \InvalidArgumentException("Unexpected field type found: " . get_class($field));
                 }
             }
+
             $this->currentPath->pop();
         }
 
@@ -439,6 +417,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                     }
                 }
             }
+
             $this->currentPath->pop();
         }
 
@@ -456,7 +435,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      */
     public function entitiesFromIdentifiers(
         $resourceDefinition,
-        $content,
+        array $content,
         EntityFactoryContract $factory,
         ContextContract $context
     ) {
@@ -490,6 +469,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 $out[] = $entity;
             }
         }
+
         return $out;
     }
 
@@ -530,7 +510,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @throws Exceptions\InvalidResourceDefinition
      */
-    public function processEagerLoading($entities, $resourceDefinition = null, ContextContract $context = null)
+    public function processEagerLoading($entities, $resourceDefinition = null, ContextContract $context = null): void
     {
         if (!$resourceDefinition) {
             return;
@@ -672,7 +652,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RESTResource $resource,
         ContextContract $context,
         $visible = true
-    ) {
+    ): void {
         if (count($this->parents) > $this->maxDepth) {
             $this->linkRelationship($field, $entity, $resource, $context, $visible);
             return;
@@ -711,7 +691,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RESTResource $resource,
         ContextContract $context,
         $visible = true
-    ) {
+    ): void {
         $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         $childrenValue = $resource->touchChildrenProperty($field);
 
@@ -774,7 +754,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RESTResource $resource,
         ContextContract $context,
         $visible = true
-    ) {
+    ): void {
         $url = $this->getPropertyResolver()
             ->resolvePathParameters($this, $entity, $field->getUrl(), $context);
 
@@ -808,7 +788,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @throws InvalidPropertyException
      */
-    private function relationshipFromArray(RelationshipField $field, &$body, RESTResource $resource, ContextContract $context)
+    private function relationshipFromArray(RelationshipField $field, &$body, RESTResource $resource, ContextContract $context): void
     {
         // If no data is provided, don't set the property.
         if (!$this->getPropertyResolver()->hasRelationshipInput($this, $body, $field, $context)) {
@@ -834,6 +814,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 } else {
                     $resource->setChildProperty($context, $field, null, null, true);
                 }
+
                 break;
 
             default:
@@ -854,7 +835,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RESTResource $resource,
         ContextContract $context,
         $visible
-    ) {
+    ): void {
         $url = $this->getPropertyResolver()->resolvePathParameters($this, $entity, $field->getUrl(), $context);
         $resource->setLink($context, $field, $url, $visible);
     }
@@ -864,7 +845,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param $entity
      * @throws InvalidEntityException
      */
-    private function checkEntityType(ResourceDefinitionContract $resourceDefinition, $entity)
+    private function checkEntityType(ResourceDefinitionContract $resourceDefinition, $entity): void
     {
         $entityClassName = $resourceDefinition->getEntityClassName();
 
@@ -875,11 +856,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
 
         if (! ($entity instanceof $entityClassName)) {
 
-            if (is_object($entity)) {
-                $providedType = get_class($entity);
-            } else {
-                $providedType = gettype($entity);
-            }
+            $providedType = is_object($entity) ? get_class($entity) : gettype($entity);
 
             throw InvalidEntityException::makeTranslatable(
                 'ResourceTransformer expects %s, %s given.',
@@ -896,10 +873,12 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @return bool
      */
-    private function shouldInclude(Field $field, ContextContract $context)
+    private function shouldInclude(Field $field, ContextContract $context): bool
     {
-        return $field->shouldInclude($context, $this->currentPath) ||
-            $field->isRequiredForSorting();
+        if ($field->shouldInclude($context, $this->currentPath)) {
+            return true;
+        }
+        return $field->isRequiredForSorting();
     }
 
     /**

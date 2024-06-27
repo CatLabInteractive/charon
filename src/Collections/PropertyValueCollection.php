@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
@@ -53,11 +55,7 @@ class PropertyValueCollection extends Collection
     public function getProperty(Field $resourceField)
     {
         $key = spl_object_hash($resourceField);
-
-        if (isset($this[$key])) {
-            return $this[$key];
-        }
-        return null;
+        return $this[$key] ?? null;
     }
 
     /**
@@ -105,7 +103,7 @@ class PropertyValueCollection extends Collection
     /**
      * @return PropertyValue[]
      */
-    public function getValues()
+    public function getValues(): array
     {
         return array_values($this->toArray());
     }
@@ -114,12 +112,13 @@ class PropertyValueCollection extends Collection
      * @param Field $field
      * @return $this
      */
-    public function clear(Field $field)
+    public function clear(Field $field): self
     {
         $key = spl_object_hash($field);
         if (isset($this[$key])) {
             unset ($this[$key]);
         }
+
         return $this;
     }
 
@@ -128,7 +127,7 @@ class PropertyValueCollection extends Collection
      * @param $propertyValueClass
      * @return Value
      */
-    private function touchPropertyValue(Field $resourceField, $propertyValueClass)
+    private function touchPropertyValue(Field $resourceField, string $propertyValueClass)
     {
         $key = spl_object_hash($resourceField);
 
@@ -145,7 +144,7 @@ class PropertyValueCollection extends Collection
     public function getIdentifiers()
     {
         return $this->filter(
-            function(Value $v) {
+            function(Value $v): bool {
                 return $v->getField() instanceof IdentifierField;
             }
         );
@@ -158,7 +157,7 @@ class PropertyValueCollection extends Collection
     public function getResourceFields()
     {
         return $this->filter(
-            function(Value $v) {
+            function(Value $v): bool {
                 return $v->getField() instanceof ResourceField;
             }
         );
@@ -171,7 +170,7 @@ class PropertyValueCollection extends Collection
     public function getRelationships()
     {
         return $this->filter(
-            function(Value $v) {
+            function(Value $v): bool {
                 return $v->getField() instanceof RelationshipField;
             }
         );
@@ -184,7 +183,7 @@ class PropertyValueCollection extends Collection
     public function getFromName(string $name)
     {
         return $this->filter(
-            function(Value $v) use ($name) {
+            function(Value $v) use ($name): bool {
                 return $v->getField()->getName() === $name;
             }
         )->first();
@@ -197,7 +196,7 @@ class PropertyValueCollection extends Collection
     public function getFromDisplayName(string $name)
     {
         return $this->filter(
-            function(Value $v) use ($name) {
+            function(Value $v) use ($name): bool {
                 return $v->getField()->getDisplayName() === $name;
             }
         )->first();
@@ -206,7 +205,7 @@ class PropertyValueCollection extends Collection
     /**
      * @return array|\CatLab\Charon\Models\Values\Base\Value[]
      */
-    public function toMap()
+    public function toMap(): array
     {
         $out = [];
         foreach ($this->getValues() as $value) {
@@ -222,7 +221,7 @@ class PropertyValueCollection extends Collection
      * @return array
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
-    public function transformToEntityValuesMap(Context $context = null)
+    public function transformToEntityValuesMap(Context $context = null): array
     {
         $out = [];
         foreach ($this->getValues() as $value) {

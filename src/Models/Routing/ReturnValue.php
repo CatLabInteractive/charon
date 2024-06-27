@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
@@ -20,42 +22,27 @@ class ReturnValue implements RouteMutator
     /**
      * @var Route
      */
-    private $parent;
+    private \CatLab\Charon\Interfaces\RouteMutator $parent;
 
     /**
      * @var string
      */
     private $type;
 
-    /**
-     * @var array
-     */
-    private $types;
+    private ?array $types = null;
 
-    /**
-     * @var string
-     */
-    private $cardinality = Cardinality::ONE;
+    private string $cardinality = Cardinality::ONE;
 
     /**
      * @var string
      */
     private $context;
 
-    /**
-     * @var int
-     */
-    private $statusCode;
+    private int $statusCode;
 
-    /**
-     * @var string
-     */
-    private $description;
+    private ?string $description = null;
 
-    /**
-     * @var HeaderCollection
-     */
-    private $headers;
+    private \CatLab\Charon\Collections\HeaderCollection $headers;
 
     /**
      * ReturnValue constructor.
@@ -123,7 +110,7 @@ class ReturnValue implements RouteMutator
      * @return $this
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function oneOf(array $types)
+    public function oneOf(array $types): static
     {
         $this->one();
         $this->types = $types;
@@ -135,7 +122,7 @@ class ReturnValue implements RouteMutator
      * @return $this
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function anyOf(array $types)
+    public function anyOf(array $types): static
     {
         $this->many();
         $this->types = $types;
@@ -155,11 +142,7 @@ class ReturnValue implements RouteMutator
      */
     public function getType()
     {
-        if (isset($this->type)) {
-            return $this->type;
-        } else {
-            return PropertyType::STRING;
-        }
+        return $this->type ?? PropertyType::STRING;
     }
 
     /**
@@ -167,7 +150,7 @@ class ReturnValue implements RouteMutator
      */
     public function getTypes()
     {
-        if (isset($this->types)) {
+        if ($this->types !== null) {
             return $this->type;
         }
 
@@ -179,15 +162,11 @@ class ReturnValue implements RouteMutator
      */
     public function getContext() : string
     {
-        if (!isset($this->cardinality)) {
+        if ($this->cardinality === null) {
             $this->cardinality = Cardinality::ONE;
         }
 
-        if (isset($this->context)) {
-            return $this->context;
-        }
-
-        return Action::getReadAction($this->cardinality);
+        return $this->context ?? Action::getReadAction($this->cardinality);
     }
 
     /**
@@ -231,7 +210,7 @@ class ReturnValue implements RouteMutator
      * @param $status
      * @return $this
      */
-    public function statusCode($status)
+    public function statusCode($status): static
     {
         $this->statusCode = $status;
         return $this;
@@ -249,7 +228,7 @@ class ReturnValue implements RouteMutator
      * @param string $description
      * @return $this
      */
-    public function describe(string $description)
+    public function describe(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -267,12 +246,13 @@ class ReturnValue implements RouteMutator
      * @return \CatLab\Charon\Interfaces\ResourceDefinition|null
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function getResourceDefinition()
+    public function getResourceDefinition(): ?\CatLab\Charon\Interfaces\ResourceDefinition
     {
         $definition = $this->getResourceDefinitions();
         if (count($definition) > 0) {
             return $definition[0];
         }
+
         return null;
     }
 
@@ -280,7 +260,7 @@ class ReturnValue implements RouteMutator
      * @return \CatLab\Charon\Interfaces\ResourceDefinition[]
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function getResourceDefinitions()
+    public function getResourceDefinitions(): array
     {
         $types = $this->getType();
         if (!is_array($types)) {
@@ -297,6 +277,7 @@ class ReturnValue implements RouteMutator
                 }
             }
         }
+
         return $out;
     }
 
@@ -304,7 +285,7 @@ class ReturnValue implements RouteMutator
      * @return string
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function getDescriptionFromType()
+    public function getDescriptionFromType(): string
     {
         if (!$this->getType()) {
             return 'No description set.';
@@ -312,20 +293,16 @@ class ReturnValue implements RouteMutator
 
         if (PropertyType::isNative($this->getType())) {
             return 'Returns ' . $this->getType();
-        } else {
-
-            $types = $this->getTypes();
-
-            $classNames = array_map(function($type) {
-
-                $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($type);
-                $type = $factory->getDefault();
-
-                return $type->getEntityClassName();
-            }, $types);
-
-            return 'Returns ' . $this->getCardinality() . ' ' . implode(', ', $classNames);
         }
+        $types = $this->getTypes();
+        $classNames = array_map(function($type) {
+
+            $factory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($type);
+            $type = $factory->getDefault();
+
+            return $type->getEntityClassName();
+        }, $types);
+        return 'Returns ' . $this->getCardinality() . ' ' . implode(', ', $classNames);
     }
 
     /**
@@ -334,7 +311,7 @@ class ReturnValue implements RouteMutator
      */
     public function consumes(string $mimetype) : RouteMutator
     {
-        return call_user_func_array([ $this->parent, 'consumes' ], func_get_args());
+        return $this->parent->consumes(...func_get_args());
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Charon\Interfaces\Context;
@@ -32,7 +34,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         // Check for add method
         if ($this->methodExists($entity, 'add'.ucfirst($name))) {
             array_unshift($parameters, $childEntities);
-            call_user_func_array(array($entity, 'add'.ucfirst($name)), $parameters);
+            call_user_func_array([$entity, 'add'.ucfirst($name)], $parameters);
         } else {
             throw InvalidPropertyException::create($name, get_class($entity));
         }
@@ -50,7 +52,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         // Check for add method
         if ($this->methodExists($entity, 'edit'.ucfirst($name))) {
             array_unshift($parameters, $childEntities);
-            call_user_func_array(array($entity, 'edit'.ucfirst($name)), $parameters);
+            call_user_func_array([$entity, 'edit'.ucfirst($name)], $parameters);
         } else {
             throw InvalidPropertyException::create($name, get_class($entity));
         }
@@ -68,7 +70,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         // Check for add method
         if ($this->methodExists($entity, 'remove'.ucfirst($name))) {
             array_unshift($parameters, $childEntities);
-            call_user_func_array(array($entity, 'remove'.ucfirst($name)), $parameters);
+            call_user_func_array([$entity, 'remove'.ucfirst($name)], $parameters);
         } else {
             throw InvalidPropertyException::create($name, get_class($entity));
         }
@@ -86,17 +88,12 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
     {
         // Check for get method
         if ($this->methodExists($entity, 'set'.ucfirst($name))) {
-
             array_unshift($setterParameters, $value);
-            return call_user_func_array(array($entity, 'set'.ucfirst($name)), $setterParameters);
-
-        } elseif (
-            is_object($entity) &&
-            property_exists($entity, $name)
-        ) {
-
+            return call_user_func_array([$entity, 'set'.ucfirst($name)], $setterParameters);
+        }
+        if (is_object($entity) &&
+        property_exists($entity, $name)) {
             $entity->$name = $value;
-
         } elseif (
             $this->methodExists($entity, 'hasAttribute') &&
             call_user_func([ $entity, 'hasAttribute'], $name)
@@ -104,9 +101,11 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
 
             $entity->$name = $value;
 
-        } else {
+        }
+        else {
             throw InvalidPropertyException::create($name, get_class($entity));
         }
+        return null;
     }
 
     /**
@@ -151,8 +150,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         Field $field,
         $value,
         Context $context
-    ) {
-        list ($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+    ): void {
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $this->setValueInEntity($entity, $name, $value, $parameters);
     }
 
@@ -172,8 +171,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         RelationshipField $field,
         array $childEntities,
         Context $context
-    ) {
-        list($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+    ): void {
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $this->addChildrenToEntity($entity, $name, $childEntities, $parameters);
     }
 
@@ -193,9 +192,9 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         RelationshipField $field,
         array $childEntities,
         Context $context
-    )
+    ): void
     {
-        list($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $this->editChildrenInEntity($entity, $name, $childEntities, $parameters);
     }
 
@@ -215,8 +214,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         RelationshipField $field,
         $childEntities,
         Context $context
-    ) {
-        list($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+    ): void {
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $this->removeChildrenFromEntity($entity, $name, $childEntities, $parameters);
     }
 
@@ -235,8 +234,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         RelationshipField $field,
         $value,
         Context $context
-    ) {
-        list ($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+    ): void {
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $this->setChildInEntity($entity, $name, $value, $parameters);
     }
 
@@ -253,8 +252,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         $entity,
         RelationshipField $field,
         Context $context
-    ) {
-        list ($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+    ): void {
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $existingChild = $this->getValueFromEntity($entity, $name, $parameters, $context);
 
         // Don't remove any new entities
@@ -284,7 +283,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         $entity,
         Field $field,
         Context $context
-    ) {
+    ): array {
         $path = $this->splitPathParameters($field->getName());
 
         $name = array_pop($path);
@@ -292,11 +291,11 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         // If the water is deep enough, we need to first fetch the corresponding entity.
         // We will NOT create the entity if it doesn't exist.
         // Relationships support this functionality. Regular setters do not.
-        if (count($path) > 0) {
+        if ($path !== []) {
             $entity = $this->resolveChildPath($transformer, $entity, $path, $field, $context);
         }
 
-        list($name, $parameters) = $this->getPropertyNameAndParameters($transformer, $name, $context, $field, $entity);
+        [$name, $parameters] = $this->getPropertyNameAndParameters($transformer, $name, $context, $field, $entity);
         return [ $entity, $name, $parameters ];
     }
 
@@ -318,8 +317,8 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         RelationshipField $field,
         array $identifiers,
         Context $context
-    ) {
-        list ($entity, $name, $parameters) = $this->resolvePath($transformer, $entity, $field, $context);
+    ): void {
+        [$entity, $name, $parameters] = $this->resolvePath($transformer, $entity, $field, $context);
         $existingChildren = $this->getValueFromEntity($entity, $name, $parameters, $context);
 
         $toRemove = [];
@@ -351,7 +350,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
             }
         }
 
-        if (count($toRemove) > 0) {
+        if ($toRemove !== []) {
             $this->removeChildren($transformer, $entity, $field, $toRemove, $context);
         }
     }

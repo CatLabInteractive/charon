@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Exceptions;
 
 /**
@@ -8,8 +10,9 @@ namespace CatLab\Charon\Exceptions;
  */
 class InvalidContextAction extends ResourceException
 {
-    const WRITEABLE = 'Writeable';
-    const READABLE = 'Readable';
+    public const WRITEABLE = 'Writeable';
+
+    public const READABLE = 'Readable';
 
     public static function create($expected, $actual)
     {

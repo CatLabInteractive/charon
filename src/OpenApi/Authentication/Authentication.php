@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\OpenApi\Authentication;
 
 /**
@@ -8,15 +10,9 @@ namespace CatLab\Charon\OpenApi\Authentication;
  */
 abstract class Authentication
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    protected string $name;
 
-    /**
-     * @var string
-     */
-    protected $type;
+    protected string $type;
 
     /**
      * Authentication constructor.

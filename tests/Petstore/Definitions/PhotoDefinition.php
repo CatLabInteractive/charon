@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Petstore\Definitions;
 
 use Tests\Petstore\Models\Photo;

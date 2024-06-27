@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Properties\Base;
 
 use CatLab\Charon\Enums\Action;
@@ -36,7 +38,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * Define in which contexts this attribute should be visible
      * @var string[]
      */
-    protected $actions;
+    protected $actions = [];
 
     /**
      * @var string
@@ -60,20 +62,17 @@ class Field implements Property, ResourceDefinitionManipulator
      */
     protected $description;
 
-    /**
-     * @var ResourceDefinition
-     */
-    protected $resourceDefinition;
+    protected \CatLab\Charon\Models\ResourceDefinition $resourceDefinition;
 
     /**
      * @var bool
      */
-    protected $visible;
+    protected $visible = false;
 
     /**
      * @var string
      */
-    protected $path;
+    protected $path = '';
 
     /**
      * @var string
@@ -83,12 +82,12 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @var bool
      */
-    protected $requiredForSorting;
+    protected $requiredForSorting = false;
 
     /**
      * @var bool
      */
-    protected $alwaysValidate;
+    protected $alwaysValidate = false;
 
     /**
      * ResourceField constructor.
@@ -97,17 +96,11 @@ class Field implements Property, ResourceDefinitionManipulator
      */
     public function __construct(ResourceDefinition $resourceDefinition, $fieldName)
     {
-        $this->actions = [];
-        $this->visible = false;
-        $this->path = '';
         $this->type = PropertyType::STRING;
-        $this->alwaysValidate = false;
 
         $this->name = $fieldName;
         $this->displayName = $fieldName;
         $this->resourceDefinition = $resourceDefinition;
-
-        $this->requiredForSorting = false;
     }
 
     /**
@@ -115,7 +108,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param bool $useTransformer
      * @return $this
      */
-    public function setType($type, $useTransformer = true)
+    public function setType($type, $useTransformer = true): static
     {
         $this->traitSetType($type);
 
@@ -168,7 +161,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $displayName
      * @return $this
      */
-    public function setDisplayName($displayName)
+    public function setDisplayName($displayName): static
     {
         $this->displayName = $displayName;
         return $this;
@@ -187,7 +180,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param $name
      * @return $this
      */
-    public function setLabel($name)
+    public function setLabel($name): static
     {
         $this->labelName = $name;
         return $this;
@@ -210,6 +203,7 @@ class Field implements Property, ResourceDefinitionManipulator
         if ($this->labelName) {
             return $this->labelName;
         }
+
         return ucfirst($this->getDisplayName());
     }
 
@@ -219,7 +213,7 @@ class Field implements Property, ResourceDefinitionManipulator
      *
      * @return $this
      */
-    public function visible($index = false, $view = true)
+    public function visible($index = false, $view = true): static
     {
         $this->visible = true;
 
@@ -235,7 +229,7 @@ class Field implements Property, ResourceDefinitionManipulator
      *
      * @return $this
      */
-    public function writeable($create = true, $edit = true)
+    public function writeable($create = true, $edit = true): static
     {
         $this->actions[Action::CREATE] = $create;
         $this->actions[Action::EDIT] = $edit;
@@ -270,7 +264,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $context
      * @return bool
      */
-    public function hasAction($action)
+    public function hasAction($action): bool
     {
         if (
             $action === Action::IDENTIFIER
@@ -354,7 +348,7 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @return bool
      */
-    public function canSetProperty()
+    public function canSetProperty(): bool
     {
         return true;
     }
@@ -365,7 +359,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param bool $validateNonProvidedFields
      * @throws PropertyValidationException
      */
-    public function validate($value, string $path, $validateNonProvidedFields)
+    public function validate($value, string $path, $validateNonProvidedFields): void
     {
         $this->setPath($path);
         $this->getRequirements()->validate($this, $value);
@@ -375,7 +369,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $path
      * @return $this
      */
-    public function setPath(string $path)
+    public function setPath(string $path): static
     {
         $this->path = $path;
         return $this;
@@ -389,15 +383,14 @@ class Field implements Property, ResourceDefinitionManipulator
     {
         if (!empty($this->path)) {
             return $this->path . '.' . $this->getDisplayName();
-        } else {
-            return $this->getDisplayName();
         }
+        return $this->getDisplayName();
     }
 
     /**
      * @return bool
      */
-    public function isSortable()
+    public function isSortable(): bool
     {
         return false;
     }
@@ -406,7 +399,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param bool $requiredForSorting
      * @return $this
      */
-    public function setRequiredForProcessor($requiredForSorting = true)
+    public function setRequiredForProcessor($requiredForSorting = true): static
     {
         $this->requiredForSorting = $requiredForSorting;
         return $this;
@@ -427,7 +420,7 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @return bool
      */
-    public function isFilterable()
+    public function isFilterable(): bool
     {
         return false;
     }
@@ -435,7 +428,7 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @return bool
      */
-    public function isSearchable()
+    public function isSearchable(): bool
     {
         return false;
     }
@@ -444,7 +437,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $description
      * @return $this
      */
-    public function describe(string $description)
+    public function describe(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -462,7 +455,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string|Transformer $transformer
      * @return $this
      */
-    public function transformer($transformer)
+    public function transformer($transformer): static
     {
         $this->transformer = $transformer;
         return $this;
@@ -474,9 +467,10 @@ class Field implements Property, ResourceDefinitionManipulator
      */
     public function getTransformer()
     {
-        if (isset($this->transformer)) {
+        if ($this->transformer !== null) {
             return TransformerLibrary::make($this->transformer);
         }
+
         return null;
     }
 
@@ -484,7 +478,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $transformer
      * @return $this
      */
-    public function datetime($transformer = DateTransformer::class)
+    public function datetime($transformer = DateTransformer::class): static
     {
         $this->type = PropertyType::DATETIME;
         $this->transformer($transformer);
@@ -495,7 +489,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param $transformer
      * @return $this
      */
-    public function html($transformer = HtmlTransformer::class)
+    public function html($transformer = HtmlTransformer::class): static
     {
         $this->type = PropertyType::HTML;
         $this->transformer($transformer);
@@ -507,20 +501,18 @@ class Field implements Property, ResourceDefinitionManipulator
      */
     public function toArray() : array
     {
-        $out = [
+        return [
             'name' => $this->getPropertyName(),
             'type' => $this->getType(),
             'access' => $this->actions
         ];
-
-        return $out;
     }
 
     /**
      * Marks this field as required, even for PATCH requests.
      * @return $this
      */
-    public function alwaysRequired()
+    public function alwaysRequired(): static
     {
         $this->required();
         return $this;
@@ -529,7 +521,7 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @return $this
      */
-    public function alwaysValidate()
+    public function alwaysValidate(): static
     {
         $this->alwaysValidate = true;
         return $this;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 /**
@@ -50,7 +52,7 @@ class FilterResults
      * @param mixed $queryBuilder
      * @return FilterResults
      */
-    public function setQueryBuilder($queryBuilder)
+    public function setQueryBuilder($queryBuilder): static
     {
         $this->queryBuilder = $queryBuilder;
         return $this;
@@ -140,7 +142,7 @@ class FilterResults
      * @param string $currentPage
      * @return FilterResults
      */
-    public function setCurrentPage($currentPage)
+    public function setCurrentPage($currentPage): static
     {
         $this->currentPage = $currentPage;
         return $this;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\Enums\Action;
@@ -10,18 +12,18 @@ use PHPUnit_Framework_TestCase;
 use Tests\Models\MockEntityModel;
 use Tests\ResourceDefinitionDepths\MockResourceDefinitionExtraAttributes;
 
-require_once 'ResourceDefinitionDepths/MockResourceDefinitionExtraAttributes.php';
+require_once __DIR__ . '/ResourceDefinitionDepths/MockResourceDefinitionExtraAttributes.php';
 
 /**
  * Class FieldSelectionTest
  * @package CatLab\RESTResource\Tests
  */
-class FieldSelectionTest extends BaseTest
+final class FieldSelectionTest extends BaseTest
 {
     /**
      * Default case, no fields and no expand.
      */
-    public function testDefaultFieldCollection()
+    public function testDefaultFieldCollection(): void
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
@@ -45,7 +47,7 @@ class FieldSelectionTest extends BaseTest
     /**
      *
      */
-    public function testOnlyProvidedFieldSelection()
+    public function testOnlyProvidedFieldSelection(): void
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
@@ -67,7 +69,7 @@ class FieldSelectionTest extends BaseTest
     /**
      *
      */
-    public function testExpandField()
+    public function testExpandField(): void
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
@@ -115,7 +117,7 @@ class FieldSelectionTest extends BaseTest
     /**
      *
      */
-    public function testExpandAndFieldSelection()
+    public function testExpandAndFieldSelection(): void
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
@@ -163,7 +165,7 @@ class FieldSelectionTest extends BaseTest
     /**
      *
      */
-    public function testExpandAndFieldSelectionWithRelationshipSpecified()
+    public function testExpandAndFieldSelectionWithRelationshipSpecified(): void
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
@@ -199,7 +201,7 @@ class FieldSelectionTest extends BaseTest
     /**
      * Default case, no fields and no select.
      */
-    public function testAsteriskNotation()
+    public function testAsteriskNotation(): void
     {
         $resourceDefinition = new MockResourceDefinitionExtraAttributes();
 
@@ -224,7 +226,7 @@ class FieldSelectionTest extends BaseTest
     /**
      * @return MockEntityModel
      */
-    private function getDeepChildren()
+    private function getDeepChildren(): \Tests\Models\MockEntityModel
     {
         MockEntityModel::clearNextId();
         $mockEntity = new MockEntityModel();

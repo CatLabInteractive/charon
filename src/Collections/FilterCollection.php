@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
@@ -11,10 +13,7 @@ use CatLab\Charon\Models\Filter;
  */
 class FilterCollection extends Collection
 {
-    /**
-     * @var ResourceDefinition
-     */
-    private $resourceDefinition;
+    private \CatLab\Charon\Interfaces\ResourceDefinition $resourceDefinition;
 
     public function __construct(ResourceDefinition $resourceDefinition)
     {
@@ -41,6 +40,7 @@ class FilterCollection extends Collection
                 return $v;
             }
         }
+
         return null;
     }
 
@@ -56,6 +56,7 @@ class FilterCollection extends Collection
                 return $v;
             }
         }
+
         return null;
     }
 }

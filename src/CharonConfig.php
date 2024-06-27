@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon;
 
 use CatLab\Charon\Models\Singleton;
@@ -30,10 +32,7 @@ class CharonConfig extends Singleton
      */
     private $htmlPurifierFactory;
 
-    /**
-     * @var int
-     */
-    private $defaultRecordCount = 25;
+    private int $defaultRecordCount = 25;
 
     /**
      * @return string
@@ -47,7 +46,7 @@ class CharonConfig extends Singleton
      * @param HTMLPurifier $purifier
      * @return $this
      */
-    public function setHtmlPurifierFactory(callable $factory)
+    public function setHtmlPurifierFactory(callable $factory): static
     {
         $this->htmlPurifierFactory = $factory;
         return $this;
@@ -58,9 +57,9 @@ class CharonConfig extends Singleton
      */
     public function getHtmlPurifier()
     {
-        if (!isset($this->htmlPurifier)) {
+        if ($this->htmlPurifier === null) {
 
-            if (isset($this->htmlPurifierFactory)) {
+            if ($this->htmlPurifierFactory !== null) {
                 $this->htmlPurifier = call_user_func($this->htmlPurifierFactory);
             } else {
                 $config = HTMLPurifier_Config::createDefault();
@@ -75,7 +74,7 @@ class CharonConfig extends Singleton
      * @param int $records
      * @return $this
      */
-    public function setDefaultRecordCount(int $records)
+    public function setDefaultRecordCount(int $records): static
     {
         $this->defaultRecordCount = $records;
         return $this;

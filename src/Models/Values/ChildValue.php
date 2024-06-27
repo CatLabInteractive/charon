@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -21,16 +23,13 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  */
 class ChildValue extends RelationshipValue
 {
-    /**
-     * @var RESTResource
-     */
-    private $child;
+    private ?\CatLab\Charon\Models\RESTResource $child = null;
 
     /**
      * @param RESTResource $child
      * @return $this
      */
-    public function setChild(RESTResource $child)
+    public function setChild(RESTResource $child): static
     {
         $this->child = $child;
         return $this;
@@ -55,7 +54,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource[]
      */
-    public function getResources()
+    public function getResources(): array
     {
         return [ $this->child ];
     }
@@ -68,6 +67,7 @@ class ChildValue extends RelationshipValue
         if ($this->child === null) {
             return null;
         }
+
         return $this->child->toArray();
     }
 
@@ -82,15 +82,13 @@ class ChildValue extends RelationshipValue
 
         if ($attribute === null) {
             return $this->child->getProperties()->transformToEntityValuesMap($context);
-        } else {
-            // For performance reasons, only process the field we actually want.
-            $field = $this->child->getProperties()->getFromName($attribute);
-            if (!$field) {
-                return null;
-            }
-
-            return $field->getTransformedEntityValue($context);
         }
+        // For performance reasons, only process the field we actually want.
+        $field = $this->child->getProperties()->getFromName($attribute);
+        if (!$field) {
+            return null;
+        }
+        return $field->getTransformedEntityValue($context);
     }
 
     /**
@@ -101,6 +99,7 @@ class ChildValue extends RelationshipValue
         if ($this->child === null) {
             return null;
         }
+
         return $this->child->toArray();
     }
 
@@ -115,7 +114,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource[]
      */
-    protected function getChildrenToProcess()
+    protected function getChildrenToProcess(): array
     {
         return [ $this->child ];
     }
@@ -138,7 +137,7 @@ class ChildValue extends RelationshipValue
         Context $context
     )
     {
-        if (count($childEntities) > 0) {
+        if ($childEntities !== []) {
             $propertySetter->setChild($transformer, $entity, $this->getField(), $childEntities[0], $context);
         }
     }
@@ -155,7 +154,7 @@ class ChildValue extends RelationshipValue
      */
     protected function editChildren(ResourceTransformer $transformer, PropertySetter $propertySetter, $entity, RelationshipField $field, array $childEntities, Context $context)
     {
-        if (count($childEntities) > 0) {
+        if ($childEntities !== []) {
             $propertySetter->editChildren($transformer, $entity, $this->getField(), $childEntities[0], $context);
         }
     }
@@ -178,16 +177,14 @@ class ChildValue extends RelationshipValue
     ) {
         $childEntity = $propertyResolver->resolveProperty($transformer, $parent, $this->getField(), $context);
 
-        if (
-            !$childEntity ||
-            !$propertyResolver->doesResourceRepresentEntity(
-                $transformer,
-                $childEntity,
-                $this->child,
-                $context
-            )
-        ) {
-            $childEntity = null;
+        if (!$childEntity ||
+        !$propertyResolver->doesResourceRepresentEntity(
+            $transformer,
+            $childEntity,
+            $this->child,
+            $context
+        )) {
+            return null;
         }
 
         return $childEntity;
@@ -214,7 +211,7 @@ class ChildValue extends RelationshipValue
     )
     {
         // Only one value allowed, so if $identifiers is empty, clear value
-        if (empty($identifiers)) {
+        if ($identifiers === []) {
             $propertySetter->clearChild($transformer, $entity, $field, $context);
         }
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Transformers;
 
 use CatLab\Charon\CharonConfig;
@@ -44,7 +46,7 @@ class HtmlTransformer implements Transformer
      * @return mixed|void
      * @throws \CatLab\Charon\Exceptions\CharonException
      */
-    public function toParameterValue($value)
+    public function toParameterValue($value): never
     {
         throw NotImplementedException::makeTranslatable('HTML parameters are not supported');
     }

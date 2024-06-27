@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Library;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Exceptions\InvalidResourceDefinition;
@@ -20,17 +22,17 @@ class ResourceDefinitionLibrary
         if (!isset($in)) {
             $in = new self();
         }
+
         return $in;
     }
 
     /**
      * @var ResourceDefinition[]
      */
-    private $descriptions;
+    private array $descriptions = [];
 
     private function __construct()
     {
-        $this->descriptions = [];
     }
 
     /**
@@ -42,9 +44,8 @@ class ResourceDefinitionLibrary
     {
         if ($classname instanceof ResourceDefinition) {
             return $classname;
-        } else {
-            return self::instance()->makeResourceDescription($classname);
         }
+        return self::instance()->makeResourceDescription($classname);
     }
 
     /**

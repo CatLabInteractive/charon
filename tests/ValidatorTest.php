@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\ResourceTransformer;
@@ -13,12 +15,12 @@ use PHPUnit_Framework_TestCase;
  * Class ValidatorTest
  * @package CatLab\RESTResource\Tests
  */
-class ValidatorTest extends BaseTest
+final class ValidatorTest extends BaseTest
 {
     /**
      * Check valid input.
      */
-    public function testPetInput()
+    public function testPetInput(): void
     {
         $transformer = $this->getResourceTransformer();
         $context = new Context(Action::CREATE);
@@ -50,7 +52,7 @@ class ValidatorTest extends BaseTest
      * @throws \CatLab\Charon\Exceptions\InvalidPropertyException
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function testPetNotEnoughPhotos()
+    public function testPetNotEnoughPhotos(): void
     {
         $this->expectException(\CatLab\Requirements\Exceptions\ResourceValidationException::class);
 

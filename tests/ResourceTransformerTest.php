@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use Tests\Models\MockEntityModel;
@@ -8,7 +10,7 @@ use Tests\Models\MockResourceDefinition;
 /**
  * Class ResourceTransformerTest
  */
-class ResourceTransformerTest extends BaseTest
+final class ResourceTransformerTest extends BaseTest
 {
     /**
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
@@ -17,7 +19,7 @@ class ResourceTransformerTest extends BaseTest
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      * @throws \CatLab\Charon\Exceptions\IterableExpected
      */
-    public function testResourceTransformer()
+    public function testResourceTransformer(): void
     {
         MockEntityModel::clearNextId();
         $model = new MockEntityModel();

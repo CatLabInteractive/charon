@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Transformers;
 
 use CatLab\Charon\Exceptions\InvalidPropertyException;
@@ -20,13 +22,13 @@ class BooleanTransformer implements Transformer
      * @param Context $context
      * @return mixed
      */
-    public function toResourceValue($value, Context $context)
+    public function toResourceValue($value, Context $context): ?bool
     {
         if ($value === null) {
             return null;
         }
 
-        return !!$value;
+        return (bool) $value;
     }
 
     /**
@@ -44,12 +46,12 @@ class BooleanTransformer implements Transformer
      * @param $value
      * @return mixed
      */
-    public function toParameterValue($value)
+    public function toParameterValue($value): ?bool
     {
         if ($value === null) {
             return null;
         }
 
-        return !!$value && $value !== 'false';
+        return (bool) $value && $value !== 'false';
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Library;
 
 /**
@@ -11,20 +13,18 @@ class PrettyEntityNameLibrary
     /**
      * @var string[]
      */
-    private $entityNames;
+    private array $entityNames = [];
 
     /**
      * @var string[]
      */
-    private $entityNamesReverse;
+    private array $entityNamesReverse = [];
 
     /**
      * EntityNameLibrary constructor.
      */
     public function __construct()
     {
-        $this->entityNames = [];
-        $this->entityNamesReverse = [];
     }
 
     /**
@@ -51,12 +51,12 @@ class PrettyEntityNameLibrary
 
         if (!isset($this->entityNamesReverse[$modelName])) {
             return $modelName;
-        } else {
-            $number = 1;
-            while (isset($this->entityNamesReverse[$modelName . $number])) {
-                $number ++;
-            }
-            return $modelName . $number;
         }
+        $number = 1;
+        while (isset($this->entityNamesReverse[$modelName . $number])) {
+            ++$number;
+        }
+
+        return $modelName . $number;
     }
 }
