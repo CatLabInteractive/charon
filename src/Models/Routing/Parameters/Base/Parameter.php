@@ -57,7 +57,7 @@ class Parameter implements RouteMutator, Property
     /**
      * @var string
      */
-    protected $type = 'string';
+    protected $type;
 
     /**
      * @var Route
