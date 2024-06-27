@@ -183,7 +183,7 @@ class RESTResource implements ResourceContract
     /**
      * @return PropertyValueCollection
      */
-    public function getProperties()
+    public function getProperties(): \CatLab\Charon\Collections\PropertyValueCollection
     {
         return $this->properties;
     }
@@ -191,7 +191,7 @@ class RESTResource implements ResourceContract
     /**
      * @return ResourceDefinitionContract
      */
-    public function getResourceDefinition()
+    public function getResourceDefinition(): \CatLab\Charon\Interfaces\ResourceDefinition
     {
         return $this->resourceDefinition;
     }

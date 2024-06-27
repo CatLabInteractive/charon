@@ -56,7 +56,7 @@ class PropertyGroup implements ResourceDefinitionManipulator
      * @param string $name
      * @return ResourceField
      */
-    public function field($name)
+    public function field($name): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         return $this->resourceDefinition->field($name);
     }
@@ -66,7 +66,7 @@ class PropertyGroup implements ResourceDefinitionManipulator
      * @param array $fields
      * @return ResourceField
      */
-    public function fields(array $fields)
+    public function fields(array $fields): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         return $this->resourceDefinition->field($fields);
     }

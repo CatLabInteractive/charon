@@ -46,6 +46,7 @@ class InputParserLibrary
             self::instance()->inputParsers[get_class($classname)] = $classname;
             return $classname;
         }
+
         return self::instance()->makeInputParser($classname);
     }
 

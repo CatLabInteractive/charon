@@ -52,6 +52,7 @@ class PrettyEntityNameLibrary
         if (!isset($this->entityNamesReverse[$modelName])) {
             return $modelName;
         }
+
         $number = 1;
         while (isset($this->entityNamesReverse[$modelName . $number])) {
             ++$number;

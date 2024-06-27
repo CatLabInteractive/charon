@@ -265,9 +265,11 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                         if ($value === null) {
                             $value = [];
                         }
+
                         if (!ArrayHelper::isIterable($value)) {
                             throw IterableExpected::make($field, $value);
                         }
+
                         // no data? No processing.
                         if (count($value) === 0) {
                             // Is this field supposed to be a map? In that case use a stdClass
@@ -878,6 +880,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         if ($field->shouldInclude($context, $this->currentPath)) {
             return true;
         }
+
         return $field->isRequiredForSorting();
     }
 
@@ -886,7 +889,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @return bool
      */
-    private function isWritable(Field $field, ContextContract $context)
+    private function isWritable(Field $field, ContextContract $context): bool
     {
         if ($field instanceof IdentifierField) {
             return true;
@@ -900,7 +903,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @return bool
      */
-    private function shouldExpand(RelationshipField $field, ContextContract $context)
+    private function shouldExpand(RelationshipField $field, ContextContract $context): bool
     {
         return $field->shouldExpand($context, $this->currentPath);
     }

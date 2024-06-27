@@ -144,7 +144,7 @@ class ResolverBase
                     $out[] = $value;
                 } elseif ($this->isOptionalParameter($v)) {
                     $out[] = null;
-                } elseif ($field) {
+                } elseif ($field instanceof \CatLab\Charon\Models\Properties\Base\Field) {
                     throw VariableNotFoundInContext::makeTranslatable(
                         'Field %s requires a parameter %s to be set in the context, but no such parameter was defined.',
                         [
@@ -181,20 +181,19 @@ class ResolverBase
         if ($this->methodExists($entity, 'get'.ucfirst($name))) {
             return call_user_func_array([$entity, 'get'.ucfirst($name)], $getterParameters);
         }
+
         if ($this->methodExists($entity, 'is'.ucfirst($name))) {
             return call_user_func_array([$entity, 'is'.ucfirst($name)], $getterParameters);
         }
+
         if (is_object($entity) &&
         property_exists($entity, $name)) {
             return $entity->$name;
         }
-        if (isset($entity->$name)) {
-            return $entity->$name;
-        }
-        else {
-            //throw new InvalidPropertyException;
-            return null;
-        }
+
+        //throw new InvalidPropertyException;
+        return $entity->$name ?? null;
+
         return null;
     }
 
@@ -361,6 +360,7 @@ class ResolverBase
             if (mb_substr($parameter, -2, 1) === '?') {
                 return mb_substr($parameter, 1, -2);
             }
+
             return mb_substr($parameter, 1, -1);
         }
 
@@ -404,6 +404,7 @@ class ResolverBase
                 if ($entity) {
                     return $this->descentIntoParameter($path, $this->getValueFromEntity($entity, $parameterName, $parameters, $context), $context);
                 }
+
                 return null;
 
                 break;
@@ -417,6 +418,7 @@ class ResolverBase
                 if ($parent) {
                     return $this->descentIntoParameter($path, $this->getValueFromEntity($parent, $parameterName, $parameters, $context), $context);
                 }
+
                 return null;
 
                 break;

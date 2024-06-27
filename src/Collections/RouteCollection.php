@@ -70,7 +70,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param callable $callback
      * @return RouteCollection
      */
-    public function group($options, callable $callback = null)
+    public function group($options, callable $callback = null): static
     {
         if (!isset($callback) && is_callable($options)) {
             $callback = $options;
@@ -204,7 +204,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function resource($resourceDefinition, string $path, string $controller, array $options)
+    public function resource($resourceDefinition, string $path, string $controller, array $options): static
     {
         $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
 
@@ -325,7 +325,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @return RouteCollection
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function childResource($resourceDefinition, $parentPath, string $childPath, string $controller, array $options)
+    public function childResource($resourceDefinition, $parentPath, string $childPath, string $controller, array $options): static
     {
         $resourceDefinitionFactory = StaticResourceDefinitionFactory::getFactoryOrDefaultFactory($resourceDefinition);
 
@@ -410,7 +410,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * Return a flat list of routes
      * @return Route[]
      */
-    public function getRoutes()
+    public function getRoutes(): array
     {
         $out = [];
         $out = $this->routes;
@@ -452,9 +452,11 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
             if ($route->getPath() !== $path) {
                 continue;
             }
+
             if (strtoupper($route->getMethod()) !== strtoupper($method)) {
                 continue;
             }
+
             return $route;
         }
 
@@ -525,6 +527,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
         if (is_string($offset)) {
             return isset($this->namedRoutesMap[$offset]);
         }
+
         return isset($this->routes[$offset]);
     }
 
@@ -533,11 +536,12 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @return mixed|void
      * @throws NotImplementedException
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if (is_string($offset)) {
             return $this->namedRoutesMap[$offset];
         }
+
         return $this->routes[$offset];
     }
 

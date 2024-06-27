@@ -337,16 +337,19 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
             return null;
         }
 
-        if (
-            $children &&
-            isset($children[ResourceTransformer::RELATIONSHIP_ITEMS]) &&
-            is_array($children[ResourceTransformer::RELATIONSHIP_ITEMS])
-
-        ) {
-            return $children[ResourceTransformer::RELATIONSHIP_ITEMS];
+        if (!$children) {
+            return null;
         }
 
-        return null;
+        if (!isset($children[ResourceTransformer::RELATIONSHIP_ITEMS])) {
+            return null;
+        }
+
+        if (!is_array($children[ResourceTransformer::RELATIONSHIP_ITEMS])) {
+            return null;
+        }
+
+        return $children[ResourceTransformer::RELATIONSHIP_ITEMS];
     }
 
     /**

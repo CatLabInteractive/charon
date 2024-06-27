@@ -36,7 +36,7 @@ class BooleanTransformer implements Transformer
      * @param Context $context
      * @return mixed
      */
-    public function toEntityValue($value, Context $context)
+    public function toEntityValue($value, Context $context): ?bool
     {
         return $this->toParameterValue($value);
     }

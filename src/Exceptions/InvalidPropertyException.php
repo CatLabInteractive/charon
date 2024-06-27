@@ -10,7 +10,7 @@ namespace CatLab\Charon\Exceptions;
  */
 class InvalidPropertyException extends ResourceException
 {
-    public static function create($name, $className)
+    public static function create($name, $className): \CatLab\Charon\Exceptions\CharonException
     {
         return self::makeTranslatable('Invalid property %s in %s.', [ $name, $className ]);
     }

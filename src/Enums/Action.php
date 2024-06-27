@@ -63,9 +63,11 @@ class Action
         if (self::isReadContext($action)) {
             return;
         }
+
         if (self::isWriteContext($action)) {
             return;
         }
+
         throw InvalidContextAction::makeTranslatable('Unknown context provided: %s.', [ $action ]);
     }
 
@@ -78,6 +80,7 @@ class Action
         if ($cardinality === Cardinality::MANY) {
             return Action::INDEX;
         }
+
         return Action::VIEW;
     }
 }

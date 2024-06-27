@@ -92,6 +92,7 @@ class ScalarTransformer implements Transformer
 
             return $value;
         }
+
         return $this->castToScalar($value);
     }
 

@@ -36,7 +36,7 @@ class ChildrenValue extends RelationshipValue
     /**
      * @return ResourceCollection
      */
-    public function getChildren()
+    public function getChildren(): ?\CatLab\Charon\Collections\ResourceCollection
     {
         return $this->children;
     }
@@ -77,7 +77,7 @@ class ChildrenValue extends RelationshipValue
     /**
      * @return ResourceCollection
      */
-    protected function getChildrenToProcess()
+    protected function getChildrenToProcess(): ?\CatLab\Charon\Collections\ResourceCollection
     {
         return $this->children;
     }

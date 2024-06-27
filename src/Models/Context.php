@@ -209,7 +209,7 @@ class Context implements ContextContract
      */
     public function shouldShowField(CurrentPath $fieldPath)
     {
-        if (count($this->fieldsToShow) === 0) {
+        if ($this->fieldsToShow === []) {
             return null;
         }
 
@@ -227,7 +227,7 @@ class Context implements ContextContract
      */
     public function shouldExpandField(CurrentPath $fieldPath)
     {
-        if (count($this->fieldsToExpand) === 0) {
+        if ($this->fieldsToExpand === []) {
             return null;
         }
 
@@ -245,7 +245,7 @@ class Context implements ContextContract
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -292,6 +292,7 @@ class Context implements ContextContract
             if (count($path) == 0) {
                 return true;
             }
+
             return $this->arrayPathExists($fieldsToShow, $path, $recursivePath);
         }
 
@@ -303,6 +304,7 @@ class Context implements ContextContract
             if (count($path) == 0) {
                 return true;
             }
+
             // Check for all keys on this level that are recursive
             foreach (array_keys($fieldsToShow) as $k) {
                 if (mb_substr($k, -1) === '*') {
@@ -312,21 +314,24 @@ class Context implements ContextContract
 
             return $this->arrayPathExists($fieldsToShow[$key . '*'], $path, $recursivePath);
         }
+
         if (isset($fieldsToShow[$key])) {
             if (count($fieldsToShow[$key]) === 0) {
                 return $path !== [] ? null : true;
             }
+
             if ($path !== []) {
                 return $this->arrayPathExists($fieldsToShow[$key], $path);
             }
-            else {
-                return true;
-            }
+
+            return true;
         }
+
         // Finally, check for asterisk, which means we should keep the regular fields (and return NULL)
         if (isset($fieldsToShow['*'])) {
             return null;
         }
+
         // Nope, fail. Don't show.
         return false;
     }

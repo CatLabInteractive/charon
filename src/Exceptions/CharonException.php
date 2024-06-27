@@ -42,7 +42,7 @@ class CharonException extends \Exception
     /**
      * @return ErrorMessage
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): \CatLab\Charon\Interfaces\ErrorMessage
     {
         return $this->errorMessage;
     }

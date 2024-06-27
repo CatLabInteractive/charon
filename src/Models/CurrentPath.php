@@ -110,7 +110,7 @@ class CurrentPath implements Countable
      * Used for filtering in the context etc.
      * @return string[]
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->displayNames;
     }

@@ -105,7 +105,7 @@ class Pet
     /**
      * @return \string[]
      */
-    public function getPhotos()
+    public function getPhotos(): array
     {
         return $this->photos;
     }
@@ -114,7 +114,7 @@ class Pet
      * @param \string[] $photos
      * @return Pet
      */
-    public function setPhotos($photos): static
+    public function setPhotos(array $photos): static
     {
         $this->photos = $photos;
         return $this;
@@ -123,7 +123,7 @@ class Pet
     /**
      * @return Tag[]
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
@@ -132,7 +132,7 @@ class Pet
      * @param Tag[] $tags
      * @return Pet
      */
-    public function setTags($tags): static
+    public function setTags(array $tags): static
     {
         $this->tags = $tags;
         return $this;

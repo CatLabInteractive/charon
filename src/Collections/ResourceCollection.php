@@ -65,7 +65,7 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
             ResourceTransformer::RELATIONSHIP_ITEMS => $items,
         ];
 
-        if (!empty($this->meta)) {
+        if ($this->meta !== []) {
             $out['meta'] = $this->meta;
         }
 

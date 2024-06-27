@@ -14,7 +14,7 @@ class InvalidScalarException extends ResourceException
      * @param $scalar
      * @return InvalidScalarException
      */
-    public static function make($scalar)
+    public static function make($scalar): \CatLab\Charon\Exceptions\CharonException
     {
         return self::makeTranslatable('Only php scalars are accepted, %s provided.', [ $scalar ]);
     }

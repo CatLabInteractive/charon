@@ -83,7 +83,7 @@ class CharonConfig extends Singleton
     /**
      * @return int
      */
-    public function getDefaultRecordCount()
+    public function getDefaultRecordCount(): int
     {
         return $this->defaultRecordCount;
     }

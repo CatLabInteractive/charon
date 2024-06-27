@@ -43,7 +43,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
      * @param string $operator
      * @return bool|void
      */
-    public function hasFilter($request, ResourceField $field, $operator = Operator::EQ)
+    public function hasFilter($request, ResourceField $field, $operator = Operator::EQ): bool
     {
         return $this->hasParameter($request, $field->getDisplayName());
     }

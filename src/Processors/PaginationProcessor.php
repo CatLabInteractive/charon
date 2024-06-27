@@ -497,6 +497,7 @@ class PaginationProcessor implements Processor
                 if ($transformer) {
                     return $field->getTransformer()->toEntityValue($value, $context);
                 }
+
                 return $value;
             });
     }

@@ -44,12 +44,12 @@ class StaticResourceDefinitionFactory implements \CatLab\Charon\Interfaces\Resou
         if (!is_subclass_of($resourceDefinition, ResourceDefinitionFactory::class)) {
             return new StaticResourceDefinitionFactory($resourceDefinition);
         }
+
         if (!is_string($resourceDefinition)) {
             return $resourceDefinition;
         }
-        else {
-            return new $resourceDefinition;
-        }
+
+        return new $resourceDefinition;
     }
 
     /**

@@ -23,7 +23,7 @@ class FilterCollection extends Collection
     /**
      * @return ResourceDefinition
      */
-    public function getResourceDefinition()
+    public function getResourceDefinition(): \CatLab\Charon\Interfaces\ResourceDefinition
     {
         return $this->resourceDefinition;
     }

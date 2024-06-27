@@ -469,7 +469,7 @@ abstract class RelationshipValue extends Value
      * @param Field $field
      * @return string
      */
-    private function appendToPath(CurrentPath $path, Field $field)
+    private function appendToPath(CurrentPath $path, Field $field): \CatLab\Charon\Models\CurrentPath
     {
         /*
         $display = $field->getDisplayName();

@@ -17,7 +17,7 @@ class IterableExpected extends ResourceException
      * @param $value
      * @return IterableExpected
      */
-    public static function make(Field $field, $value)
+    public static function make(Field $field, $value): \CatLab\Charon\Exceptions\CharonException
     {
         return self::makeTranslatable("Iterable object / array expected for field %s.", [ $field->getName() ]);
     }

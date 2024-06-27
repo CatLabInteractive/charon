@@ -117,6 +117,7 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
         if (is_countable($queryBuilder)) {
             return count($queryBuilder);
         }
+
         //throw new \InvalidArgumentException('countRecords doesn\'t know how to handle ' . get_class($queryBuilder));
         return 10;
     }

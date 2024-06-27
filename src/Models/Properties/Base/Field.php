@@ -136,7 +136,7 @@ class Field implements Property, ResourceDefinitionManipulator
     /**
      * @return ResourceDefinition
      */
-    public function getResourceDefinition()
+    public function getResourceDefinition(): \CatLab\Charon\Models\ResourceDefinition
     {
         return $this->resourceDefinition;
     }
@@ -171,7 +171,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $name
      * @return $this
      */
-    public function display($name)
+    public function display($name): static
     {
         return $this->setDisplayName($name);
     }
@@ -190,7 +190,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param $name
      * @return $this
      */
-    public function label($name)
+    public function label($name): static
     {
         return $this->setLabel($name);
     }
@@ -280,7 +280,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldInclude(Context $context, CurrentPath $currentPath)
+    public function shouldInclude(Context $context, CurrentPath $currentPath): bool
     {
         $contextVisible = $context->shouldShowField($currentPath);
 
@@ -296,7 +296,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function isWriteable(Context $context, CurrentPath $currentPath)
+    public function isWriteable(Context $context, CurrentPath $currentPath): bool
     {
         return $this->hasAction($context->getAction());
     }
@@ -310,7 +310,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param string $name
      * @return ResourceField
      */
-    public function field($name)
+    public function field($name): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         return $this->resourceDefinition->field($name);
     }
@@ -320,7 +320,7 @@ class Field implements Property, ResourceDefinitionManipulator
      * @param array $name
      * @return ResourceField
      */
-    public function fields(array $name)
+    public function fields(array $name): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         return $this->resourceDefinition->fields($name);
     }
@@ -384,6 +384,7 @@ class Field implements Property, ResourceDefinitionManipulator
         if (!empty($this->path)) {
             return $this->path . '.' . $this->getDisplayName();
         }
+
         return $this->getDisplayName();
     }
 

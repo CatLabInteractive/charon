@@ -119,7 +119,7 @@ class Route extends RouteProperties implements RouteMutator
             $matches = array_slice($matches, 1);
 
             // Extract the matched URL parameters (and only the parameters)
-            $params = array_map(function($match, $index) use ($matches, $basePosition): ?string {
+            $params = array_map(function(array $match, $index) use ($matches, $basePosition): ?string {
                 // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
                 if (
                     isset($matches[$index+1]) &&
@@ -129,6 +129,7 @@ class Route extends RouteProperties implements RouteMutator
                 ) {
                     return trim(substr($match[0][0], 0, $matches[$index+1][0][1] - $match[0][1] + $basePosition), '/');
                 }
+
                 return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
             }, $matches, array_keys($matches));
             return new MatchedRoute($this, $params);
@@ -345,7 +346,7 @@ class Route extends RouteProperties implements RouteMutator
      * @return Parameter
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    protected function getSearchField(Field $field)
+    protected function getSearchField(Field $field): \CatLab\Charon\Models\Routing\Parameters\Base\Parameter
     {
         return (new QueryParameter($field->getDisplayName()))
             ->setType($field->getType())

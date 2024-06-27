@@ -51,7 +51,7 @@ class TranslatableErrorMessage implements ErrorMessage
     /**
      * @return mixed[]
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

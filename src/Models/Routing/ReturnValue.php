@@ -210,7 +210,7 @@ class ReturnValue implements RouteMutator
      * @param $status
      * @return $this
      */
-    public function statusCode($status): static
+    public function statusCode(int $status): static
     {
         $this->statusCode = $status;
         return $this;
@@ -219,7 +219,7 @@ class ReturnValue implements RouteMutator
     /**
      * @return int
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -237,7 +237,7 @@ class ReturnValue implements RouteMutator
     /**
      * @return HeaderCollection
      */
-    public function headers()
+    public function headers(): \CatLab\Charon\Collections\HeaderCollection
     {
         return $this->headers;
     }
@@ -249,7 +249,7 @@ class ReturnValue implements RouteMutator
     public function getResourceDefinition(): ?\CatLab\Charon\Interfaces\ResourceDefinition
     {
         $definition = $this->getResourceDefinitions();
-        if (count($definition) > 0) {
+        if ($definition !== []) {
             return $definition[0];
         }
 
@@ -294,6 +294,7 @@ class ReturnValue implements RouteMutator
         if (PropertyType::isNative($this->getType())) {
             return 'Returns ' . $this->getType();
         }
+
         $types = $this->getTypes();
         $classNames = array_map(function($type) {
 
@@ -327,7 +328,7 @@ class ReturnValue implements RouteMutator
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }

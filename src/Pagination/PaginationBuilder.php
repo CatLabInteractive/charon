@@ -97,7 +97,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
             $queryBuilder = new SelectQueryParameters();
         }
 
-        if ($this->records) {
+        if ($this->records !== 0) {
             $offset = ($this->page - 1) * $this->records;
             $limit = $this->records;
 

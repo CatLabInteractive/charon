@@ -75,6 +75,7 @@ abstract class AbstractInputParser
         if (function_exists('getAllHeaders')) {
             return $this->getAllHeaders();
         }
+
         $headers = [];
         foreach ($_SERVER as $name => $value) {
             if (substr($name, 0, 5) === 'HTTP_') {

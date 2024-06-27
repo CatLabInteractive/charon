@@ -47,7 +47,7 @@ class LinkValue extends Value
         PropertySetter $propertySetter,
         EntityFactory $factory,
         Context $context
-    ) {
+    ): void {
 
     }
 

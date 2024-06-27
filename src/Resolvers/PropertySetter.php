@@ -91,6 +91,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
             array_unshift($setterParameters, $value);
             return call_user_func_array([$entity, 'set'.ucfirst($name)], $setterParameters);
         }
+
         if (is_object($entity) &&
         property_exists($entity, $name)) {
             $entity->$name = $value;
@@ -105,6 +106,7 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         else {
             throw InvalidPropertyException::create($name, get_class($entity));
         }
+
         return null;
     }
 

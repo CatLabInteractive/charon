@@ -95,7 +95,7 @@ abstract class RouteProperties implements RouteMutator
     {
         $out = $this->parameters->toMap();
 
-        if ($this->parent) {
+        if ($this->parent instanceof \CatLab\Charon\Collections\RouteCollection) {
             $out = array_merge($out, $this->parent->getParameters());
         }
 
@@ -107,7 +107,7 @@ abstract class RouteProperties implements RouteMutator
      */
     public function getOptions()
     {
-        $out = $this->parent !== null ? $this->parent->getOptions() : [];
+        $out = $this->parent instanceof \CatLab\Charon\Collections\RouteCollection ? $this->parent->getOptions() : [];
 
         foreach ($this->options as $k => $v) {
             $out[$k] = isset($out[$k]) ? $this->mergeOptions($k, $out[$k], $v) : $v;
@@ -157,7 +157,7 @@ abstract class RouteProperties implements RouteMutator
     public function getReturnValues()
     {
         $out = $this->returnValues;
-        if ($this->parent) {
+        if ($this->parent instanceof \CatLab\Charon\Collections\RouteCollection) {
             return array_merge($out, $this->parent->getReturnValues());
         }
 
@@ -172,12 +172,13 @@ abstract class RouteProperties implements RouteMutator
         if (count($this->consumes) > 0) {
             return $this->consumes;
         }
-        if ($this->parent && count($parentValues = $this->parent->getConsumeValues()) > 0) {
+
+        if ($this->parent instanceof \CatLab\Charon\Collections\RouteCollection && count($parentValues = $this->parent->getConsumeValues()) > 0) {
             return $parentValues;
         }
-        else {
-            return [];
-        }
+
+        return [];
+
         return null;
     }
 
@@ -210,9 +211,11 @@ abstract class RouteProperties implements RouteMutator
         if (!$this->summary) {
             return 'No route summary set.';
         }
+
         if ($this->summary instanceof Closure) {
             return call_user_func($this->summary);
         }
+
         return $this->summary;
         return 'No route summary set.';
     }
@@ -272,7 +275,7 @@ abstract class RouteProperties implements RouteMutator
             $path .= $this->options['suffix'];
         }
 
-        if ($this->parent !== null) {
+        if ($this->parent instanceof \CatLab\Charon\Collections\RouteCollection) {
             return $this->parent->processPath($path);
         }
 
@@ -285,7 +288,7 @@ abstract class RouteProperties implements RouteMutator
      */
     protected function processAction($action)
     {
-        if ($this->parent) {
+        if ($this->parent instanceof \CatLab\Charon\Collections\RouteCollection) {
             $action = $this->parent->processAction($action);
         }
 
@@ -321,9 +324,11 @@ abstract class RouteProperties implements RouteMutator
         if (!isset($this->options[$name])) {
             return;
         }
+
         if (is_array($this->options[$name])) {
             return;
         }
+
         $this->options[$name] = [ $this->options[$name] ];
     }
 
@@ -333,19 +338,20 @@ abstract class RouteProperties implements RouteMutator
      * @param $b
      * @return array|string
      */
-    private function mergeOptions($name, string $a, string $b): array|string
+    private function mergeOptions(int|string $name, string $a, string $b): array|string
     {
         if (is_array($a) && is_array($b)) {
             return array_merge($a, $b);
         }
+
         if ($name === 'prefix') {
             return $a . $b;
         }
+
         if ($name === 'suffix') {
             return $b . $a;
         }
-        else {
-            return $a . $b;
-        }
+
+        return $a . $b;
     }
 }

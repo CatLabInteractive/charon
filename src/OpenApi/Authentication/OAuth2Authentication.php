@@ -77,7 +77,7 @@ class OAuth2Authentication extends Authentication
     /**
      * @return \string[]
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->scopes;
     }

@@ -74,9 +74,11 @@ abstract class Value
         if (!$this->getField()->getTransformer()) {
             return $value;
         }
+
         if (!$context instanceof \CatLab\Charon\Interfaces\Context) {
             return $this->getField()->getTransformer()->toParameterValue($value);
         }
+
         return $this->getField()->getTransformer()->toEntityValue($value, $context);
         return $value;
     }

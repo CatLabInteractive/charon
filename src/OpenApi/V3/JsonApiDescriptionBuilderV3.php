@@ -138,6 +138,7 @@ class JsonApiDescriptionBuilderV3 extends OpenApiV3Builder
                 ]
             ];
         }
+
         return [
             'type' => 'object',
             'properties' => [

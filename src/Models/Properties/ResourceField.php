@@ -53,7 +53,7 @@ class ResourceField extends Field
     /**
      * @return bool
      */
-    public function isFilterable()
+    public function isFilterable(): bool
     {
         return $this->filterable;
     }
@@ -72,7 +72,7 @@ class ResourceField extends Field
     /**
      * @return bool
      */
-    public function isSearchable()
+    public function isSearchable(): bool
     {
         return $this->searchable;
     }
@@ -81,7 +81,7 @@ class ResourceField extends Field
      * @param bool $sortable
      * @return $this
      */
-    public function sortable($sortable = true): static
+    public function sortable(bool $sortable = true): static
     {
         $this->sortable = $sortable;
 
@@ -91,7 +91,7 @@ class ResourceField extends Field
     /**
      * @return bool
      */
-    public function isSortable()
+    public function isSortable(): bool
     {
         return $this->sortable;
     }
@@ -137,7 +137,7 @@ class ResourceField extends Field
     /**
      * @return bool
      */
-    public function isArray()
+    public function isArray(): bool
     {
         return $this->isArray;
     }
@@ -145,7 +145,7 @@ class ResourceField extends Field
     /**
      * @return bool
      */
-    public function isMap()
+    public function isMap(): bool
     {
         return $this->isMap;
     }
@@ -158,7 +158,7 @@ class ResourceField extends Field
      * @throws PropertyValidationException
      * @throws ValidationException
      */
-    public function validate($value, string $path, $validateNonProvidedFields = true)
+    public function validate($value, string $path, $validateNonProvidedFields = true): void
     {
         if ($this->isArray()) {
             if ($value ===  null) {
@@ -175,6 +175,7 @@ class ResourceField extends Field
         } else {
             return parent::validate($value, $path, $validateNonProvidedFields);
         }
+
         return null;
     }
 }

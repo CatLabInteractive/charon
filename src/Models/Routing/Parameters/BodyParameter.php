@@ -16,15 +16,13 @@ use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
 class BodyParameter extends Parameter
 {
     public $resourceAction;
+
     /**
      * @var mixed
      */
     private $resourceDefinition;
 
-    /**
-     * @var string
-     */
-    private $cardinality = Cardinality::ONE;
+    private string $cardinality = Cardinality::ONE;
 
     /**
      * PathParameter constructor.
@@ -57,7 +55,7 @@ class BodyParameter extends Parameter
     /**
      * @return string
      */
-    public function getCardinality()
+    public function getCardinality(): string
     {
         return $this->cardinality;
     }

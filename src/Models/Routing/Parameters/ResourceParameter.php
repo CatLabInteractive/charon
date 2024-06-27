@@ -58,7 +58,7 @@ class ResourceParameter extends Parameter
     /**
      * @return string
      */
-    public function getCardinality()
+    public function getCardinality(): string
     {
         return $this->cardinality;
     }

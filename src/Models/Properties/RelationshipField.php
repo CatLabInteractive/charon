@@ -152,7 +152,7 @@ class RelationshipField extends Field
      * @return $this
      */
     public function expanded(
-        $expandContextAction = Action::INDEX,
+        string $expandContextAction = Action::INDEX,
         $explicitExpandContextAction = null
     ): static {
         if ($explicitExpandContextAction === null) {
@@ -179,7 +179,7 @@ class RelationshipField extends Field
     /**
      * @return string
      */
-    public function getCardinality()
+    public function getCardinality(): string
     {
         return $this->cardinality;
     }
@@ -215,7 +215,7 @@ class RelationshipField extends Field
     /**
      * @return bool
      */
-    public function isExpanded()
+    public function isExpanded(): bool
     {
         return $this->expanded;
     }
@@ -223,7 +223,7 @@ class RelationshipField extends Field
     /**
      * @return bool
      */
-    public function isExpandable()
+    public function isExpandable(): bool
     {
         return $this->expandable;
     }
@@ -242,7 +242,7 @@ class RelationshipField extends Field
      * @param bool $edit
      * @return $this
      */
-    public function linkable($create = true, $edit = true)
+    public function linkable($create = true, $edit = true): \CatLab\Charon\Models\Properties\Base\Field
     {
         $this->linkActions[Action::CREATE] = $create;
         $this->linkActions[Action::EDIT] = $edit;
@@ -256,7 +256,7 @@ class RelationshipField extends Field
      *
      * @return $this
      */
-    public function writeable($create = true, $edit = true)
+    public function writeable($create = true, $edit = true): static
     {
         $this->createActions[Action::CREATE] = $create;
         $this->createActions[Action::EDIT] = $edit;
@@ -311,10 +311,10 @@ class RelationshipField extends Field
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldInclude(Context $context, CurrentPath $currentPath)
+    public function shouldInclude(Context $context, CurrentPath $currentPath): bool
     {
         // Check for max depth.
-        if ($maxDepth = $this->getMaxDepth()) {
+        if (($maxDepth = $this->getMaxDepth()) !== 0) {
             $existing = $currentPath->countSame($this);
             if ($existing > $maxDepth) {
                 return false;
@@ -329,10 +329,10 @@ class RelationshipField extends Field
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function isWriteable(Context $context, CurrentPath $currentPath)
+    public function isWriteable(Context $context, CurrentPath $currentPath): bool
     {
         // Check for max depth.
-        if ($maxDepth = $this->getMaxDepth()) {
+        if (($maxDepth = $this->getMaxDepth()) !== 0) {
             $existing = $currentPath->countSame($this);
             if ($existing > $maxDepth) {
                 return false;
@@ -394,7 +394,7 @@ class RelationshipField extends Field
     /**
      * @return int
      */
-    public function getMaxDepth()
+    public function getMaxDepth(): int
     {
         return $this->maxDepth;
     }
@@ -413,7 +413,7 @@ class RelationshipField extends Field
     /**
      * @return \array[]
      */
-    public function getOrderBy()
+    public function getOrderBy(): array
     {
         return $this->sortBy;
     }

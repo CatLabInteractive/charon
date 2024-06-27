@@ -45,6 +45,7 @@ class ResourceDefinitionLibrary
         if ($classname instanceof ResourceDefinition) {
             return $classname;
         }
+
         return self::instance()->makeResourceDescription($classname);
     }
 

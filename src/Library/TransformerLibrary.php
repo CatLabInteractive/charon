@@ -55,6 +55,7 @@ class TransformerLibrary
 
             return self::instance()->transformers[$serialized];
         }
+
         return self::instance()->makeTransformer($classname);
     }
 

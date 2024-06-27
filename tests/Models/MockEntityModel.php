@@ -6,10 +6,7 @@ namespace Tests\Models;
 
 class MockEntityModel
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private float|int $id;
 
     /**
      * @var MockEntityModel[]
@@ -58,7 +55,7 @@ class MockEntityModel
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): float|int
     {
         return $this->id;
     }
@@ -90,7 +87,7 @@ class MockEntityModel
     /**
      * @return MockEntityModel[]
      */
-    public function getViewVisibleRelationship()
+    public function getViewVisibleRelationship(): array
     {
         return $this->getChildren();
     }
@@ -98,7 +95,7 @@ class MockEntityModel
     /**
      * @return MockEntityModel[]
      */
-    public function getAlwaysVisibleRelationship()
+    public function getAlwaysVisibleRelationship(): array
     {
         return $this->getChildren();
     }
@@ -106,7 +103,7 @@ class MockEntityModel
     /**
      * @return MockEntityModel[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }

@@ -102,6 +102,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
 
             return new PropertyGroup($this, $fields);
         }
+
         $field = new ResourceField($this, $name);
         $this->fields->add($field);
         return $field;
@@ -111,7 +112,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      * @param array $fields
      * @return PropertyGroup|ResourceField
      */
-    public function fields(array $fields)
+    public function fields(array $fields): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         return $this->field($fields);
     }
@@ -154,13 +155,14 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
         if ($plural) {
             return StringHelper::plural($entityName, is_numeric($plural) ? $plural : 2);
         }
+
         return $entityName;
     }
 
     /**
      * @return ResourceFieldCollection
      */
-    public function getFields()
+    public function getFields(): \CatLab\Charon\Collections\ResourceFieldCollection
     {
         return $this->fields;
     }
@@ -186,7 +188,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -212,7 +214,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     /**
      * @return string
      */
-    public function getDefaultOrder()
+    public function getDefaultOrder(): ?string
     {
         return $this->defaultOrder;
     }

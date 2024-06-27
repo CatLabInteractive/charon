@@ -174,6 +174,7 @@ class OpenApiV2Builder implements DescriptionBuilder
         if ($cardinality === Cardinality::ONE) {
             return $this->addItemDefinition($this->getResourceDefinitionName($resourceDefinition), $refId, $action);
         }
+
         return $this->addItemListDefinition(
             $this->getResourceDefinitionName($resourceDefinition),
             $refId,
@@ -435,12 +436,16 @@ class OpenApiV2Builder implements DescriptionBuilder
             if ($a['required'] && !$b['required']) {
                 return -1;
             }
-            if ($b['required'] && !$a['required']) {
-                return 1;
-            }
-            else {
+
+            if (!$b['required']) {
                 return 0;
             }
+
+            if ($a['required']) {
+                return 0;
+            }
+
+            return 1;
         });
 
         // Check consumes
@@ -526,7 +531,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @return mixed
      * @throws OpenApiException
      */
-    protected function buildFieldDescription(Field $field, $action)
+    protected function buildFieldDescription(Field $field, $action): array
     {
         switch (true) {
 
@@ -561,6 +566,7 @@ class OpenApiV2Builder implements DescriptionBuilder
                 '$ref' => $schema['$ref']
             ];
         }
+
         if (Action::isWriteContext($action)) {
             if ($field->canLinkExistingEntities(new \CatLab\Charon\Models\Context($action))) {
 
@@ -574,6 +580,7 @@ class OpenApiV2Builder implements DescriptionBuilder
                     '$ref' => $schema['$ref']
                 ];
             }
+
             $schema = $this->getRelationshipSchema(
                 $field->getChildResourceDefinition(),
                 Action::CREATE,
@@ -583,15 +590,14 @@ class OpenApiV2Builder implements DescriptionBuilder
                 '$ref' => $schema['$ref']
             ];
         }
-        else {
-            return [
-                'properties' => [
-                    ResourceTransformer::RELATIONSHIP_LINK => [
-                        'type' => 'string'
-                    ]
+
+        return [
+            'properties' => [
+                ResourceTransformer::RELATIONSHIP_LINK => [
+                    'type' => 'string'
                 ]
-            ];
-        }
+            ]
+        ];
     }
 
     /**
@@ -676,7 +682,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws SwaggerMultipleInputParsers
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    protected function buildParameterDescription(Parameter $parameter, Context $context)
+    protected function buildParameterDescription(Parameter $parameter, Context $context): array
     {
         switch (true) {
             case $parameter instanceof BodyParameter:
@@ -699,7 +705,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      * @throws OpenApiException
      */
-    protected function buildBodyParameterDescription(BodyParameter $parameter, Context $context)
+    protected function buildBodyParameterDescription(BodyParameter $parameter, Context $context): array
     {
         $out = $this->buildNativeParameterDescription($parameter, $context);
         unset($out['type']);

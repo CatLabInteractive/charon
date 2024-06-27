@@ -38,7 +38,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource
      */
-    public function getChild()
+    public function getChild(): ?\CatLab\Charon\Models\RESTResource
     {
         return $this->child;
     }
@@ -46,7 +46,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource
      */
-    public function getResource()
+    public function getResource(): ?\CatLab\Charon\Models\RESTResource
     {
         return $this->child;
     }
@@ -64,7 +64,7 @@ class ChildValue extends RelationshipValue
      */
     public function getValue()
     {
-        if ($this->child === null) {
+        if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;
         }
 
@@ -76,18 +76,20 @@ class ChildValue extends RelationshipValue
      */
     public function getTransformedEntityValue(Context $context = null, string $attribute = null)
     {
-        if ($this->child === null) {
+        if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;
         }
 
         if ($attribute === null) {
             return $this->child->getProperties()->transformToEntityValuesMap($context);
         }
+
         // For performance reasons, only process the field we actually want.
         $field = $this->child->getProperties()->getFromName($attribute);
         if (!$field) {
             return null;
         }
+
         return $field->getTransformedEntityValue($context);
     }
 
@@ -96,7 +98,7 @@ class ChildValue extends RelationshipValue
      */
     public function toArray()
     {
-        if ($this->child === null) {
+        if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;
         }
 
@@ -106,7 +108,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->getChildrenToProcess();
     }

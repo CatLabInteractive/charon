@@ -154,7 +154,7 @@ class ParameterCollection
     /**
      * @return \CatLab\Charon\Models\Routing\Parameters\Base\Parameter[]
      */
-    public function toMap()
+    public function toMap(): array
     {
         return $this->parameters;
     }
