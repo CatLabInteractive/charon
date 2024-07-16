@@ -31,6 +31,7 @@ class PropertyValueCollection extends Collection
         $key = spl_object_hash($value->getField());
 
         $this[$key] = $value;
+        
         return $this;
     }
 

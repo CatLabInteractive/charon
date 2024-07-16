@@ -107,7 +107,7 @@ interface PropertySetter
         RelationshipField $field,
         array $identifiers,
         Context $context
-    );
+    ): void;
 
     /**
      * Add a child to a colleciton

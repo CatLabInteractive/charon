@@ -210,7 +210,7 @@ class ChildValue extends RelationshipValue
         RelationshipField $field,
         array $identifiers,
         Context $context
-    )
+    ): void
     {
         // Only one value allowed, so if $identifiers is empty, clear value
         if ($identifiers === []) {

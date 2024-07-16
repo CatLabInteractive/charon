@@ -158,7 +158,7 @@ class ResourceField extends Field
      * @throws PropertyValidationException
      * @throws ValidationException
      */
-    public function validate($value, string $path, $validateNonProvidedFields = true): void
+    public function validate($value, string $path, $validateNonProvidedFields = true)
     {
         if ($this->isArray()) {
             if ($value ===  null) {

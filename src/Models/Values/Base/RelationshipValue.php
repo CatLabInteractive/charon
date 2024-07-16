@@ -105,7 +105,7 @@ abstract class RelationshipValue extends Value
         RelationshipField $field,
         array $identifiers,
         Context $context
-    );
+    ): void;
 
     /**
      * @param ResourceTransformer $transformer

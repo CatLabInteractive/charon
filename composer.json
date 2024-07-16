@@ -1,6 +1,7 @@
 {
   "name": "catlabinteractive/charon",
   "description": "Charon is a framework for building self documented RESTful API's.",
+  "version": "1.5.13",
   "type": "library",
   "require": {
     "php": ">=7.1",

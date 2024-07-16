@@ -79,7 +79,7 @@ class ScalarTransformer implements Transformer
      * @param $value
      * @return bool|float|int|null|string
      */
-    protected function castMixedToScalar(array $value)
+    protected function castMixedToScalar($value)
     {
         if ($value === null) {
             return null;
@@ -104,7 +104,7 @@ class ScalarTransformer implements Transformer
     {
         switch ($this->type) {
             case PropertyType::BOOL:
-                return (bool) $value && strtolower($value) !== 'false';
+                return (bool) $value && strtolower((string) $value) !== 'false';
 
             case PropertyType::INTEGER:
                 if (

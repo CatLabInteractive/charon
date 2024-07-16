@@ -178,7 +178,7 @@ class ChildrenValue extends RelationshipValue
         RelationshipField $field,
         array $identifiers,
         Context $context
-    ) {
+    ): void {
         $propertySetter->removeAllChildrenExcept(
             $transformer,
             $propertyResolver,
