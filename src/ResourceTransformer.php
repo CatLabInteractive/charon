@@ -211,7 +211,6 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         RelationshipValue $parent = null,
         $parentEntity = null
     ) : ResourceContract {
-
         $resourceDefinition = $this->getResourceDefinition($resourceDefinition, $entity);
 
         $this->checkEntityType($resourceDefinition, $entity);
@@ -757,9 +756,6 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         ContextContract $context,
         $visible = true
     ): void {
-        if($field->getUrl() === null) {
-            dd($field, $field->getUrl());
-        }
         $url = $this->getPropertyResolver()
             ->resolvePathParameters($this, $entity, $field->getUrl(), $context);
 
