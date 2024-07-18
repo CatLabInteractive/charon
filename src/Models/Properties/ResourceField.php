@@ -22,12 +22,12 @@ class ResourceField extends Field
     /**
      * @var bool
      */
-    private $filterable;
+    private $filterable = false;
 
     /**
      * @var bool
      */
-    private $searchable;
+    private $searchable = false;
 
     private bool $sortable = false;
 
