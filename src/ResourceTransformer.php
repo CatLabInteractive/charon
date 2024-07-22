@@ -436,7 +436,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      */
     public function entitiesFromIdentifiers(
         $resourceDefinition,
-        array $content,
+        $content,
         EntityFactoryContract $factory,
         ContextContract $context
     ) {

@@ -20,7 +20,7 @@ class Identifier extends RESTResource
     {
         $identifier = new self($resourceDefinition);
         foreach ($data as $k => $v) {
-            $field = $identifier->getResourceDefinition()->getFields()->getFromDisplayName($k);
+            $field = $identifier->getResourceDefinition()->getFields()->getFromDisplayName((string) $k);
             if ($field) {
                 $identifier->setProperty($field, $v, true);
             }
