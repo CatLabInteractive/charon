@@ -37,5 +37,14 @@
     "platform": {
       "php": "8.0"
     }
+  },
+  "archive": {
+    "exclude": [
+      "/blogs/",
+      "/docs/",
+      "/docusaurus/",
+      "/tests/",
+      "/example/"
+    ]
   }
 }

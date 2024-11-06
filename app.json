@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "dokku": {
+      "predeploy": "cd docusaurus && npm install && npm run build"
+    }
+  },
+  "healthchecks": {
+    "web": [
+      {
+        "type":        "startup",
+        "name":        "web check",
+        "description": "Checking if the app responds to the /sitemap.xml endpoint",
+        "path":        "/sitemap.xml"
+      }
+    ]
+  }
+}
