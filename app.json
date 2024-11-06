@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dokku": {
-      "predeploy": "cd docusaurus && npm install && npm run build"
+      "predeploy": "npm run build"
     }
   },
   "healthchecks": {
