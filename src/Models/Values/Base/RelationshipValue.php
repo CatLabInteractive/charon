@@ -11,7 +11,6 @@ use CatLab\Requirements\Exceptions\PropertyValidationException;
 use CatLab\Requirements\Exceptions\RequirementValidationException;
 use CatLab\Requirements\Exceptions\ResourceValidationException;
 use CatLab\Requirements\Exists;
-use CatLab\Charon\Collections\PropertyValueCollection;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\EntityFactory;
 use CatLab\Charon\Interfaces\PropertyResolver;
@@ -387,14 +386,23 @@ abstract class RelationshipValue extends Value
                     } catch (PropertyValidationException $e) {
                         // If not, do a full validation.
                         try {
-                            $child->validate($context, null, $this->appendToPath($path, $field), $validateNonProvidedFields);
+                            $child->validate(
+                                $context,
+                                null,
+                                $this->appendToPath($path, $field),
+                                $validateNonProvidedFields
+                            );
                         } catch (ResourceValidationException $e) {
                             $messages->merge($e->getMessages());
                         }
                     }
 
                 } else {
-                    $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
+                    $this->getField()->validate(
+                        null,
+                        (string) $this->appendToPath($path, $field),
+                        $validateNonProvidedFields
+                    );
                 }
             }
         } elseif ($field->canLinkExistingEntities($context)) {
@@ -406,7 +414,11 @@ abstract class RelationshipValue extends Value
                     $this->validateLinkableResource($child, $path);
                 } else {
                     try {
-                        $this->getField()->validate(null, $this->appendToPath($path, $field), $validateNonProvidedFields);
+                        $this->getField()->validate(
+                            null,
+                            (string) $this->appendToPath($path, $field),
+                            $validateNonProvidedFields
+                        );
                     } catch (ResourceValidationException $e) {
                         $messages->merge($e->getMessages());
                     }
@@ -437,7 +449,7 @@ abstract class RelationshipValue extends Value
             /** @var IdentifierField $identifier */
             $prop = $child->getProperties()->getFromName($identifier->getName());
             if (!$prop || $prop->getValue() === null) {
-                $identifier->setPath($this->appendToPath($path, $field));
+                $identifier->setPath((string) $this->appendToPath($path, $field));
                 $propertyException = RequirementValidationException::make($identifier, new Exists(), null);
                 $messages = new MessageCollection();
                 $messages->add($propertyException->getRequirement()->getErrorMessage($propertyException));
@@ -471,25 +483,10 @@ abstract class RelationshipValue extends Value
     /**
      * @param CurrentPath $path
      * @param Field $field
-     * @return string
+     * @return CurrentPath
      */
     private function appendToPath(CurrentPath $path, Field $field)
     {
-        /*
-        $display = $field->getDisplayName();
-        if ($field instanceof RelationshipField) {
-            if ($field->getCardinality() === Cardinality::MANY) {
-                $display .= '[]';
-            }
-        }
-
-        if (!empty($path)) {
-            return $path . '.' . $display;
-        } else {
-            return $display;
-        }
-        */
-
         return $path->clonePush($field);
     }
 }
