@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Validation\Requirements;
 
 use CatLab\Requirements\Exists;
@@ -13,7 +15,7 @@ class RelationshipExists extends Exists
     /**
      * @return string
      */
-    function getTemplate() : string
+    public function getTemplate() : string
     {
         return 'The %s is a required relationship.';
     }

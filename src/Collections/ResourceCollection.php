@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
@@ -15,14 +17,13 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
     /**
      * @var string
      */
-    private $meta;
+    private array $meta = [];
 
     /**
      * RESTResourceCollection constructor.
      */
     public function __construct()
     {
-        $this->meta = [];
     }
 
     /**
@@ -30,7 +31,7 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
      * @param mixed $data
      * @return $this
      */
-    public function addMeta($name, $data)
+    public function addMeta($name, $data): static
     {
         $this->meta[$name] = $data;
         return $this;
@@ -43,8 +44,9 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
     public function getMeta($key = null)
     {
         if ($key !== null) {
-            return isset($this->meta[$key]) ? $this->meta[$key] : null;
+            return $this->meta[$key] ?? null;
         }
+
         return $this->meta;
     }
 
@@ -63,7 +65,7 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
             ResourceTransformer::RELATIONSHIP_ITEMS => $items,
         ];
 
-        if (!empty($this->meta)) {
+        if ($this->meta !== []) {
             $out['meta'] = $this->meta;
         }
 
@@ -74,7 +76,7 @@ class ResourceCollection extends Collection implements \CatLab\Charon\Interfaces
      * @param $reference
      * @return array
      */
-    public function getSwaggerDescription($reference)
+    public function getSwaggerDescription($reference): array
     {
         return [
             'type' => 'object',

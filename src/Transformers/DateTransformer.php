@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Transformers;
 
 use CatLab\Charon\Exceptions\InvalidPropertyException;

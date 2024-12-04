@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing\Parameters\Base;
 
 use CatLab\Base\Interfaces\Database\OrderParameter;
@@ -27,11 +29,15 @@ class Parameter implements RouteMutator, Property
         setType as traitSetType;
     }
 
-    const IN_PATH = 'path';
-    const IN_QUERY = 'query';
-    const IN_HEADER = 'header';
-    const IN_BODY = 'body';
-    const IN_FORM = 'formData';
+    public const IN_PATH = 'path';
+
+    public const IN_QUERY = 'query';
+
+    public const IN_HEADER = 'header';
+
+    public const IN_BODY = 'body';
+
+    public const IN_FORM = 'formData';
 
     /**
      * @var string
@@ -51,7 +57,7 @@ class Parameter implements RouteMutator, Property
     /**
      * @var string
      */
-    protected $type;
+    protected $type = 'string';
 
     /**
      * @var Route
@@ -76,7 +82,7 @@ class Parameter implements RouteMutator, Property
     /**
      * @var string[]
      */
-    protected $transformers;
+    protected $transformers = [];
 
     /**
      * @var Validator|null
@@ -86,7 +92,7 @@ class Parameter implements RouteMutator, Property
     /**
      * @var string[]
      */
-    protected $enumValues;
+    protected $enumValues = null;
 
     /**
      * Parameter constructor.
@@ -97,16 +103,13 @@ class Parameter implements RouteMutator, Property
     {
         $this->name = $name;
         $this->in = $type;
-        $this->type = 'string';
-        $this->transformers = [];
-        $this->enumValues = null;
     }
 
     /**
      * @param RouteMutator $route
      * @return $this
      */
-    public function setRoute(RouteMutator $route)
+    public function setRoute(RouteMutator $route): static
     {
         $this->route = $route;
         return $this;
@@ -117,7 +120,7 @@ class Parameter implements RouteMutator, Property
      * @param bool $enforce
      * @return $this
      */
-    public function enum(array $values, $enforce = true)
+    public function enum(array $values, $enforce = true): static
     {
         $this->enumValues = $values;
         if ($enforce) {
@@ -140,7 +143,7 @@ class Parameter implements RouteMutator, Property
      * @param string $transformer
      * @return $this
      */
-    public function allowMultiple($multiple = true, $transformer = null)
+    public function allowMultiple($multiple = true, $transformer = null): static
     {
         $this->allowMultiple = $multiple;
 
@@ -169,7 +172,7 @@ class Parameter implements RouteMutator, Property
      * @param string $transformer   Transformer that should be used to translate plain values to arrays.
      * @return $this
      */
-    public function array($transformer = null)
+    public function array($transformer = null): static
     {
         $this->allowMultiple(true, $transformer);
         return $this;
@@ -187,7 +190,7 @@ class Parameter implements RouteMutator, Property
      * @param $type
      * @return $this
      */
-    public function type($type)
+    public function type($type): static
     {
         $this->type = $type;
         return $this;
@@ -222,7 +225,7 @@ class Parameter implements RouteMutator, Property
      * @param string $description
      * @return $this
      */
-    public function describe(string $description)
+    public function describe(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -232,7 +235,7 @@ class Parameter implements RouteMutator, Property
      * @param $defaultValue
      * @return $this
      */
-    public function default($defaultValue)
+    public function default($defaultValue): static
     {
         $this->default = $defaultValue;
         return $this;
@@ -281,7 +284,7 @@ class Parameter implements RouteMutator, Property
      */
     public function consumes(string $mimetype) : RouteMutator
     {
-        return call_user_func_array([ $this->route, 'consumes' ], func_get_args());
+        return $this->route->consumes(...func_get_args());
     }
 
     /**
@@ -308,7 +311,7 @@ class Parameter implements RouteMutator, Property
      * @param Parameter $parameter
      * @return static
      */
-    public function merge(Parameter $parameter)
+    public function merge(Parameter $parameter): static
     {
         foreach ($parameter->getRequirements() as $requirement) {
             $this->addRequirement($requirement);
@@ -331,7 +334,7 @@ class Parameter implements RouteMutator, Property
      * @param Transformer|string $transformer
      * @return static
      */
-    public function transformer($transformer)
+    public function transformer($transformer): static
     {
         $this->transformers[] = $transformer;
         return $this;
@@ -341,7 +344,7 @@ class Parameter implements RouteMutator, Property
      * @return Transformer|null
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
-    public function getTransformer()
+    public function getTransformer(): ?\CatLab\Charon\Transformers\TransformerQueue
     {
         $transformers = $this->getTransformers();
         if (count($transformers) === 0) {
@@ -356,7 +359,7 @@ class Parameter implements RouteMutator, Property
      * @return array|null
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
-    public function getTransformers()
+    public function getTransformers(): ?array
     {
         if (count($this->transformers) === null) {
             return null;
@@ -375,7 +378,7 @@ class Parameter implements RouteMutator, Property
      * @return $this
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    public function datetime($transformer = null)
+    public function datetime($transformer = null): static
     {
         if ($transformer !== null) {
             $this->transformer($transformer);
@@ -391,7 +394,7 @@ class Parameter implements RouteMutator, Property
      * @return $this
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    public function setType($type, $transformer = 'default')
+    public function setType($type, $transformer = 'default'): static
     {
         $this->traitSetType($type);
 

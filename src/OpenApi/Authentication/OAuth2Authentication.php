@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\OpenApi\Authentication;
 
 /**
@@ -8,8 +10,9 @@ namespace CatLab\Charon\OpenApi\Authentication;
  */
 class OAuth2Authentication extends Authentication
 {
-    const FLOW_IMPLICIT = 'implicit';
-    const FLOW_CODE = 'code';
+    public const FLOW_IMPLICIT = 'implicit';
+
+    public const FLOW_CODE = 'code';
 
     /**
      * @var string
@@ -24,23 +27,22 @@ class OAuth2Authentication extends Authentication
     /**
      * @var string[]
      */
-    private $scopes;
+    private array $scopes = [];
 
     /**
      * OAuth2Authentication constructor.
      * @param string $name
      */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         parent::__construct($name, 'oauth2');
-        $this->scopes = [];
     }
 
     /**
      * @param string $authorizationUrl
      * @return OAuth2Authentication
      */
-    public function setAuthorizationUrl($authorizationUrl)
+    public function setAuthorizationUrl($authorizationUrl): static
     {
         $this->authorizationUrl = $authorizationUrl;
         return $this;
@@ -50,7 +52,7 @@ class OAuth2Authentication extends Authentication
      * @param string $flow
      * @return OAuth2Authentication
      */
-    public function setFlow($flow)
+    public function setFlow($flow): static
     {
         $this->flow = $flow;
         return $this;
@@ -75,7 +77,7 @@ class OAuth2Authentication extends Authentication
     /**
      * @return \string[]
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return $this->scopes;
     }
@@ -85,7 +87,7 @@ class OAuth2Authentication extends Authentication
      * @param string $description
      * @return $this
      */
-    public function addScope(string $name, string $description)
+    public function addScope(string $name, string $description): static
     {
         $this->scopes[$name] = $description;
         return $this;
@@ -94,7 +96,7 @@ class OAuth2Authentication extends Authentication
     /**
      * @return mixed
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'type' => $this->getType(),

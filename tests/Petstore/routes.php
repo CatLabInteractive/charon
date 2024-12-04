@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Action;
 use Tests\Petstore\Definitions\PetDefinition;
@@ -17,7 +19,7 @@ $routes->group(
             ]
         ]
     ],
-    function(RouteCollection $routes) {
+    function(RouteCollection $routes): void {
 
         $routes
             ->parameters()->path('format')

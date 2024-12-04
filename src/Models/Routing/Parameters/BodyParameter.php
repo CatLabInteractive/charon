@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing\Parameters;
 
 use CatLab\Charon\Enums\Action;
@@ -13,15 +15,14 @@ use CatLab\Charon\Models\Routing\Parameters\Base\Parameter;
  */
 class BodyParameter extends Parameter
 {
+    public $resourceAction;
+
     /**
      * @var mixed
      */
     private $resourceDefinition;
 
-    /**
-     * @var string
-     */
-    private $cardinality = Cardinality::ONE;
+    private string $cardinality = Cardinality::ONE;
 
     /**
      * PathParameter constructor.
@@ -36,7 +37,7 @@ class BodyParameter extends Parameter
     /**
      * @return $this
      */
-    public function one()
+    public function one(): static
     {
         $this->cardinality = Cardinality::ONE;
         return $this;
@@ -45,7 +46,7 @@ class BodyParameter extends Parameter
     /**
      * @return $this
      */
-    public function many()
+    public function many(): static
     {
         $this->cardinality = Cardinality::MANY;
         return $this;
@@ -54,7 +55,7 @@ class BodyParameter extends Parameter
     /**
      * @return string
      */
-    public function getCardinality()
+    public function getCardinality(): string
     {
         return $this->cardinality;
     }
@@ -63,7 +64,7 @@ class BodyParameter extends Parameter
      * @param Action $action
      * @return $this
      */
-    public function setAction($action)
+    public function setAction($action): static
     {
         $this->resourceAction = $action;
         return $this;
@@ -85,7 +86,7 @@ class BodyParameter extends Parameter
      * @param Parameter $parameter
      * @return $this|Parameter
      */
-    public function merge(Parameter $parameter)
+    public function merge(Parameter $parameter): static
     {
         parent::merge($parameter);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 use CatLab\Charon\Interfaces\InputParser;
@@ -25,42 +27,33 @@ class Context implements ContextContract
     /**
      * @var mixed[]
      */
-    private $parameters;
+    private array $parameters;
 
     /**
      * @var Context[]
      */
-    private $childContext = [];
+    private array $childContext = [];
 
     /**
      * @var string
      */
-    private $fieldsToShow;
+    private array $fieldsToShow = [];
 
     /**
      * @var string
      */
-    private $fieldsToExpand;
+    private array $fieldsToExpand = [];
 
-    /**
-     * @var ProcessorCollection
-     */
-    private $processors;
+    private \CatLab\Charon\Collections\ProcessorCollection $processors;
 
-    /**
-     * @var string
-     */
-    private $url;
+    private ?string $url = null;
 
-    /**
-     * @var InputParserCollection
-     */
-    private $inputParsers;
+    private \CatLab\Charon\Collections\InputParserCollection $inputParsers;
 
     /**
      *
      */
-    const FIELD_PATH_DELIMITER = '.';
+    public const FIELD_PATH_DELIMITER = '.';
 
     /**
      * Context constructor.
@@ -74,16 +67,13 @@ class Context implements ContextContract
 
         $this->action = $action;
         $this->parameters = $parameters;
-
-        $this->fieldsToExpand = [];
-        $this->fieldsToShow = [];
     }
 
     /**
      * @param Processor $processor
      * @return $this
      */
-    public function addProcessor(Processor $processor)
+    public function addProcessor(Processor $processor): static
     {
         $this->processors->add($processor);
         return $this;
@@ -93,7 +83,7 @@ class Context implements ContextContract
      * @param string $inputParser
      * @return $this
      */
-    public function addInputParser(string $inputParser)
+    public function addInputParser(string $inputParser): static
     {
         $this->inputParsers->add($inputParser);
         return $this;
@@ -140,7 +130,7 @@ class Context implements ContextContract
      * @param string $action
      * @return static
      */
-    protected function createChildContext($action = Action::INDEX)
+    protected function createChildContext($action = Action::INDEX): static
     {
         $childContext = new static($action);
 
@@ -167,7 +157,7 @@ class Context implements ContextContract
      * @param string $field
      * @return $this
      */
-    public function showField($field)
+    public function showField($field): static
     {
         $path = explode(self::FIELD_PATH_DELIMITER, $field);
         $this->touchArrayPath($this->fieldsToShow, $path);
@@ -179,7 +169,7 @@ class Context implements ContextContract
      * @param string $field
      * @return $this
      */
-    public function expandField($field)
+    public function expandField($field): static
     {
         $path = explode(self::FIELD_PATH_DELIMITER, $field);
         $this->touchArrayPath($this->fieldsToExpand, $path);
@@ -191,11 +181,12 @@ class Context implements ContextContract
      * @param string[] $fields
      * @return $this
      */
-    public function showFields(array $fields)
+    public function showFields(array $fields): static
     {
         foreach ($fields as $field) {
             $this->showField($field);
         }
+
         return $this;
     }
 
@@ -203,7 +194,7 @@ class Context implements ContextContract
      * @param string[] $fields
      * @return $this
      */
-    public function expandFields(array $fields)
+    public function expandFields(array $fields): static
     {
         foreach ($fields as $field) {
             $this->expandField($field);
@@ -218,7 +209,7 @@ class Context implements ContextContract
      */
     public function shouldShowField(CurrentPath $fieldPath)
     {
-        if (count($this->fieldsToShow) === 0) {
+        if ($this->fieldsToShow === []) {
             return null;
         }
 
@@ -236,7 +227,7 @@ class Context implements ContextContract
      */
     public function shouldExpandField(CurrentPath $fieldPath)
     {
-        if (count($this->fieldsToExpand) === 0) {
+        if ($this->fieldsToExpand === []) {
             return null;
         }
 
@@ -254,7 +245,7 @@ class Context implements ContextContract
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -262,7 +253,7 @@ class Context implements ContextContract
     /**
      * @param string $url
      */
-    public function setUrl(string $url)
+    public function setUrl(string $url): void
     {
         $this->url = $url;
     }
@@ -271,7 +262,7 @@ class Context implements ContextContract
      * @param bool[] $target
      * @param string[] $path
      */
-    private function touchArrayPath(array &$target, array $path)
+    private function touchArrayPath(array &$target, array $path): void
     {
         $key = array_shift($path);
         if (!$key) {
@@ -281,6 +272,7 @@ class Context implements ContextContract
         if (!isset($target[$key])) {
             $target[$key] = [];
         }
+
         $this->touchArrayPath($target[$key], $path);
     }
 
@@ -299,9 +291,9 @@ class Context implements ContextContract
         if (isset($recursivePath[$key])) {
             if (count($path) == 0) {
                 return true;
-            } else {
-                return $this->arrayPathExists($fieldsToShow, $path, $recursivePath);
             }
+
+            return $this->arrayPathExists($fieldsToShow, $path, $recursivePath);
         }
 
         if (count($fieldsToShow) == 0) {
@@ -311,35 +303,37 @@ class Context implements ContextContract
         if (isset($fieldsToShow[$key . '*'])) {
             if (count($path) == 0) {
                 return true;
-            } else {
-                // Check for all keys on this level that are recursive
-                foreach ($fieldsToShow as $k => $v) {
-                    if (mb_substr($k, -1) === '*') {
-                        $recursivePath[mb_substr($k, 0, -1)] = true;
-                    }
-                }
-                return $this->arrayPathExists($fieldsToShow[$key . '*'], $path, $recursivePath);
             }
+
+            // Check for all keys on this level that are recursive
+            foreach (array_keys($fieldsToShow) as $k) {
+                if (mb_substr($k, -1) === '*') {
+                    $recursivePath[mb_substr($k, 0, -1)] = true;
+                }
+            }
+
+            return $this->arrayPathExists($fieldsToShow[$key . '*'], $path, $recursivePath);
         }
 
         if (isset($fieldsToShow[$key])) {
             if (count($fieldsToShow[$key]) === 0) {
-                return count($path) > 0 ? null : true;
-            } elseif (count($path) > 0) {
+                return $path !== [] ? null : true;
+            }
+
+            if ($path !== []) {
                 return $this->arrayPathExists($fieldsToShow[$key], $path);
-            } else {
-                return true;
-            }
-        } else {
-
-            // Finally, check for asterisk, which means we should keep the regular fields (and return NULL)
-            if (isset($fieldsToShow['*'])) {
-                return null;
             }
 
-            // Nope, fail. Don't show.
-            return false;
+            return true;
         }
+
+        // Finally, check for asterisk, which means we should keep the regular fields (and return NULL)
+        if (isset($fieldsToShow['*'])) {
+            return null;
+        }
+
+        // Nope, fail. Don't show.
+        return false;
     }
 
     /**
@@ -354,7 +348,7 @@ class Context implements ContextContract
      * Return a fork of the context.
      * @return self
      */
-    public function fork()
+    public function fork(): static
     {
         return clone $this;
     }

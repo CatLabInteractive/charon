@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
@@ -23,12 +25,12 @@ use Tests\Petstore\Models\Tag;
  *
  * @package CatLab\RESTResource\Tests
  */
-class PaginationBuilderTest extends BaseTest
+final class PaginationBuilderTest extends BaseTest
 {
     /**
      *
      */
-    public function testDisplayName()
+    public function testDisplayName(): void
     {
         $cursors = $this->getCursorsToTest('pet-id');
         $this->assertEquals('{"pet-id":1}', base64_decode($cursors['before']));
@@ -38,7 +40,7 @@ class PaginationBuilderTest extends BaseTest
     /**
      *
      */
-    public function testDisplayNameReverse()
+    public function testDisplayNameReverse(): void
     {
         $cursors = $this->getCursorsToTest('!pet-id');
         $this->assertEquals('{"!pet-id":1}', base64_decode($cursors['before']));
@@ -48,7 +50,7 @@ class PaginationBuilderTest extends BaseTest
     /**
      *
      */
-    public function testUnknownSortOrder()
+    public function testUnknownSortOrder(): void
     {
         $cursors = $this->getCursorsToTest('fubaro');
         $this->assertEquals('{"pet-id":1}', base64_decode($cursors['before']));
@@ -58,7 +60,7 @@ class PaginationBuilderTest extends BaseTest
     /**
      *
      */
-    public function testDate()
+    public function testDate(): void
     {
         // temporary disabled
         return;
@@ -96,7 +98,7 @@ class PaginationBuilderTest extends BaseTest
         $this->assertEquals('1986-04-02 10:00:00', $dateWhere->getComparison()->getValue()->format('Y-m-d H:i:s'));
     }
 
-    private function getCursorsToTest($sortOrder, $afterCursor = null, $beforeCursor = null)
+    private function getCursorsToTest(string $sortOrder, $afterCursor = null, $beforeCursor = null): array
     {
         $petDefinition = new PetDefinitionWithDate();
 

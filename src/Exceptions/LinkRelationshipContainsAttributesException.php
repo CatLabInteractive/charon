@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Exceptions;
 
 use CatLab\Requirements\Collections\MessageCollection;

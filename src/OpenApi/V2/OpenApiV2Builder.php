@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\OpenApi\V2;
 
 use CatLab\Base\Collections\Collection;
@@ -37,36 +39,27 @@ use CatLab\Requirements\Enums\PropertyType;
  */
 class OpenApiV2Builder implements DescriptionBuilder
 {
-    /**
-     * @var string
-     */
-    protected $host;
+    protected string $host;
 
-    /**
-     * @var string
-     */
-    protected $basePath;
+    protected string $basePath;
 
     /**
      * @var mixed[]
      */
-    protected $paths;
+    protected $paths = [];
 
     /**
      * @var mixed[]
      */
-    protected $schemas;
+    protected $schemas = [];
 
     /**
      * Keep a list of unique resource definition names.
      * @var mixed[]
      */
-    protected $resourceDefinitionNames;
+    protected $resourceDefinitionNames = [];
 
-    /**
-     * @var PrettyEntityNameLibrary
-     */
-    protected $entityNameLibrary;
+    protected \CatLab\Charon\Library\PrettyEntityNameLibrary $entityNameLibrary;
 
     /**
      * @var string
@@ -101,17 +94,14 @@ class OpenApiV2Builder implements DescriptionBuilder
     /**
      * @var Authentication[]
      */
-    protected $authentications;
+    protected $authentications = [];
 
     /**
      * @var Route
      */
-    protected $routes;
+    protected $routes = [];
 
-    /**
-     * @var ResourceFactoryInterface
-     */
-    protected $resourceFactory;
+    protected \CatLab\Charon\Interfaces\ResourceFactory $resourceFactory;
 
     /**
      * SwaggerBuilder constructor.
@@ -124,18 +114,11 @@ class OpenApiV2Builder implements DescriptionBuilder
         string $basePath,
         ResourceFactoryInterface $resourceFactory = null
     ) {
-        $this->paths = [];
-        $this->schemas = [];
-        $this->authentications = [];
-
         $this->resourceFactory = $resourceFactory ?? new ResourceFactory();
         $this->entityNameLibrary = new PrettyEntityNameLibrary();
-        $this->resourceDefinitionNames = [];
 
         $this->host = $host;
         $this->basePath = $basePath;
-
-        $this->routes = [];
     }
 
     /**
@@ -143,7 +126,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws RouteAlreadyDefined
      * @return $this
      */
-    public function addRoute(Route $route)
+    public function addRoute(Route $route): static
     {
         $path = str_replace('?', '', $route->getPath());
 
@@ -177,7 +160,7 @@ class OpenApiV2Builder implements DescriptionBuilder
         ResourceDefinition $resourceDefinition,
         string $action,
         string $cardinality = Cardinality::ONE
-    ) {
+    ): string {
         $this->checkResourceDefinitionType($resourceDefinition);
 
         $name = $this->getResourceDefinitionName($resourceDefinition) . '_' . $action;
@@ -190,20 +173,20 @@ class OpenApiV2Builder implements DescriptionBuilder
 
         if ($cardinality === Cardinality::ONE) {
             return $this->addItemDefinition($this->getResourceDefinitionName($resourceDefinition), $refId, $action);
-        } else {
-            return $this->addItemListDefinition(
-                $this->getResourceDefinitionName($resourceDefinition),
-                $refId,
-                $action
-            );
         }
+
+        return $this->addItemListDefinition(
+            $this->getResourceDefinitionName($resourceDefinition),
+            $refId,
+            $action
+        );
     }
 
     /**
      * @param $name
      * @return string
      */
-    protected function getResourceDefinitionReference($name)
+    protected function getResourceDefinitionReference(string $name): string
     {
         return '#/definitions/' . $name;
     }
@@ -232,7 +215,7 @@ class OpenApiV2Builder implements DescriptionBuilder
             // check if this name is already in use
             $counter = 1;
             while (in_array($name, $this->resourceDefinitionNames)) {
-                $counter ++;
+                ++$counter;
                 $name = $prettyName . $counter;
             }
 
@@ -249,7 +232,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @return array[]
      * @throws OpenApiException
      */
-    public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
+    public function getRelationshipSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality): array
     {
         return [
             '$ref' => $this->addResourceDefinition($resourceDefinition, $action, $cardinality)
@@ -263,7 +246,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @return array[]
      * @throws OpenApiException
      */
-    public function getResponseSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality)
+    public function getResponseSchema(ResourceDefinition $resourceDefinition, string $action, string $cardinality): array
     {
         return [
             '$ref' => $this->addResourceDefinition($resourceDefinition, $action, $cardinality)
@@ -274,7 +257,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param string $title
      * @return $this
      */
-    public function setTitle(string $title)
+    public function setTitle(string $title): static
     {
         $this->title = $title;
         return $this;
@@ -284,7 +267,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param string $description
      * @return $this
      */
-    public function setDescription(string $description)
+    public function setDescription(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -294,7 +277,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param string $terms
      * @return $this
      */
-    public function setTermsOfService(string $terms)
+    public function setTermsOfService(string $terms): static
     {
         $this->termsOfService = $terms;
         return $this;
@@ -306,7 +289,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param string $email
      * @return $this
      */
-    public function setContact(string $name, string $url, string $email)
+    public function setContact(string $name, string $url, string $email): static
     {
         $this->contact = [
             'name' => $name,
@@ -322,7 +305,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param string $url
      * @return $this
      */
-    public function setLicense(string $name, string $url)
+    public function setLicense(string $name, string $url): static
     {
         $this->license = [
             'name' => $name,
@@ -336,7 +319,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param string $version
      * @return $this
      */
-    public function setVersion(string $version)
+    public function setVersion(string $version): static
     {
         $this->version = $version;
         return $this;
@@ -346,7 +329,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param Authentication $authentication
      * @return $this
      */
-    public function addAuthentication(Authentication $authentication)
+    public function addAuthentication(Authentication $authentication): static
     {
         $this->authentications[] = $authentication;
         return $this;
@@ -358,7 +341,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function build(Context $context)
+    public function build(Context $context): array
     {
         $out = [];
 
@@ -392,7 +375,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      */
     protected function buildRoute(Route $route, Context $context)
     {
-        list ($path, $staticRouteParameters) = $route->getPathWithStaticRouteParameters();
+        [$path, $staticRouteParameters] = $route->getPathWithStaticRouteParameters();
 
         $path = str_replace('?', '', $path);
         $method = $route->getHttpMethod();
@@ -410,7 +393,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    public function routeToSwagger(Route $route, DescriptionBuilder $builder, Context $context)
+    public function routeToSwagger(Route $route, DescriptionBuilder $builder, Context $context): array
     {
         $out = [];
 
@@ -434,11 +417,7 @@ class OpenApiV2Builder implements DescriptionBuilder
         $out['parameters'] = [];
 
         if (isset($options['tags'])) {
-            if (is_array($options['tags'])) {
-                $out['tags'] = $options['tags'];
-            } else {
-                $out['tags'] = [ $options['tags'] ];
-            }
+            $out['tags'] = is_array($options['tags']) ? $options['tags'] : [ $options['tags'] ];
         }
 
         foreach ($parameters as $parameter) {
@@ -453,14 +432,20 @@ class OpenApiV2Builder implements DescriptionBuilder
         }
 
         // Sort parameters: required first
-        usort($out['parameters'], function ($a, $b) {
+        usort($out['parameters'], function (array $a, array $b): int {
             if ($a['required'] && !$b['required']) {
                 return -1;
-            } elseif ($b['required'] && !$a['required']) {
-                return 1;
-            } else {
+            }
+
+            if (!$b['required']) {
                 return 0;
             }
+
+            if ($a['required']) {
+                return 0;
+            }
+
+            return 1;
         });
 
         // Check consumes
@@ -501,37 +486,38 @@ class OpenApiV2Builder implements DescriptionBuilder
             $resourceCollection = $this->resourceFactory->createResourceCollection();
             $this->schemas[$name] = $resourceCollection->getSwaggerDescription($reference);
         }
+
         return $this->getResourceDefinitionReference($name);
     }
 
     /**
      * @return array
      */
-    protected function getInfoObject()
+    protected function getInfoObject(): array
     {
         $out = [];
 
-        if (isset($this->title)) {
+        if ($this->title !== null) {
             $out['title'] = $this->title;
         }
 
-        if (isset($this->description)) {
+        if ($this->description !== null) {
             $out['description'] = $this->description;
         }
 
-        if (isset($this->termsOfService)) {
+        if ($this->termsOfService !== null) {
             $out['termsOfService'] = $this->termsOfService;
         }
 
-        if (isset($this->contact)) {
+        if ($this->contact !== null) {
             $out['contact'] = $this->contact;
         }
 
-        if (isset($this->license)) {
+        if ($this->license !== null) {
             $out['license'] = $this->license;
         }
 
-        if (isset($this->version)) {
+        if ($this->version !== null) {
             $out['version'] = $this->version;
         }
 
@@ -545,7 +531,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @return mixed
      * @throws OpenApiException
      */
-    protected function buildFieldDescription(Field $field, $action)
+    protected function buildFieldDescription(Field $field, $action): array
     {
         switch (true) {
 
@@ -568,20 +554,20 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws OpenApiException
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    protected function buildRelationshipFieldDescription(RelationshipField $field, $action)
+    protected function buildRelationshipFieldDescription(RelationshipField $field, $action): array
     {
         if (Action::isReadContext($action) && $field->isExpanded()) {
-
             $schema = $this->getRelationshipSchema(
                 $field->getChildResourceDefinition(),
                 $field->getExpandAction(),
                 $field->getCardinality()
             );
-
             return [
                 '$ref' => $schema['$ref']
             ];
-        } elseif (Action::isWriteContext($action)) {
+        }
+
+        if (Action::isWriteContext($action)) {
             if ($field->canLinkExistingEntities(new \CatLab\Charon\Models\Context($action))) {
 
                 $schema = $this->getRelationshipSchema(
@@ -593,26 +579,25 @@ class OpenApiV2Builder implements DescriptionBuilder
                 return [
                     '$ref' => $schema['$ref']
                 ];
-            } else {
-                $schema = $this->getRelationshipSchema(
-                    $field->getChildResourceDefinition(),
-                    Action::CREATE,
-                    $field->getCardinality()
-                );
-
-                return [
-                    '$ref' => $schema['$ref']
-                ];
             }
-        } else {
+
+            $schema = $this->getRelationshipSchema(
+                $field->getChildResourceDefinition(),
+                Action::CREATE,
+                $field->getCardinality()
+            );
             return [
-                'properties' => [
-                    ResourceTransformer::RELATIONSHIP_LINK => [
-                        'type' => 'string'
-                    ]
-                ]
+                '$ref' => $schema['$ref']
             ];
         }
+
+        return [
+            'properties' => [
+                ResourceTransformer::RELATIONSHIP_LINK => [
+                    'type' => 'string'
+                ]
+            ]
+        ];
     }
 
     /**
@@ -620,7 +605,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param $action
      * @return array
      */
-    protected function buildResourceFieldDescription(ResourceField $field, $action)
+    protected function buildResourceFieldDescription(ResourceField $field, $action): array
     {
         $description = [];
 
@@ -652,7 +637,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      * @throws OpenApiException
      */
-    protected function buildReturnValueDescription(ReturnValue $returnValue)
+    protected function buildReturnValueDescription(ReturnValue $returnValue): array
     {
         $response = [];
 
@@ -697,7 +682,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws SwaggerMultipleInputParsers
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    protected function buildParameterDescription(Parameter $parameter, Context $context)
+    protected function buildParameterDescription(Parameter $parameter, Context $context): array
     {
         switch (true) {
             case $parameter instanceof BodyParameter:
@@ -720,7 +705,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      * @throws OpenApiException
      */
-    protected function buildBodyParameterDescription(BodyParameter $parameter, Context $context)
+    protected function buildBodyParameterDescription(BodyParameter $parameter, Context $context): array
     {
         $out = $this->buildNativeParameterDescription($parameter, $context);
         unset($out['type']);
@@ -746,7 +731,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @throws SwaggerMultipleInputParsers
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    protected function buildResourceParameterDescription(ResourceParameter $parameter, Context $context)
+    protected function buildResourceParameterDescription(ResourceParameter $parameter, Context $context): array
     {
         $out = [];
 
@@ -775,7 +760,7 @@ class OpenApiV2Builder implements DescriptionBuilder
         return $out;
     }
 
-    protected function buildNativeParameterDescription(Parameter $parameter, Context $context)
+    protected function buildNativeParameterDescription(Parameter $parameter, Context $context): array
     {
         $out = [];
 
@@ -795,9 +780,7 @@ class OpenApiV2Builder implements DescriptionBuilder
         if ($parameter->isAllowMultiple()) {
             //$out['allowMultiple'] = $this->allowMultiple;
             $out['type'] = 'array';
-            $out['items'] = array(
-                'type' => $this->getSwaggerType($parameter)
-            );
+            $out['items'] = ['type' => $this->getSwaggerType($parameter)];
         }
 
         $values = $parameter->getEnumValues();
@@ -840,7 +823,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @param HeaderCollection $headers
      * @return array
      */
-    protected function buildHeaderDescription(HeaderCollection $headers)
+    protected function buildHeaderDescription(HeaderCollection $headers): array
     {
         return [];
     }
@@ -851,7 +834,7 @@ class OpenApiV2Builder implements DescriptionBuilder
      * @return array
      * @throws OpenApiException
      */
-    protected function buildResourceDefinitionDescription(ResourceDefinition $resourceDefinition, $action)
+    protected function buildResourceDefinitionDescription(ResourceDefinition $resourceDefinition, $action): array
     {
         $out = [];
 
@@ -871,6 +854,7 @@ class OpenApiV2Builder implements DescriptionBuilder
                             'properties' => []
                         ];
                     }
+
                     $container = &$container[$containerName]['properties'];
                 }
 
@@ -879,7 +863,7 @@ class OpenApiV2Builder implements DescriptionBuilder
             }
         }
 
-        if (count($out['properties']) === 0) {
+        if ($out['properties'] === []) {
             $out['properties'] = (object) [];
         }
 

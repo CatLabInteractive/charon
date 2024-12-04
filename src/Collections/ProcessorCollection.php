@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
@@ -29,7 +31,7 @@ class ProcessorCollection extends Collection implements Processor
         ResourceDefinition $definition,
         Context $context,
         FilterResults $filterResults
-    ) {
+    ): void {
         foreach ($this as $processor) {
             /** @var Processor */
             $processor->processFilters($transformer, $queryBuilder, $request, $definition, $context, $filterResults);
@@ -47,7 +49,7 @@ class ProcessorCollection extends Collection implements Processor
         FilterResults $filterResults = null,
         RelationshipValue $parent = null,
         $parentEntity = null
-    ) {
+    ): void {
         foreach ($this as $processor) {
             /** @var Processor */
             $processor->processCollection($transformer, $collection, $definition, $context, $filterResults, $parent, $parentEntity);
@@ -64,7 +66,7 @@ class ProcessorCollection extends Collection implements Processor
         Context $context,
         RelationshipValue $parent = null,
         $parentEntity = null
-    ) {
+    ): void {
         foreach ($this as $processor) {
             /** @var Processor */
             $processor->processResource($transformer, $resource, $definition, $context, $parent, $parentEntity);

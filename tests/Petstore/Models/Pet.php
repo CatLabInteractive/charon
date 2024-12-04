@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Petstore\Models;
 
 /**
@@ -8,9 +10,11 @@ namespace Tests\Petstore\Models;
  */
 class Pet
 {
-    const STATUS_AVAILABLE = 'available';
-    const STATUS_ENDING = 'ending';
-    const STATUS_SOLD = 'sold';
+    public const STATUS_AVAILABLE = 'available';
+
+    public const STATUS_ENDING = 'ending';
+
+    public const STATUS_SOLD = 'sold';
 
     /**
      * @var int
@@ -30,22 +34,19 @@ class Pet
     /**
      * @var string[]
      */
-    private $photos = [];
+    private array $photos = [];
 
     /**
      * @var Tag[]
      */
-    private $tags = [];
+    private array $tags = [];
 
     /**
      * @var string
      */
     private $status;
 
-    /**
-     * @var \DateTime
-     */
-    private $someDate;
+    private ?\DateTime $someDate = null;
 
     /**
      * @return int
@@ -59,7 +60,7 @@ class Pet
      * @param int $id
      * @return Pet
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
         return $this;
@@ -77,7 +78,7 @@ class Pet
      * @param string $name
      * @return Pet
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
         return $this;
@@ -95,7 +96,7 @@ class Pet
      * @param Category $category
      * @return Pet
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->category = $category;
         return $this;
@@ -104,7 +105,7 @@ class Pet
     /**
      * @return \string[]
      */
-    public function getPhotos()
+    public function getPhotos(): array
     {
         return $this->photos;
     }
@@ -113,7 +114,7 @@ class Pet
      * @param \string[] $photos
      * @return Pet
      */
-    public function setPhotos($photos)
+    public function setPhotos(array $photos): static
     {
         $this->photos = $photos;
         return $this;
@@ -122,7 +123,7 @@ class Pet
     /**
      * @return Tag[]
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
@@ -131,7 +132,7 @@ class Pet
      * @param Tag[] $tags
      * @return Pet
      */
-    public function setTags($tags)
+    public function setTags(array $tags): static
     {
         $this->tags = $tags;
         return $this;
@@ -149,7 +150,7 @@ class Pet
      * @param string $status
      * @return Pet
      */
-    public function setStatus($status)
+    public function setStatus($status): static
     {
         $this->status = $status;
         return $this;
@@ -167,7 +168,7 @@ class Pet
      * @param \DateTime $someDate
      * @return Pet
      */
-    public function setSomeDate(\DateTime $someDate)
+    public function setSomeDate(\DateTime $someDate): static
     {
         $this->someDate = $someDate;
         return $this;

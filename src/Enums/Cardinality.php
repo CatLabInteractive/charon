@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Enums;
 
 /**
@@ -8,6 +10,7 @@ namespace CatLab\Charon\Enums;
  */
 class Cardinality
 {
-    const ONE = 'one';
-    const MANY = 'many';
+    public const ONE = 'one';
+
+    public const MANY = 'many';
 }

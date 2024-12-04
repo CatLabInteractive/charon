@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Base\Enum\Operator;
@@ -117,7 +119,7 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         $queryBuilder,
         RelationshipField $field,
         Context $context
-    ) {
+    ): void {
         $this->callEntitySpecificMethodIfExists(
             $transformer,
             $field,
@@ -149,7 +151,7 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         $queryBuilder,
         $value,
         $operator = Operator::EQ
-    ) {
+    ): void {
         // do we have a specific 'filter' method?
         if ($this->callEntitySpecificMethodIfExists(
             $transformer,
@@ -186,7 +188,7 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         Field $field,
         $queryBuilder,
         $direction = 'asc'
-    ) {
+    ): void {
         // do we have a specific 'filter' method?
         if ($this->callEntitySpecificMethodIfExists(
             $transformer,

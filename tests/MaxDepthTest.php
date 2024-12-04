@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\ResourceTransformer;
@@ -21,12 +23,12 @@ use Tests\ResourceDefinitionDepths\MockResourceDefinitionDepthTwo;
  *
  * @package CatLab\RESTResource\Tests
  */
-class MaxDepthTest extends BaseTest
+final class MaxDepthTest extends BaseTest
 {
     /**
      * @return MockEntityModel
      */
-    private function getDeepChildren()
+    private function getDeepChildren(): \Tests\Models\MockEntityModel
     {
         MockEntityModel::clearNextId();
         $mockEntity = new MockEntityModel();
@@ -47,7 +49,7 @@ class MaxDepthTest extends BaseTest
     /**
      * @return mixed
      */
-    private function getDeepArray()
+    private function getDeepArray(): array
     {
         return json_decode('
             {
@@ -363,7 +365,7 @@ class MaxDepthTest extends BaseTest
     /**
      * @return mixed
      */
-    private function getDeepData3()
+    private function getDeepData3(): array
     {
         return json_decode('
             {
@@ -544,7 +546,7 @@ class MaxDepthTest extends BaseTest
     /**
      * @return mixed
      */
-    private function getDeepData2()
+    private function getDeepData2(): array
     {
         return json_decode('
             {
@@ -608,7 +610,7 @@ class MaxDepthTest extends BaseTest
     /**
      * @return mixed
      */
-    private function getDeepData1()
+    private function getDeepData1(): array
     {
         return json_decode('
             {
@@ -634,7 +636,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testOutputMaxDepthOne()
+    public function testOutputMaxDepthOne(): void
     {
         $transformer = $this->getResourceTransformer();
 
@@ -649,7 +651,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testOutputMaxDepthTwo()
+    public function testOutputMaxDepthTwo(): void
     {
         $transformer = $this->getResourceTransformer();
 
@@ -664,7 +666,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testOutputMaxDepthThree()
+    public function testOutputMaxDepthThree(): void
     {
         $transformer = $this->getResourceTransformer();
 
@@ -679,7 +681,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testOutputMaxDepthFour()
+    public function testOutputMaxDepthFour(): void
     {
         $transformer = $this->getResourceTransformer();
 
@@ -694,7 +696,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testInputDepthOne()
+    public function testInputDepthOne(): void
     {
         $transformer = $this->getResourceTransformer();
 
@@ -712,7 +714,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testInputDepthTwo()
+    public function testInputDepthTwo(): void
     {
         $transformer = $this->getResourceTransformer();
 
@@ -730,7 +732,7 @@ class MaxDepthTest extends BaseTest
     /**
      *
      */
-    public function testInputDepthThree()
+    public function testInputDepthThree(): void
     {
         $transformer = $this->getResourceTransformer();
 

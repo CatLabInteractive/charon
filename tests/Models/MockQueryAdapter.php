@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Models;
 
 use CatLab\Base\Enum\Operator;
@@ -17,7 +19,7 @@ use CatLab\Charon\Models\Properties\RelationshipField;
 use Countable;
 
 if (!function_exists('is_countable')) {
-    function is_countable($var) {
+    function is_countable($var): bool {
         return (is_array($var) || $var instanceof Countable);
     }
 }
@@ -31,7 +33,7 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
     /**
      * @inheritDoc
      */
-    public function getChildByIdentifiers(ResourceTransformer $transformer, RelationshipField $field, $parentEntity, Identifier $identifier, Context $context)
+    public function getChildByIdentifiers(ResourceTransformer $transformer, RelationshipField $field, $parentEntity, Identifier $identifier, Context $context): void
     {
         // TODO: Implement getChildByIdentifiers() method.
     }
@@ -39,7 +41,7 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
     /**
      * @inheritDoc
      */
-    public function getQualifiedName(Field $field)
+    public function getQualifiedName(Field $field): string
     {
         return $field->getResourceDefinition()->getEntityClassName() . '.' . $field->getName();
     }
@@ -90,7 +92,7 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
         $queryBuilder,
         $records,
         $skip
-    ) {
+    ): void {
         /** @var SelectQueryParameters $queryBuilder */
         if ($skip) {
             $queryBuilder->limit(new LimitParameter($records));
@@ -111,13 +113,13 @@ class MockQueryAdapter extends \CatLab\Charon\Resolvers\QueryAdapter
         ResourceDefinition $definition,
         Context $context,
         $queryBuilder
-    ) {
+    ): int {
         if (is_countable($queryBuilder)) {
             return count($queryBuilder);
-        } else {
-            //throw new \InvalidArgumentException('countRecords doesn\'t know how to handle ' . get_class($queryBuilder));
-            return 10;
         }
+
+        //throw new \InvalidArgumentException('countRecords doesn\'t know how to handle ' . get_class($queryBuilder));
+        return 10;
     }
 
     /**

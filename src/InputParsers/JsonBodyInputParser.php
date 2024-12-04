@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\InputParsers;
 
 use CatLab\Charon\Collections\IdentifierCollection;
@@ -41,7 +43,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $resource = null
-    ) {
+    ): ?\CatLab\Charon\Collections\IdentifierCollection {
         if (!$this->hasApplicableContentType()) {
             return null;
         }
@@ -86,7 +88,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
         ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
-    ) {
+    ): ?\CatLab\Charon\Interfaces\ResourceCollection {
         if (!$this->hasApplicableContentType()) {
             return null;
         }
@@ -125,7 +127,7 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
     /**
      * @return bool
      */
-    protected function hasApplicableContentType()
+    protected function hasApplicableContentType(): bool
     {
         switch ($this->getContentType()) {
             case 'application/json':

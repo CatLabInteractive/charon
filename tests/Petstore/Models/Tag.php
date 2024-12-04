@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Petstore\Models;
 
 /**
@@ -41,7 +43,7 @@ class Tag
      * @param int $id
      * @return Tag
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
         return $this;
@@ -59,7 +61,7 @@ class Tag
      * @param string $name
      * @return Tag
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
         return $this;

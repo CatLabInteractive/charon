@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 use CatLab\Base\Enum\Operator;
@@ -10,10 +12,7 @@ use CatLab\Charon\Models\Properties\Base\Field;
  */
 class Filter
 {
-    /**
-     * @var Field
-     */
-    private $field;
+    private \CatLab\Charon\Models\Properties\Base\Field $field;
 
     /**
      * @var Operator

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Transformers;
 
 use CatLab\Charon\Exceptions\NotImplementedException;
@@ -23,7 +25,7 @@ class ArrayTransformer implements Transformer
      * @return mixed
      * @throws NotImplementedException
      */
-    public function toResourceValue($value, Context $context)
+    public function toResourceValue($value, Context $context): never
     {
         throw NotImplementedException::makeTranslatable('ArrayTransformer only works for parameters.');
     }
@@ -34,7 +36,7 @@ class ArrayTransformer implements Transformer
      * @return mixed
      * @throws NotImplementedException
      */
-    public function toEntityValue($value, Context $context)
+    public function toEntityValue($value, Context $context): never
     {
         throw NotImplementedException::makeTranslatable('ArrayTransformer only works for parameters.');
     }
@@ -44,7 +46,7 @@ class ArrayTransformer implements Transformer
      * @param $value
      * @return mixed
      */
-    public function toParameterValue($value)
+    public function toParameterValue($value): array
     {
         return explode($this->delimiter, $value);
     }

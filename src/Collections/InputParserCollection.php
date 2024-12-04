@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Base\Collections\Collection;
@@ -60,6 +62,7 @@ class InputParserCollection extends Collection implements InputParser
         if ($lastException) {
             throw $lastException;
         }
+
         return null;
     }
 
@@ -99,9 +102,10 @@ class InputParserCollection extends Collection implements InputParser
             }
         }
 
-        if ($lastException !== null) {
+        if ($lastException instanceof \CatLab\Charon\Exceptions\InputDecodeException) {
             throw $lastException;
         }
+
         return null;
     }
 

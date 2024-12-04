@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
@@ -73,7 +75,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         $child = null;
         try {
             $child = $this->resolveProperty($transformer, $entity, $field, $context);
-        } catch (InvalidPropertyException $e) {
+        } catch (InvalidPropertyException $invalidPropertyException) {
             return null;
         }
 
@@ -103,12 +105,14 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
             if (!isset($tmp[$v])) {
                 throw ValueUndefined::make($field->getDisplayName());
             }
+
             $tmp = &$tmp[$v];
         }
 
         if (!is_array($tmp) || !array_key_exists($displayName, $tmp)) {
             throw ValueUndefined::make($displayName);
         }
+
         return $tmp[$displayName];
     }
 
@@ -195,9 +199,10 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
                 $childContext = $this->getInputChildContext($transformer, $field, $context);
                 return $transformer->fromArray($field->getChildResource(), $child, $childContext);
             }
-        } catch (ValueUndefined $e) {
+        } catch (ValueUndefined $valueUndefined) {
             // Don't worry be happy.
         }
+
         return null;
     }
 
@@ -208,7 +213,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
      * @return Context
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    private function getInputChildContext(ResourceTransformer $transformer, RelationshipField $field, Context $context)
+    private function getInputChildContext(ResourceTransformer $transformer, RelationshipField $field, Context $context): \CatLab\Charon\Interfaces\Context
     {
         $childResourceDefinition = $field->getChildResource();
 
@@ -223,9 +228,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
             $action = Action::CREATE;
         }
 
-        $childContext = $context->getChildContext($field, $action);
-
-        return $childContext;
+        return $context->getChildContext($field, $action);
     }
 
     /**
@@ -251,6 +254,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
                 return $entity;
             }
         }
+
         return null;
     }
 
@@ -307,8 +311,10 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
                     return false;
                 }
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -327,19 +333,23 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
     ) {
         try {
             $children = $this->resolvePropertyInput($transformer, $input, $field, $context);
-        } catch (ValueUndefined $e) {
+        } catch (ValueUndefined $valueUndefined) {
             return null;
         }
 
-        if (
-            $children &&
-            isset($children[ResourceTransformer::RELATIONSHIP_ITEMS]) &&
-            is_array($children[ResourceTransformer::RELATIONSHIP_ITEMS])
-
-        ) {
-            return $children[ResourceTransformer::RELATIONSHIP_ITEMS];
+        if (!$children) {
+            return null;
         }
-        return null;
+
+        if (!isset($children[ResourceTransformer::RELATIONSHIP_ITEMS])) {
+            return null;
+        }
+
+        if (!is_array($children[ResourceTransformer::RELATIONSHIP_ITEMS])) {
+            return null;
+        }
+
+        return $children[ResourceTransformer::RELATIONSHIP_ITEMS];
     }
 
     /**
@@ -348,8 +358,8 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
      * @param null $default
      * @return mixed
      */
-    public function getParameterFromRequest($request, string $key, $default = null)
+    public function getParameterFromRequest(array $request, string $key, $default = null)
     {
-        return isset($request[$key]) ? $request[$key] : $default;
+        return $request[$key] ?? $default;
     }
 }

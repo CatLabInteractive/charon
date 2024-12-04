@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\Factories\ResourceFactory;
@@ -14,7 +16,7 @@ abstract class BaseTest extends TestCase
 {
     public function getResourceTransformer(PropertyResolverContract $propertyResolver = null)
     {
-        if ($propertyResolver === null) {
+        if (!$propertyResolver instanceof \CatLab\Charon\Interfaces\PropertyResolver) {
             $propertyResolver = new MockPropertyResolver();
         }
 

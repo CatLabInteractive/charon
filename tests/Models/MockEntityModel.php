@@ -1,25 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Models;
 
 class MockEntityModel
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private float|int $id;
 
     /**
      * @var MockEntityModel[]
      */
-    private $children;
+    private array $children = [];
 
-    private static $_nextId;
+    private static ?int $_nextId = null;
 
     /**
      * @return int
      */
-    private static function getNextId()
+    private function getNextId(): int|float
     {
         if (!isset(self::$_nextId)) {
             self::$_nextId = 0;
@@ -28,7 +27,7 @@ class MockEntityModel
         return ++self::$_nextId;
     }
 
-    public static function clearNextId()
+    public static function clearNextId(): void
     {
         if (isset(self::$_nextId)) {
             self::$_nextId = 0;
@@ -40,14 +39,13 @@ class MockEntityModel
      */
     public function __construct()
     {
-        $this->id = self::getNextId();
-        $this->children = [];
+        $this->id = $this->getNextId();
     }
 
     /**
      *
      */
-    public function addChildren()
+    public function addChildren(): void
     {
         $this->children[] = new MockEntityModel($this->id + 1);
         $this->children[] = new MockEntityModel($this->id + 2);
@@ -57,7 +55,7 @@ class MockEntityModel
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): float|int
     {
         return $this->id;
     }
@@ -65,7 +63,7 @@ class MockEntityModel
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Mock entity ' . $this->getId();
     }
@@ -73,7 +71,7 @@ class MockEntityModel
     /**
      * @return string
      */
-    public function getAlwaysVisibleField()
+    public function getAlwaysVisibleField(): string
     {
         return 'wololo';
     }
@@ -81,7 +79,7 @@ class MockEntityModel
     /**
      * @return string
      */
-    public function getViewVisibleField()
+    public function getViewVisibleField(): string
     {
         return 'everything is awesome';
     }
@@ -89,7 +87,7 @@ class MockEntityModel
     /**
      * @return MockEntityModel[]
      */
-    public function getViewVisibleRelationship()
+    public function getViewVisibleRelationship(): array
     {
         return $this->getChildren();
     }
@@ -97,7 +95,7 @@ class MockEntityModel
     /**
      * @return MockEntityModel[]
      */
-    public function getAlwaysVisibleRelationship()
+    public function getAlwaysVisibleRelationship(): array
     {
         return $this->getChildren();
     }
@@ -105,7 +103,7 @@ class MockEntityModel
     /**
      * @return MockEntityModel[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }

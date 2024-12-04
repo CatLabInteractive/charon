@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
@@ -14,12 +16,17 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  */
 interface ResourceTransformer
 {
-    const RELATIONSHIP_LINK = 'link';
-    const RELATIONSHIP_ITEMS = 'items';
-    const SORT_PARAMETER = 'sort';
-    const EXPAND_PARAMETER = 'expand';
-    const LIMIT_PARAMETER = 'records';
-    const FIELDS_PARAMETER = 'fields';
+    public const RELATIONSHIP_LINK = 'link';
+
+    public const RELATIONSHIP_ITEMS = 'items';
+
+    public const SORT_PARAMETER = 'sort';
+
+    public const EXPAND_PARAMETER = 'expand';
+
+    public const LIMIT_PARAMETER = 'records';
+
+    public const FIELDS_PARAMETER = 'fields';
 
     /**
      * @return mixed

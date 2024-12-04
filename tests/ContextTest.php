@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\Enums\Action;
@@ -12,12 +14,12 @@ use Tests\BaseTest;
  * Class ContextTest
  * @package CatLab\RESTResource\Tests
  */
-class ContextTest extends BaseTest
+final class ContextTest extends BaseTest
 {
     /**
      *
      */
-    public function testExpandParameter()
+    public function testExpandParameter(): void
     {
         $context = new Context(Action::VIEW);
         $context->expandField('children');
@@ -26,7 +28,7 @@ class ContextTest extends BaseTest
         $this->assertNull($context->shouldExpandField(CurrentPath::fromArray([ 'children', 'children' ])));
     }
 
-    public function testSelectiveShow()
+    public function testSelectiveShow(): void
     {
         $context = new Context(Action::VIEW);
         $context->showField('children*');
@@ -41,7 +43,7 @@ class ContextTest extends BaseTest
     /**
      *
      */
-    public function testSelectiveExpand()
+    public function testSelectiveExpand(): void
     {
         $context = new Context(Action::VIEW);
         $context->showField('children.id');
@@ -55,7 +57,7 @@ class ContextTest extends BaseTest
     /**
      *
      */
-    public function testExpandParameterRecursive()
+    public function testExpandParameterRecursive(): void
     {
         $context = new Context(Action::VIEW);
         $context->showField('id*');
@@ -93,7 +95,7 @@ class ContextTest extends BaseTest
     /**
      *
      */
-    public function testExpandParameterRecursiveCombination()
+    public function testExpandParameterRecursiveCombination(): void
     {
         $context = new Context(Action::VIEW);
         $context->expandField('foobar');

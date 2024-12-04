@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\InputParsers;
 
 use CatLab\Charon\Collections\IdentifierCollection;
@@ -40,9 +42,9 @@ class PostInputParser extends AbstractInputParser implements InputParser
         ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
-    ) {
+    ): ?\CatLab\Charon\Collections\IdentifierCollection {
         if (!$this->hasApplicableContentType()) {
-            return;
+            return null;
         }
 
         $identifierCollection = new IdentifierCollection();
@@ -70,9 +72,9 @@ class PostInputParser extends AbstractInputParser implements InputParser
         ResourceDefinitionFactory $resourceDefinition,
         Context $context,
         $request = null
-    ) {
+    ): ?\CatLab\Charon\Interfaces\ResourceCollection {
         if (!$this->hasApplicableContentType()) {
-            return;
+            return null;
         }
 
         // @TODO this can probably be improved at some point
@@ -93,7 +95,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
     /**
      * @return bool
      */
-    protected function hasApplicableContentType()
+    protected function hasApplicableContentType(): bool
     {
         switch ($this->getContentType()) {
             case 'multipart/form-data':
@@ -148,7 +150,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
         ResourceDefinition $resourceDefinition,
         Context $context = null
     ) {
-        if (!$context) {
+        if (!$context instanceof \CatLab\Charon\Interfaces\Context) {
             $context = new \CatLab\Charon\Models\Context(
                 Method::toAction($route->getMethod(), Cardinality::ONE)
             );

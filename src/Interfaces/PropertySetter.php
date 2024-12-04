@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\PropertyValueCollection;
@@ -105,7 +107,7 @@ interface PropertySetter
         RelationshipField $field,
         array $identifiers,
         Context $context
-    );
+    ): void;
 
     /**
      * Add a child to a colleciton

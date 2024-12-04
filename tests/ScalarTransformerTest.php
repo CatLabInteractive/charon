@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\Transformers\ScalarTransformer;
@@ -11,13 +13,13 @@ use PHPUnit_Framework_TestCase;
  * Class ScalarTransformerTest
  * @package CatLab\RESTResource\Tests
  */
-class ScalarTransformerTest extends TestCase
+final class ScalarTransformerTest extends TestCase
 {
     /**
      *
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    public function testBooleanTransformer()
+    public function testBooleanTransformer(): void
     {
         $transformer = new ScalarTransformer(PropertyType::BOOL);
 
@@ -37,7 +39,7 @@ class ScalarTransformerTest extends TestCase
     /**
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    public function testIntegerTransformer()
+    public function testIntegerTransformer(): void
     {
         $transformer = new ScalarTransformer(PropertyType::INTEGER);
 

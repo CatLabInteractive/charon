@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 
@@ -17,12 +19,12 @@ use Tests\Petstore\Models\Tag;
  * Class PetstoreTest
  * @package CatLab\RESTResource\Tests
  */
-class PetstoreTest extends BaseTest
+final class PetstoreTest extends BaseTest
 {
     /**
      *
      */
-    public function testPetStoreExpanded()
+    public function testPetStoreExpanded(): void
     {
         $petDefinition = new PetDefinition(Pet::class);
 
@@ -111,7 +113,7 @@ class PetstoreTest extends BaseTest
     /**
      *
      */
-    public function testPetStoreFields()
+    public function testPetStoreFields(): void
     {
         $petDefinition = new PetDefinition(Pet::class);
 
@@ -180,7 +182,7 @@ class PetstoreTest extends BaseTest
     /**
      *
      */
-    public function testTransformer()
+    public function testTransformer(): void
     {
         $petDefinition = new PetDefinitionWithDate();
 

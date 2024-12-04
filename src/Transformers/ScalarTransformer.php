@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Transformers;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -87,10 +89,11 @@ class ScalarTransformer implements Transformer
             foreach ($value as $k => $v) {
                 $value[$k] = $this->castToScalar($v);
             }
+
             return $value;
-        } else {
-            return $this->castToScalar($value);
         }
+
+        return $this->castToScalar($value);
     }
 
     /**
@@ -101,28 +104,28 @@ class ScalarTransformer implements Transformer
     {
         switch ($this->type) {
             case PropertyType::BOOL:
-                return !!$value && strtolower($value) !== 'false';
+                return (bool) $value && strtolower((string) $value) !== 'false';
 
             case PropertyType::INTEGER:
                 if (
                     !is_numeric($value) ||
-                    intval($value) != floatval($value)
+                    (int) $value != (float) $value
                 ) {
                     return null;
                 }
 
-                return intval($value);
+                return (int) $value;
 
             case PropertyType::NUMBER:
                 if (!is_numeric($value)) {
                     return null;
                 }
 
-                return floatval($value);
+                return (float) $value;
 
             case PropertyType::STRING:
             case PropertyType::HTML:
-                return strval($value);
+                return (string) $value;
 
             default:
                 return $value;
