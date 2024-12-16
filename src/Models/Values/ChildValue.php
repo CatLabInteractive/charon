@@ -156,7 +156,7 @@ class ChildValue extends RelationshipValue
     protected function editChildren(ResourceTransformer $transformer, PropertySetter $propertySetter, $entity, RelationshipField $field, array $childEntities, Context $context)
     {
         if (count($childEntities) > 0) {
-            $propertySetter->editChildren($transformer, $entity, $this->getField(), $childEntities[0], $context);
+            $propertySetter->editChildren($transformer, $entity, $this->getField(), $childEntities, $context);
         }
     }
 
