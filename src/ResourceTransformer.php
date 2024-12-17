@@ -220,9 +220,14 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         }
 
         // Dynamic context required?
+        // ONLY transform the context if the entity is fully loaded, and not if we have optimized this to be
+        // an empty entity with only an ID (when context action is IDENTIFIER) = we don't want to load the full entity.
         if (
-            $resourceDefinition instanceof DynamicContextContract ||
-            $entity instanceof DynamicContextContract
+            $context->getAction() !== Action::IDENTIFIER &&
+            (
+                $resourceDefinition instanceof DynamicContextContract ||
+                $entity instanceof DynamicContextContract
+            )
         ) {
             // In case of dynamic context we must start from a fork of the context
             $context = $context->fork();
