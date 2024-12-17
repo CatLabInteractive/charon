@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Petstore\Models;
 use DateTime;
 
@@ -51,7 +53,7 @@ class Order
      * @param int $id
      * @return Order
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
         return $this;
@@ -69,7 +71,7 @@ class Order
      * @param int $petId
      * @return Order
      */
-    public function setPetId($petId)
+    public function setPetId($petId): static
     {
         $this->petId = $petId;
         return $this;
@@ -87,7 +89,7 @@ class Order
      * @param boolean $complete
      * @return Order
      */
-    public function setComplete($complete)
+    public function setComplete($complete): static
     {
         $this->complete = $complete;
         return $this;
@@ -105,7 +107,7 @@ class Order
      * @param int $quantity
      * @return Order
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): static
     {
         $this->quantity = $quantity;
         return $this;
@@ -123,7 +125,7 @@ class Order
      * @param DateTime $shipDate
      * @return Order
      */
-    public function setShipDate($shipDate)
+    public function setShipDate($shipDate): static
     {
         $this->shipDate = $shipDate;
         return $this;
@@ -141,7 +143,7 @@ class Order
      * @param string $status
      * @return Order
      */
-    public function setStatus($status)
+    public function setStatus($status): static
     {
         $this->status = $status;
         return $this;

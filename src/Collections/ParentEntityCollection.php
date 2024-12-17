@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 /**
@@ -8,11 +10,11 @@ namespace CatLab\Charon\Collections;
  */
 class ParentEntityCollection implements \Countable
 {
-    private $entities = [];
+    private array $entities = [];
 
-    public function push($entity)
+    public function push($entity): void
     {
-        array_push($this->entities, $entity);
+        $this->entities[] = $entity;
     }
 
     public function pop()
@@ -28,6 +30,7 @@ class ParentEntityCollection implements \Countable
         if (count($this->entities) > 1) {
             return $this->entities[count($this->entities) - 2];
         }
+
         return null;
     }
 

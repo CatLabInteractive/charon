@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Library;
 
 use CatLab\Base\Helpers\StringHelper;
@@ -14,7 +16,7 @@ use CatLab\Charon\Interfaces\Transformer;
  */
 class TransformerLibrary
 {
-    const SERIALIZED_PREFIX = 'serialized|';
+    public const SERIALIZED_PREFIX = 'serialized|';
 
     /**
      * @return TransformerLibrary
@@ -25,17 +27,17 @@ class TransformerLibrary
         if (!isset($in)) {
             $in = new self();
         }
+
         return $in;
     }
 
     /**
      * @var Transformer[]
      */
-    private $transformers;
+    private array $transformers = [];
 
     private function __construct()
     {
-        $this->transformers = [];
     }
 
     /**
@@ -50,10 +52,11 @@ class TransformerLibrary
             if (!isset(self::instance()->transformers[$serialized])) {
                 self::instance()->transformers[$serialized] = $classname;
             }
+
             return self::instance()->transformers[$serialized];
-        } else {
-            return self::instance()->makeTransformer($classname);
         }
+
+        return self::instance()->makeTransformer($classname);
     }
 
     /**

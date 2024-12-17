@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\SimpleResolvers;
 
 use CatLab\Base\Enum\Operator;
@@ -19,22 +21,22 @@ use CatLab\Charon\Resolvers\QueryAdapter;
 class SimpleQueryAdapter extends QueryAdapter
 {
 
-    public function getQualifiedName(Field $field)
+    public function getQualifiedName(Field $field): void
     {
         // TODO: Implement getQualifiedName() method.
     }
 
-    public function getRecords(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder)
+    public function getRecords(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder): void
     {
         // TODO: Implement getRecords() method.
     }
 
-    public function getChildByIdentifiers(ResourceTransformer $transformer, RelationshipField $field, $parentEntity, Identifier $identifier, Context $context)
+    public function getChildByIdentifiers(ResourceTransformer $transformer, RelationshipField $field, $parentEntity, Identifier $identifier, Context $context): void
     {
         // TODO: Implement getChildByIdentifiers() method.
     }
 
-    public function applyLimit(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder, $records, $skip)
+    public function applyLimit(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder, $records, $skip): void
     {
         // TODO: Implement applyLimit() method.
     }
@@ -49,7 +51,7 @@ class SimpleQueryAdapter extends QueryAdapter
         // TODO: Implement applySimpleSorting() method.
     }
 
-    public function countRecords(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder)
+    public function countRecords(ResourceTransformer $transformer, ResourceDefinition $definition, Context $context, $queryBuilder): void
     {
         // TODO: Implement countRecords() method.
     }

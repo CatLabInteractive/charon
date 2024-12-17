@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\InputParsers;
 
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -72,14 +74,15 @@ abstract class AbstractInputParser
     {
         if (function_exists('getAllHeaders')) {
             return $this->getAllHeaders();
-        } else {
-            $headers = [];
-            foreach ($_SERVER as $name => $value) {
-                if (substr($name, 0, 5) == 'HTTP_') {
-                    $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-                }
-            }
-            return $headers;
         }
+
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) === 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+
+        return $headers;
     }
 }

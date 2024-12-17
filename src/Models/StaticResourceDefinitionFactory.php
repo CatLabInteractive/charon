@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace CatLab\Charon\Models;
 
@@ -18,10 +19,7 @@ use CatLab\Charon\Library\ResourceDefinitionLibrary;
  */
 class StaticResourceDefinitionFactory implements \CatLab\Charon\Interfaces\ResourceDefinitionFactory
 {
-    /**
-     * @var array
-     */
-    private static $staticLibrary = [];
+    private static array $staticLibrary = [];
 
     /**
      * @param $resourceDefinition
@@ -33,6 +31,7 @@ class StaticResourceDefinitionFactory implements \CatLab\Charon\Interfaces\Resou
         if (!isset(self::$staticLibrary[$objectHash])) {
             self::$staticLibrary[$objectHash] = self::createFactoryOrDefaultFactory($resourceDefinition);
         }
+
         return self::$staticLibrary[$objectHash];
     }
 
@@ -40,17 +39,17 @@ class StaticResourceDefinitionFactory implements \CatLab\Charon\Interfaces\Resou
      * @param $resourceDefinition
      * @return StaticResourceDefinitionFactory
      */
-    private static function createFactoryOrDefaultFactory($resourceDefinition)
+    private static function createFactoryOrDefaultFactory($resourceDefinition): \CatLab\Charon\Interfaces\ResourceDefinitionFactory
     {
         if (!is_subclass_of($resourceDefinition, ResourceDefinitionFactory::class)) {
             return new StaticResourceDefinitionFactory($resourceDefinition);
-        } else {
-            if (!is_string($resourceDefinition)) {
-                return $resourceDefinition;
-            } else {
-                return new $resourceDefinition;
-            }
         }
+
+        if (!is_string($resourceDefinition)) {
+            return $resourceDefinition;
+        }
+
+        return new $resourceDefinition;
     }
 
     /**

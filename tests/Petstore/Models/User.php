@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Petstore\Models;
 
 /**
@@ -60,7 +62,7 @@ class User
      * @param int $id
      * @return User
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
         return $this;
@@ -78,7 +80,7 @@ class User
      * @param string $username
      * @return User
      */
-    public function setUsername($username)
+    public function setUsername($username): static
     {
         $this->username = $username;
         return $this;
@@ -96,7 +98,7 @@ class User
      * @param string $firstName
      * @return User
      */
-    public function setFirstName($firstName)
+    public function setFirstName($firstName): static
     {
         $this->firstName = $firstName;
         return $this;
@@ -114,7 +116,7 @@ class User
      * @param string $lastName
      * @return User
      */
-    public function setLastName($lastName)
+    public function setLastName($lastName): static
     {
         $this->lastName = $lastName;
         return $this;
@@ -132,7 +134,7 @@ class User
      * @param string $email
      * @return User
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->email = $email;
         return $this;
@@ -150,7 +152,7 @@ class User
      * @param string $password
      * @return User
      */
-    public function setPassword($password)
+    public function setPassword($password): static
     {
         $this->password = $password;
         return $this;
@@ -168,7 +170,7 @@ class User
      * @param string $phone
      * @return User
      */
-    public function setPhone($phone)
+    public function setPhone($phone): static
     {
         $this->phone = $phone;
         return $this;
@@ -186,7 +188,7 @@ class User
      * @param int $status
      * @return User
      */
-    public function setStatus($status)
+    public function setStatus($status): static
     {
         $this->status = $status;
         return $this;

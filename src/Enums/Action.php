@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Enums;
 
 use CatLab\Charon\Exceptions\InvalidContextAction;
@@ -11,23 +13,25 @@ use CatLab\Charon\Exceptions\InvalidContextAction;
 class Action
 {
     // Readable
-    const INDEX = 'index';
-    const VIEW = 'view';
+    public const INDEX = 'index';
 
-    const IDENTIFIER = 'identifier';
+    public const VIEW = 'view';
+
+    public const IDENTIFIER = 'identifier';
 
     // Writable
-    const CREATE = 'create';
-    const EDIT = 'edit';
+    public const CREATE = 'create';
+
+    public const EDIT = 'edit';
 
     // Destroy
-    const DESTROY = 'destroy';
+    public const DESTROY = 'destroy';
 
     /**
      * @param string $action
      * @return bool
      */
-    public static function isReadContext($action)
+    public static function isReadContext($action): bool
     {
         return in_array($action, [ Action::INDEX, Action::VIEW, Action::IDENTIFIER ]);
     }
@@ -36,7 +40,7 @@ class Action
      * @param string $action
      * @return bool
      */
-    public static function isWriteContext($action)
+    public static function isWriteContext($action): bool
     {
         return in_array($action, [ Action::CREATE, Action::EDIT, Action::IDENTIFIER ]);
     }
@@ -45,7 +49,7 @@ class Action
      * @param $action
      * @return bool
      */
-    public static function isIdentifierContext($action)
+    public static function isIdentifierContext($action): bool
     {
         return $action == self::IDENTIFIER;
     }
@@ -54,11 +58,17 @@ class Action
      * @param string $action
      * @throws InvalidContextAction
      */
-    public static function checkValid($action)
+    public static function checkValid($action): void
     {
-        if (!self::isReadContext($action) && !self::isWriteContext($action)) {
-            throw InvalidContextAction::makeTranslatable('Unknown context provided: %s.', [ $action ]);
+        if (self::isReadContext($action)) {
+            return;
         }
+
+        if (self::isWriteContext($action)) {
+            return;
+        }
+
+        throw InvalidContextAction::makeTranslatable('Unknown context provided: %s.', [ $action ]);
     }
 
     /**
@@ -69,8 +79,8 @@ class Action
     {
         if ($cardinality === Cardinality::MANY) {
             return Action::INDEX;
-        } else {
-            return Action::VIEW;
         }
+
+        return Action::VIEW;
     }
 }

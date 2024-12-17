@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Collections;
 
 use CatLab\Charon\Interfaces\ResourceDefinition;
@@ -23,12 +25,12 @@ class ParameterCollection
     /**
      * @var Route
      */
-    private $route;
+    private \CatLab\Charon\Interfaces\RouteMutator $route;
 
     /**
      * @var Parameter[]
      */
-    private $parameters;
+    private array $parameters = [];
 
     /**
      * ParameterCollection constructor.
@@ -37,14 +39,13 @@ class ParameterCollection
     public function __construct(RouteMutator $route)
     {
         $this->route = $route;
-        $this->parameters = [];
     }
 
     /**
      * @param string $name
      * @return PathParameter
      */
-    public function path($name)
+    public function path($name): \CatLab\Charon\Models\Routing\Parameters\PathParameter
     {
         $parameter = new PathParameter($name);
         $parameter->setRoute($this->route);
@@ -59,7 +60,7 @@ class ParameterCollection
      * @param string $name
      * @return BodyParameter
      */
-    public function body($name)
+    public function body($name): \CatLab\Charon\Models\Routing\Parameters\BodyParameter
     {
         if ($name instanceof ResourceDefinition) {
             $name = get_class($name);
@@ -80,7 +81,7 @@ class ParameterCollection
      * @param $resourceDefinition
      * @return ResourceParameter
      */
-    public function resource($resourceDefinition)
+    public function resource($resourceDefinition): \CatLab\Charon\Models\Routing\Parameters\ResourceParameter
     {
         if ($resourceDefinition instanceof ResourceDefinition) {
             $parameterKey = get_class($resourceDefinition);
@@ -102,7 +103,7 @@ class ParameterCollection
      * @param string $name
      * @return QueryParameter
      */
-    public function query($name)
+    public function query($name): \CatLab\Charon\Models\Routing\Parameters\QueryParameter
     {
         $parameter = new QueryParameter($name);
         $parameter->setRoute($this->route);
@@ -116,7 +117,7 @@ class ParameterCollection
      * @param string $name
      * @return PostParameter
      */
-    public function post($name)
+    public function post($name): \CatLab\Charon\Models\Routing\Parameters\PostParameter
     {
         $parameter = new PostParameter($name);
         $parameter->setRoute($this->route);
@@ -130,7 +131,7 @@ class ParameterCollection
      * @param $name
      * @return FileParameter
      */
-    public function file($name)
+    public function file($name): \CatLab\Charon\Models\Routing\Parameters\FileParameter
     {
         $parameter = new FileParameter($name);
         $parameter->setRoute($this->route);
@@ -140,7 +141,7 @@ class ParameterCollection
         return $parameter;
     }
 
-    public function header($name)
+    public function header($name): \CatLab\Charon\Models\Routing\Parameters\HeaderParameter
     {
         $parameter = new HeaderParameter($name);
         $parameter->setRoute($this->route);
@@ -153,7 +154,7 @@ class ParameterCollection
     /**
      * @return \CatLab\Charon\Models\Routing\Parameters\Base\Parameter[]
      */
-    public function toMap()
+    public function toMap(): array
     {
         return $this->parameters;
     }
@@ -161,7 +162,7 @@ class ParameterCollection
     /**
      * @return \CatLab\Charon\Models\Routing\Parameters\Base\Parameter[]
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array_values($this->parameters);
     }
@@ -170,7 +171,7 @@ class ParameterCollection
      * @param ParameterCollection $collection
      * @return array
      */
-    public function merge(ParameterCollection $collection)
+    public function merge(ParameterCollection $collection): void
     {
         $this->parameters = array_merge($this->parameters, $collection->parameters);
     }

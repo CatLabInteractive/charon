@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Petstore\Validators;
 
 use CatLab\Charon\Models\RESTResource;
@@ -16,7 +18,7 @@ class PetValidator implements Validator
      * @return mixed
      * @throws RequirementValidationException
      */
-    public function validate($value)
+    public function validate($value): void
     {
         /** @var RESTResource $value */
         // A pet must have at least one picture.

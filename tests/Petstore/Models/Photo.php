@@ -1,11 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Created by PhpStorm.
  * User: daedeloth
  * Date: 30/05/16
  * Time: 15:35
  */
-
 namespace Tests\Petstore\Models;
 
 
@@ -44,7 +46,7 @@ class Photo
      * @param int $id
      * @return Photo
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
         return $this;
@@ -62,7 +64,7 @@ class Photo
      * @param string $url
      * @return Photo
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
         return $this;

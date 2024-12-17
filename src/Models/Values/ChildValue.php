@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -21,16 +23,13 @@ use CatLab\Charon\Models\Values\Base\RelationshipValue;
  */
 class ChildValue extends RelationshipValue
 {
-    /**
-     * @var RESTResource
-     */
-    private $child;
+    private ?\CatLab\Charon\Models\RESTResource $child = null;
 
     /**
      * @param RESTResource $child
      * @return $this
      */
-    public function setChild(RESTResource $child)
+    public function setChild(RESTResource $child): static
     {
         $this->child = $child;
         return $this;
@@ -39,7 +38,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource
      */
-    public function getChild()
+    public function getChild(): ?\CatLab\Charon\Models\RESTResource
     {
         return $this->child;
     }
@@ -47,7 +46,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource
      */
-    public function getResource()
+    public function getResource(): ?\CatLab\Charon\Models\RESTResource
     {
         return $this->child;
     }
@@ -55,7 +54,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource[]
      */
-    public function getResources()
+    public function getResources(): array
     {
         return [ $this->child ];
     }
@@ -65,9 +64,10 @@ class ChildValue extends RelationshipValue
      */
     public function getValue()
     {
-        if ($this->child === null) {
+        if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;
         }
+
         return $this->child->toArray();
     }
 
@@ -76,21 +76,21 @@ class ChildValue extends RelationshipValue
      */
     public function getTransformedEntityValue(Context $context = null, string $attribute = null)
     {
-        if ($this->child === null) {
+        if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;
         }
 
         if ($attribute === null) {
             return $this->child->getProperties()->transformToEntityValuesMap($context);
-        } else {
-            // For performance reasons, only process the field we actually want.
-            $field = $this->child->getProperties()->getFromName($attribute);
-            if (!$field) {
-                return null;
-            }
-
-            return $field->getTransformedEntityValue($context);
         }
+
+        // For performance reasons, only process the field we actually want.
+        $field = $this->child->getProperties()->getFromName($attribute);
+        if (!$field) {
+            return null;
+        }
+
+        return $field->getTransformedEntityValue($context);
     }
 
     /**
@@ -98,16 +98,17 @@ class ChildValue extends RelationshipValue
      */
     public function toArray()
     {
-        if ($this->child === null) {
+        if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;
         }
+
         return $this->child->toArray();
     }
 
     /**
      * @return RESTResource[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->getChildrenToProcess();
     }
@@ -115,7 +116,7 @@ class ChildValue extends RelationshipValue
     /**
      * @return RESTResource[]
      */
-    protected function getChildrenToProcess()
+    protected function getChildrenToProcess(): array
     {
         return [ $this->child ];
     }
@@ -138,7 +139,7 @@ class ChildValue extends RelationshipValue
         Context $context
     )
     {
-        if (count($childEntities) > 0) {
+        if ($childEntities !== []) {
             $propertySetter->setChild($transformer, $entity, $this->getField(), $childEntities[0], $context);
         }
     }
@@ -178,16 +179,14 @@ class ChildValue extends RelationshipValue
     ) {
         $childEntity = $propertyResolver->resolveProperty($transformer, $parent, $this->getField(), $context);
 
-        if (
-            !$childEntity ||
-            !$propertyResolver->doesResourceRepresentEntity(
-                $transformer,
-                $childEntity,
-                $this->child,
-                $context
-            )
-        ) {
-            $childEntity = null;
+        if (!$childEntity ||
+        !$propertyResolver->doesResourceRepresentEntity(
+            $transformer,
+            $childEntity,
+            $this->child,
+            $context
+        )) {
+            return null;
         }
 
         return $childEntity;
@@ -211,10 +210,10 @@ class ChildValue extends RelationshipValue
         RelationshipField $field,
         array $identifiers,
         Context $context
-    )
+    ): void
     {
         // Only one value allowed, so if $identifiers is empty, clear value
-        if (empty($identifiers)) {
+        if ($identifiers === []) {
             $propertySetter->clearChild($transformer, $entity, $field, $context);
         }
     }

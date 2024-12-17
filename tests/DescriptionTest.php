@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use CatLab\Charon\Enums\Action;
@@ -13,14 +15,14 @@ use PHPUnit_Framework_TestCase;
  * Class ValidatorTest
  * @package CatLab\RESTResource\Tests
  */
-class DescriptionTest extends BaseTest
+final class DescriptionTest extends BaseTest
 {
     /**
      *
      */
-    public function testSwaggerDescription()
+    public function testSwaggerDescription(): void
     {
-        $routes = require 'Petstore/routes.php';
+        $routes = require __DIR__ . '/Petstore/routes.php';
 
         $builder = new OpenApiV2Builder('localhost', '/');
 

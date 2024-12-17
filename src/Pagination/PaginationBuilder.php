@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Pagination;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -21,44 +23,33 @@ use InvalidArgumentException;
  */
 class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\PaginationBuilder, HasRequestResolver
 {
-    const REQUEST_PARAM_NEXT = 'next';
-    const REQUEST_PARAM_PREVIOUS = 'previous';
+    public const REQUEST_PARAM_NEXT = 'next';
+
+    public const REQUEST_PARAM_PREVIOUS = 'previous';
 
     /**
      * @var OrderParameter[]
      */
-    private $sort = [];
+    private array $sort = [];
 
-    /**
-     * @var int
-     */
-    private $records = 10;
+    private int $records = 10;
 
     /**
      * @var int
      */
     private $page = 1;
 
-    /**
-     * @var bool
-     */
-    private $hasNextPage = false;
+    private bool $hasNextPage = false;
 
-    /**
-     * @var bool
-     */
-    private $hasPreviousPage = false;
+    private bool $hasPreviousPage = false;
 
-    /**
-     * @var RequestResolver
-     */
-    private $requestResolver;
+    private ?\CatLab\Charon\Interfaces\RequestResolver $requestResolver = null;
 
     /**
      * @param RequestResolver $requestResolver
      * @return PaginationBuilder
      */
-    public function setRequestResolver(RequestResolver $requestResolver)
+    public function setRequestResolver(RequestResolver $requestResolver): static
     {
         $this->requestResolver = $requestResolver;
         return $this;
@@ -106,14 +97,14 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
             $queryBuilder = new SelectQueryParameters();
         }
 
-        if ($this->records) {
+        if ($this->records !== 0) {
             $offset = ($this->page - 1) * $this->records;
             $limit = $this->records;
 
             $queryBuilder->limit(new LimitParameter($offset, $limit));
         }
 
-        if (isset($this->sort)) {
+        if ($this->sort !== null) {
             foreach ($this->sort as $sort) {
                 $dir = $sort->getDirection();
                 $queryBuilder->orderBy(new OrderParameter($sort->getColumn(), $dir, $sort->getEntity()));
@@ -147,6 +138,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
         if (!$this->page) {
             $this->page = 1;
         }
+
         return $this;
     }
 
@@ -187,7 +179,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
         $this->hasPreviousPage = $this->page > 1;
         $this->hasNextPage = count($results) >= $this->records;
 
-        if ($filterResults) {
+        if ($filterResults instanceof \CatLab\Charon\Models\FilterResults) {
             $filterResults->setCurrentPage($this->page);
         }
 

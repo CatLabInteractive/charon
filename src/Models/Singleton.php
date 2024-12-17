@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 /**
@@ -19,9 +21,9 @@ abstract class Singleton
      */
     final public static function instance()
     {
-        static $instances = array();
+        static $instances = [];
 
-        $calledClass = get_called_class();
+        $calledClass = static::class;
 
         if (!isset($instances[$calledClass]))
         {

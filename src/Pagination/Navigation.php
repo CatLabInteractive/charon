@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Pagination;
 
 /**
@@ -8,25 +10,13 @@ namespace CatLab\Charon\Pagination;
  */
 class Navigation implements \CatLab\Base\Interfaces\Pagination\Navigation
 {
-    /**
-     * @var int
-     */
-    private $currentPage;
+    private ?int $currentPage = null;
 
-    /**
-     * @var bool
-     */
-    private $hasNextPage;
+    private ?bool $hasNextPage = null;
 
-    /**
-     * @var bool
-     */
-    private $hasPreviousPage;
+    private ?bool $hasPreviousPage = null;
 
-    /**
-     * @var int
-     */
-    private $records;
+    private ?int $records = null;
 
     /**
      * @return mixed[]
@@ -47,6 +37,7 @@ class Navigation implements \CatLab\Base\Interfaces\Pagination\Navigation
                 'records' => $this->records
             ];
         }
+
         return null;
     }
 
@@ -61,6 +52,7 @@ class Navigation implements \CatLab\Base\Interfaces\Pagination\Navigation
                 'records' => $this->records
             ];
         }
+
         return null;
     }
 

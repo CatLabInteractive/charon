@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Library;
 
 use CatLab\Charon\Exceptions\InvalidInputParser;
@@ -21,17 +23,17 @@ class InputParserLibrary
         if (!isset($in)) {
             $in = new self();
         }
+
         return $in;
     }
 
     /**
      * @var InputParser[]
      */
-    private $inputParsers;
+    private array $inputParsers = [];
 
     private function __construct()
     {
-        $this->inputParsers = [];
     }
 
     /**
@@ -43,9 +45,9 @@ class InputParserLibrary
         if ($classname instanceof InputParser) {
             self::instance()->inputParsers[get_class($classname)] = $classname;
             return $classname;
-        } else {
-            return self::instance()->makeInputParser($classname);
         }
+
+        return self::instance()->makeInputParser($classname);
     }
 
     /**

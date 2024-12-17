@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Values\Base;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -17,10 +19,7 @@ use CatLab\Charon\Models\Properties\Base\Field;
  */
 abstract class Value
 {
-    /**
-     * @var Field
-     */
-    protected $field;
+    protected \CatLab\Charon\Models\Properties\Base\Field $field;
 
     /**
      * @var mixed
@@ -72,15 +71,16 @@ abstract class Value
         $value = $this->getValue();
 
         // Do we have a transformer?
-        if ($this->getField()->getTransformer()) {
-            if ($context === null) {
-                return $this->getField()->getTransformer()->toParameterValue($value);
-            } else {
-                return $this->getField()->getTransformer()->toEntityValue($value, $context);
-            }
-        } else {
+        if (!$this->getField()->getTransformer()) {
             return $value;
         }
+
+        if (!$context instanceof \CatLab\Charon\Interfaces\Context) {
+            return $this->getField()->getTransformer()->toParameterValue($value);
+        }
+
+        return $this->getField()->getTransformer()->toEntityValue($value, $context);
+        return $value;
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class Value
     /**
      * @param array $out
      */
-    public function addToArray(array &$out)
+    public function addToArray(array &$out): void
     {
         $displayNamePath = $this->splitParameterPath($this->field->getDisplayName());
         $displayName = array_pop($displayNamePath);
@@ -104,6 +104,7 @@ abstract class Value
             if (!isset($tmp[$path])) {
                 $tmp[$path] = [];
             }
+
             $tmp = &$tmp[$path];
         }
 
@@ -127,7 +128,7 @@ abstract class Value
         PropertySetter $propertySetter,
         EntityFactory $factory,
         Context $context
-    ) {
+    ): void {
         if ($this->field->canSetProperty()) {
 
             $value = $this->value;
@@ -207,16 +208,17 @@ abstract class Value
         $buffer = '';
         $openBrackets = 0;
 
-        for ($i = 0; $i < strlen($path); $i ++) {
+        for ($i = 0; $i < strlen($path); ++$i) {
             if ($path[$i] === '.' && $openBrackets < 1) {
                 $out[] = $buffer;
                 $buffer = '';
             } else {
                 if ($path[$i] === '{') {
-                    $openBrackets ++;
+                    ++$openBrackets;
                 } elseif ($path[$i] === '}') {
-                    $openBrackets --;
+                    --$openBrackets;
                 }
+
                 $buffer .= $path[$i];
             }
         }

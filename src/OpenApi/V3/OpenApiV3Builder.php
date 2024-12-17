@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\OpenApi\V3;
 
 use CatLab\Charon\Exceptions\RouteAlreadyDefined;
@@ -33,7 +35,7 @@ class OpenApiV3Builder extends OpenApiV2Builder
      * @throws RouteAlreadyDefined
      * @return $this
      */
-    public function addRoute(Route $route)
+    public function addRoute(Route $route): static
     {
         $path = str_replace('?', '', $route->getPath());
 
@@ -58,7 +60,7 @@ class OpenApiV3Builder extends OpenApiV2Builder
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function build(Context $context)
+    public function build(Context $context): array
     {
         $out = [];
 
@@ -96,7 +98,7 @@ class OpenApiV3Builder extends OpenApiV2Builder
      * @param $name
      * @return string
      */
-    protected function getResourceDefinitionReference($name)
+    protected function getResourceDefinitionReference($name): string
     {
         return '#/components/schemas/' . $name;
     }

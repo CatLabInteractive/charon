@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Transformers;
 
 use CatLab\Base\Helpers\ArrayHelper;
@@ -85,14 +87,14 @@ class TransformerQueue implements Transformer
      * @return Transformer[]
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
-    protected function getTransformers()
+    protected function getTransformers(): array
     {
         $out = [];
 
         foreach ($this->transformers as $transformer) {
             if ($transformer instanceof Transformer) {
                 $out[] = $transformer;
-            } else if (is_string($transformer)) {
+            } elseif (is_string($transformer)) {
                 $out[] = TransformerLibrary::make($transformer);
             } else {
                 throw new LogicException("All transformers must implement " . Transformer::class);

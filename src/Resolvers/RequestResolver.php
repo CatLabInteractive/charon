@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Resolvers;
 
 use CatLab\Base\Enum\Operator;
@@ -12,9 +14,11 @@ use CatLab\Charon\Models\Properties\ResourceField;
  */
 class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
 {
-    const PAGE_PARAMETER = 'page';
-    const CURSOR_BEFORE_PARAMETER = 'before';
-    const CURSOR_AFTER_PARAMETER = 'after';
+    public const PAGE_PARAMETER = 'page';
+
+    public const CURSOR_BEFORE_PARAMETER = 'before';
+
+    public const CURSOR_AFTER_PARAMETER = 'after';
 
     /**
      * @param $request
@@ -27,7 +31,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
     {
         $value = $this->getParameter($request, $field->getDisplayName());
         if ($field->getTransformer()) {
-            $value = $field->getTransformer()->toParameterValue($value);
+            return $field->getTransformer()->toParameterValue($value);
         }
 
         return $value;
@@ -39,7 +43,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
      * @param string $operator
      * @return bool|void
      */
-    public function hasFilter($request, ResourceField $field, $operator = Operator::EQ)
+    public function hasFilter($request, ResourceField $field, $operator = Operator::EQ): bool
     {
         return $this->hasParameter($request, $field->getDisplayName());
     }
@@ -69,10 +73,7 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
      */
     public function getParameter($request, $key)
     {
-        if (isset($request[$key])) {
-            return $request[$key];
-        }
-        return null;
+        return $request[$key] ?? null;
     }
 
     /**
@@ -80,34 +81,36 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
      * @param string $key
      * @return bool
      */
-    public function hasParameter($request, $key)
+    public function hasParameter($request, $key): bool
     {
-        return key_exists($key, $request);
+        return array_key_exists($key, $request);
     }
 
     /**
      * @param $request
      * @return int|null
      */
-    public function getPage($request)
+    public function getPage($request): ?int
     {
         $page = $this->getParameter($request, self::PAGE_PARAMETER);
         if (!is_string($page)) {
             return null;
         }
-        return intval($page);
+
+        return (int) $page;
     }
 
     /**
      * @param $request
      * @return string|null
      */
-    public function getBeforeCursor($request)
+    public function getBeforeCursor($request): ?string
     {
         $cursor = $this->getParameter($request, self::CURSOR_BEFORE_PARAMETER);
         if (!is_string($cursor)) {
             return null;
         }
+
         return $cursor;
     }
 
@@ -115,12 +118,13 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
      * @param $request
      * @return string|null
      */
-    public function getAfterCursor($request)
+    public function getAfterCursor($request): ?string
     {
         $cursor = $this->getParameter($request, self::CURSOR_AFTER_PARAMETER);
         if (!is_string($cursor)) {
             return null;
         }
+
         return $cursor;
     }
 }

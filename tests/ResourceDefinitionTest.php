@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
-class ResourceDefinitionTest extends BaseTest
+final class ResourceDefinitionTest extends BaseTest
 {
     /**
      *
      */
-    public function testMultipleFields()
+    public function testMultipleFields(): void
     {
         // Manual
         $singular = new \CatLab\Charon\Models\ResourceDefinition(null);
@@ -28,12 +30,13 @@ class ResourceDefinitionTest extends BaseTest
      * @param \CatLab\Charon\Interfaces\ResourceDefinition $definition
      * @return array
      */
-    private function serializeFields(\CatLab\Charon\Interfaces\ResourceDefinition $definition)
+    private function serializeFields(\CatLab\Charon\Interfaces\ResourceDefinition $definition): array
     {
         $serializedFields = [];
         foreach ($definition->getFields() as $field) {
             $serializedFields[] = $field->toArray();
         }
+
         return $serializedFields;
     }
 }

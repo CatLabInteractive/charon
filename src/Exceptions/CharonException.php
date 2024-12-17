@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Exceptions;
 
 use CatLab\Charon\Interfaces\ErrorMessage;
@@ -11,10 +13,7 @@ use Throwable;
  */
 class CharonException extends \Exception
 {
-    /**
-     * @var ErrorMessage
-     */
-    private $errorMessage;
+    private \CatLab\Charon\Interfaces\ErrorMessage $errorMessage;
 
     /**
      * @param string $template
@@ -23,7 +22,7 @@ class CharonException extends \Exception
      * @param Throwable|null $previous
      * @return CharonException
      */
-    public static function makeTranslatable(string $template, array $values = [], $code = 0, Throwable $previous = null)
+    public static function makeTranslatable(string $template, array $values = [], $code = 0, Throwable $previous = null): static
     {
         $message = new TranslatableErrorMessage($template, $values);
         return new static($message, $code, $previous);
@@ -43,7 +42,7 @@ class CharonException extends \Exception
     /**
      * @return ErrorMessage
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): \CatLab\Charon\Interfaces\ErrorMessage
     {
         return $this->errorMessage;
     }

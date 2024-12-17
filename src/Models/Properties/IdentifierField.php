@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Properties;
 
 use CatLab\Charon\Enums\Action;
@@ -35,7 +37,7 @@ class IdentifierField extends ResourceField
      * @param CurrentPath $currentPath
      * @return bool
      */
-    public function shouldInclude(Context $context, CurrentPath $currentPath)
+    public function shouldInclude(Context $context, CurrentPath $currentPath): bool
     {
         return true;
     }
@@ -44,20 +46,16 @@ class IdentifierField extends ResourceField
      * @param string $action
      * @return bool
      */
-    public function hasAction($action)
+    public function hasAction($action): bool
     {
         // Only on create this is not required.
-        if ($action === Action::CREATE) {
-            return false;
-        }
-
-        return true;
+        return $action !== Action::CREATE;
     }
 
     /**
      * @return bool
      */
-    public function canSetProperty()
+    public function canSetProperty(): bool
     {
         return false;
     }
@@ -67,7 +65,7 @@ class IdentifierField extends ResourceField
      * @param null $action
      * @return bool
      */
-    public function isViewable($action = null)
+    public function isViewable($action = null): bool
     {
         return true;
     }

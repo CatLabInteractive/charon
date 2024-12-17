@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models\Routing;
 
 use CatLab\Charon\Collections\RouteCollection;
@@ -98,12 +100,10 @@ class Route extends RouteProperties implements RouteMutator
      * @param $requestPath
      * @return MatchedRoute|boolean
      */
-    public function matches($requestPath, $method)
+    public function matches($requestPath, $method): false|\CatLab\Charon\Models\Routing\MatchedRoute
     {
-        if ($method) {
-            if (strtolower($method) != $this->getMethod()) {
-                return false;
-            }
+        if ($method && strtolower($method) != $this->getMethod()) {
+            return false;
         }
 
         $path = $this->getPath();
@@ -119,7 +119,7 @@ class Route extends RouteProperties implements RouteMutator
             $matches = array_slice($matches, 1);
 
             // Extract the matched URL parameters (and only the parameters)
-            $params = array_map(function($match, $index) use ($matches, $basePosition) {
+            $params = array_map(function(array $match, $index) use ($matches, $basePosition): ?string {
                 // We have a following parameter: take the substring from the current param position until the next one's position (thank you PREG_OFFSET_CAPTURE)
                 if (
                     isset($matches[$index+1]) &&
@@ -129,13 +129,12 @@ class Route extends RouteProperties implements RouteMutator
                 ) {
                     return trim(substr($match[0][0], 0, $matches[$index+1][0][1] - $match[0][1] + $basePosition), '/');
                 }
-                // We have no following parameters: return the whole lot
-                else {
-                    return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
-                }
+
+                return (isset($match[0][0]) ? trim($match[0][0], '/') : null);
             }, $matches, array_keys($matches));
             return new MatchedRoute($this, $params);
         }
+
         return false;
     }
 
@@ -145,7 +144,7 @@ class Route extends RouteProperties implements RouteMutator
      * that has a static value of 'static-parameter'.
      * @return array
      */
-    public function getPathWithStaticRouteParameters()
+    public function getPathWithStaticRouteParameters(): array
     {
         $path = $this->getPath();
 
@@ -169,7 +168,7 @@ class Route extends RouteProperties implements RouteMutator
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    public function getExtraParameters($hasCardinalityMany)
+    public function getExtraParameters($hasCardinalityMany): array
     {
         $returnValues = $this->getReturnValues();
 
@@ -220,7 +219,7 @@ class Route extends RouteProperties implements RouteMutator
             }
         }
 
-        if (count($sortValues) > 0) {
+        if ($sortValues !== []) {
             $parameters[] = (new QueryParameter(ResourceTransformer::SORT_PARAMETER))
                 ->setType('string')
                 ->enum($sortValues, true)
@@ -347,12 +346,10 @@ class Route extends RouteProperties implements RouteMutator
      * @return Parameter
      * @throws \CatLab\Charon\Exceptions\InvalidScalarException
      */
-    protected function getSearchField(Field $field)
+    protected function getSearchField(Field $field): \CatLab\Charon\Models\Routing\Parameters\Base\Parameter
     {
-        $filter = (new QueryParameter($field->getDisplayName()))
+        return (new QueryParameter($field->getDisplayName()))
             ->setType($field->getType())
             ->describe('Search results on ' . $field->getDisplayName());
-
-        return $filter;
     }
 }

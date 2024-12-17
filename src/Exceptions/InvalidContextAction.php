@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Exceptions;
 
 /**
@@ -8,10 +10,11 @@ namespace CatLab\Charon\Exceptions;
  */
 class InvalidContextAction extends ResourceException
 {
-    const WRITEABLE = 'Writeable';
-    const READABLE = 'Readable';
+    public const WRITEABLE = 'Writeable';
 
-    public static function create($expected, $actual)
+    public const READABLE = 'Readable';
+
+    public static function create($expected, $actual): \CatLab\Charon\Exceptions\CharonException
     {
         return self::makeTranslatable('%s context is expected, instead got %s.', [
             $expected,
@@ -23,7 +26,7 @@ class InvalidContextAction extends ResourceException
      * @param $actual
      * @return InvalidContextAction
      */
-    public static function expectedWriteable($actual)
+    public static function expectedWriteable($actual): \CatLab\Charon\Exceptions\CharonException
     {
         return self::create(self::WRITEABLE, $actual);
     }
@@ -32,7 +35,7 @@ class InvalidContextAction extends ResourceException
      * @param $actual
      * @return InvalidContextAction
      */
-    public static function expectedReadable($actual)
+    public static function expectedReadable($actual): \CatLab\Charon\Exceptions\CharonException
     {
         return self::create(self::READABLE, $actual);
     }

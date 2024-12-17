@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\Models;
 
 use CatLab\Base\Helpers\ObjectHelper;
@@ -20,30 +22,18 @@ use CatLab\Requirements\Interfaces\Validator;
  */
 class ResourceDefinition implements ResourceDefinitionContract, ResourceDefinitionManipulator
 {
-    /**
-     * @var ResourceFieldCollection
-     */
-    private $fields;
+    private \CatLab\Charon\Collections\ResourceFieldCollection $fields;
 
     /**
      * @var string
      */
     private $entityClassName;
 
-    /**
-     * @var string
-     */
-    private $url;
+    private ?string $url = null;
 
-    /**
-     * @var ValidatorCollection
-     */
-    private $validators;
+    private \CatLab\Requirements\Collections\ValidatorCollection $validators;
 
-    /**
-     * @var string
-     */
-    private $defaultOrder;
+    private ?string $defaultOrder = null;
 
     /**
      * @var string
@@ -67,18 +57,14 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      */
     public function getType()
     {
-        if (isset($this->type)) {
-            return $this->type;
-        }
-
-        return mb_strtolower($this->getEntityName());
+        return $this->type ?? mb_strtolower($this->getEntityName());
     }
 
     /**
      * @param $type
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->type = $type;
         return $this;
@@ -88,7 +74,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      * @param $name
      * @return IdentifierField
      */
-    public function identifier($name)
+    public function identifier($name): \CatLab\Charon\Models\Properties\IdentifierField
     {
         $field = new IdentifierField($this, $name);
         $this->fields->add($field);
@@ -100,7 +86,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      * @param string|array $name
      * @return ResourceField|PropertyGroup
      */
-    public function field($name)
+    public function field($name): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         if (is_array($name)) {
             $fields = [];
@@ -109,23 +95,24 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
                 if (!is_int($k)) {
                     $field->setDisplayName($k);
                 }
+
                 $fields[] = $field;
                 $this->fields->add($field);
             }
-            return new PropertyGroup($this, $fields);
-        } else {
-            $field = new ResourceField($this, $name);
-            $this->fields->add($field);
 
-            return $field;
+            return new PropertyGroup($this, $fields);
         }
+
+        $field = new ResourceField($this, $name);
+        $this->fields->add($field);
+        return $field;
     }
 
     /**
      * @param array $fields
      * @return PropertyGroup|ResourceField
      */
-    public function fields(array $fields)
+    public function fields(array $fields): \CatLab\Charon\Models\Properties\Base\PropertyGroup|\CatLab\Charon\Models\Properties\ResourceField
     {
         return $this->field($fields);
     }
@@ -167,15 +154,15 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
 
         if ($plural) {
             return StringHelper::plural($entityName, is_numeric($plural) ? $plural : 2);
-        } else {
-            return $entityName;
         }
+
+        return $entityName;
     }
 
     /**
      * @return ResourceFieldCollection
      */
-    public function getFields()
+    public function getFields(): \CatLab\Charon\Collections\ResourceFieldCollection
     {
         return $this->fields;
     }
@@ -201,7 +188,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -209,7 +196,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     /**
      * @param string $url
      */
-    public function setUrl(string $url)
+    public function setUrl(string $url): void
     {
         $this->url = $url;
     }
@@ -218,7 +205,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
      * @param string $order
      * @return $this
      */
-    public function defaultOrder(string $order)
+    public function defaultOrder(string $order): static
     {
         $this->defaultOrder = $order;
         return $this;
@@ -227,7 +214,7 @@ class ResourceDefinition implements ResourceDefinitionContract, ResourceDefiniti
     /**
      * @return string
      */
-    public function getDefaultOrder()
+    public function getDefaultOrder(): ?string
     {
         return $this->defaultOrder;
     }

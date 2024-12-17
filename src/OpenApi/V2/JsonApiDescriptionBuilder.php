@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace CatLab\Charon\OpenApi\V2;
 
@@ -23,7 +24,7 @@ class JsonApiDescriptionBuilder extends OpenApiV2Builder
      * @return array
      * @throws OpenApiException
      */
-    protected function buildResourceDefinitionDescription(ResourceDefinition $resourceDefinition, $action)
+    protected function buildResourceDefinitionDescription(ResourceDefinition $resourceDefinition, $action): array
     {
         $out = [];
 
@@ -82,7 +83,7 @@ class JsonApiDescriptionBuilder extends OpenApiV2Builder
             }
         }
 
-        if (count($out['properties']['attributes']['properties']) === 0) {
+        if ($out['properties']['attributes']['properties'] === []) {
             $out['properties']['attributes']['properties'] = (object) [];
         }
 
@@ -95,7 +96,7 @@ class JsonApiDescriptionBuilder extends OpenApiV2Builder
      * @param $container
      * @return array
      */
-    private function getSwaggerFieldContainer($fieldName, &$container)
+    private function getSwaggerFieldContainer($fieldName, array &$container): array
     {
         $fieldNamePath = explode('.', $fieldName);
         while (count($fieldNamePath) > 1) {
@@ -115,7 +116,7 @@ class JsonApiDescriptionBuilder extends OpenApiV2Builder
      * @param RelationshipField $field
      * @return array
      */
-    private function getRelationshipPropertySwaggerDescription(RelationshipField $field)
+    private function getRelationshipPropertySwaggerDescription(RelationshipField $field): array
     {
         $description = [
             'type' => 'object',
@@ -136,16 +137,16 @@ class JsonApiDescriptionBuilder extends OpenApiV2Builder
                     'data' => $description
                 ]
             ];
-        } else {
-            return [
-                'type' => 'object',
-                'properties' => [
-                    'data' => [
-                        'type' => 'array',
-                        'items' => $description
-                    ]
-                ]
-            ];
         }
+
+        return [
+            'type' => 'object',
+            'properties' => [
+                'data' => [
+                    'type' => 'array',
+                    'items' => $description
+                ]
+            ]
+        ];
     }
 }

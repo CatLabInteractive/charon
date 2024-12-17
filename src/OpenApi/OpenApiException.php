@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CatLab\Charon\OpenApi;
 
 use CatLab\Charon\Exceptions\CharonException;
