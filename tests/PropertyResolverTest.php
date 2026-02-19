@@ -85,7 +85,7 @@ final class PropertyResolverTest extends BaseTest
 
         $this->assertEquals(
             '/url/2',
-            $propertyResolver->resolvePathParameters($transformer, $model, '/url/{model.nthChild:"0.id}', $context)
+            $propertyResolver->resolvePathParameters($transformer, $model, '/url/{model.nthChild:0.id}', $context)
         );
 
         $this->assertEquals(
