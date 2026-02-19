@@ -23,7 +23,7 @@ class ResolverBase
 {
     public const CHILDPATH_PATH_SEPARATOR = '.';
 
-    public const CHILDPATH_PARAMETER_SEPARATOR = '|';
+    public const CHILDPATH_PARAMETER_SEPARATOR = ':';
 
     public const CHILDPATH_VARIABLE_OPEN = '{';
 
@@ -177,6 +177,10 @@ class ResolverBase
      */
     protected function getValueFromEntity($entity, $name, array $getterParameters, Context $context)
     {
+        if ($entity === null) {
+            return null;
+        }
+
         // Check for get method
         if ($this->methodExists($entity, 'get'.ucfirst($name))) {
             return call_user_func_array([$entity, 'get'.ucfirst($name)], $getterParameters);

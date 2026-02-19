@@ -1,19 +1,19 @@
 {
   "swagger": "2.0",
   "host": "localhost",
-  "basePath": "\/",
+  "basePath": "/",
   "info": {
     "title": "Pet store API",
     "description": "This pet store api allows you to buy pets",
     "contact": {
       "name": "CatLab Interactive",
-      "url": "https:\/\/www.catlab.eu\/",
+      "url": "https://www.catlab.eu/",
       "email": "info@catlab.eu"
     },
     "version": "1.0"
   },
   "paths": {
-    "api\/v1\/description.{format}": {
+    "api/v1/description.{format}": {
       "get": {
         "responses": {
           "403": {
@@ -47,12 +47,12 @@
         }
       }
     },
-    "api\/v1\/pets.{format}": {
+    "api/v1/pets.{format}": {
       "get": {
         "responses": {
           "200": {
             "schema": {
-              "$ref": "#\/definitions\/Pet_index_items"
+              "$ref": "#/definitions/Pet_index_items"
             },
             "description": "Returns many Tests\\Petstore\\Models\\Pet"
           },
@@ -135,7 +135,7 @@
             "type": "array",
             "in": "query",
             "required": false,
-            "description": "Define fields to return. Separate multiple values with comma. Values: *, pet-id, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
+            "description": "Define fields to return. Separate multiple values with comma. Values: *, pet-id, name, category, category.*, category.category-id, category.name, category.category-description, photos, photos.*, photos.photo-id, photos.url, tags, tags.*, tags.tag-id, tags.name, status",
             "items": {
               "type": "string"
             },
@@ -145,13 +145,16 @@
               "name",
               "category",
               "category.*",
+              "category.category-id",
               "category.name",
               "category.category-description",
               "photos",
               "photos.*",
+              "photos.photo-id",
               "photos.url",
               "tags",
               "tags.*",
+              "tags.tag-id",
               "tags.name",
               "status"
             ]
@@ -164,12 +167,12 @@
         }
       }
     },
-    "api\/v1\/pets\/{id}.{format}": {
+    "api/v1/pets/{id}.{format}": {
       "get": {
         "responses": {
           "200": {
             "schema": {
-              "$ref": "#\/definitions\/Pet_view"
+              "$ref": "#/definitions/Pet_view"
             },
             "description": "Returns one Tests\\Petstore\\Models\\Pet"
           },
@@ -219,7 +222,7 @@
             "type": "array",
             "in": "query",
             "required": false,
-            "description": "Define fields to return. Separate multiple values with comma. Values: *, pet-id, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
+            "description": "Define fields to return. Separate multiple values with comma. Values: *, pet-id, name, category, category.*, category.category-id, category.name, category.category-description, photos, photos.*, photos.photo-id, photos.url, tags, tags.*, tags.tag-id, tags.name, status",
             "items": {
               "type": "string"
             },
@@ -229,13 +232,16 @@
               "name",
               "category",
               "category.*",
+              "category.category-id",
               "category.name",
               "category.category-description",
               "photos",
               "photos.*",
+              "photos.photo-id",
               "photos.url",
               "tags",
               "tags.*",
+              "tags.tag-id",
               "tags.name",
               "status"
             ]
@@ -251,7 +257,7 @@
         "responses": {
           "200": {
             "schema": {
-              "$ref": "#\/definitions\/Pet_view"
+              "$ref": "#/definitions/Pet_view"
             },
             "description": "Returns one Tests\\Petstore\\Models\\Pet"
           },
@@ -286,7 +292,7 @@
             "in": "body",
             "required": false,
             "schema": {
-              "$ref": "#\/definitions\/Pet_edit"
+              "$ref": "#/definitions/Pet_edit"
             }
           },
           {
@@ -309,7 +315,7 @@
             "type": "array",
             "in": "query",
             "required": false,
-            "description": "Define fields to return. Separate multiple values with comma. Values: *, pet-id, name, category, category.*, category.name, category.category-description, photos, photos.*, photos.url, tags, tags.*, tags.name, status",
+            "description": "Define fields to return. Separate multiple values with comma. Values: *, pet-id, name, category, category.*, category.category-id, category.name, category.category-description, photos, photos.*, photos.photo-id, photos.url, tags, tags.*, tags.tag-id, tags.name, status",
             "items": {
               "type": "string"
             },
@@ -319,20 +325,23 @@
               "name",
               "category",
               "category.*",
+              "category.category-id",
               "category.name",
               "category.category-description",
               "photos",
               "photos.*",
+              "photos.photo-id",
               "photos.url",
               "tags",
               "tags.*",
+              "tags.tag-id",
               "tags.name",
               "status"
             ]
           }
         ],
         "consumes": [
-          "application\/json"
+          "application/json"
         ],
         "security": {
           "oauth2": [
@@ -357,7 +366,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "#\/definitions\/Pet_index"
+            "$ref": "#/definitions/Pet_index"
           }
         }
       }
@@ -407,10 +416,10 @@
           "type": "string"
         },
         "photos": {
-          "$ref": "#\/definitions\/Photo_create_items"
+          "$ref": "#/definitions/Photo_create_items"
         },
         "tags": {
-          "$ref": "#\/definitions\/Tag_identifier_items"
+          "$ref": "#/definitions/Tag_identifier_items"
         }
       }
     },
@@ -428,7 +437,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "#\/definitions\/Photo_create"
+            "$ref": "#/definitions/Photo_create"
           }
         }
       }
@@ -447,7 +456,7 @@
         "items": {
           "type": "array",
           "items": {
-            "$ref": "#\/definitions\/Tag_identifier"
+            "$ref": "#/definitions/Tag_identifier"
           }
         }
       }
@@ -456,7 +465,7 @@
   "securityDefinitions": {
     "oauth2": {
       "type": "oauth2",
-      "authorizationUrl": "oauth\/authorize",
+      "authorizationUrl": "oauth/authorize",
       "flow": "implicit",
       "scopes": {
         "full": "Full access"
