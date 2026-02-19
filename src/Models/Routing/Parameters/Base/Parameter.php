@@ -55,11 +55,6 @@ class Parameter implements RouteMutator, Property
     protected $in;
 
     /**
-     * @var string
-     */
-    protected $type = 'string';
-
-    /**
      * @var Route
      */
     protected $route;
@@ -103,6 +98,7 @@ class Parameter implements RouteMutator, Property
     {
         $this->name = $name;
         $this->in = $type;
+        $this->type = 'string';
     }
 
     /**
