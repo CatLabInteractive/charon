@@ -15,13 +15,13 @@ class MockResourceDefinition extends \CatLab\Charon\Models\ResourceDefinition
                 ->display('name')
                 ->visible(true)
 
-            ->relationship('nthChild|0', MockResourceDefinition::class)
+            ->relationship('nthChild:0', MockResourceDefinition::class)
                 ->display('firstChild')
                 ->expanded()
                 ->visible()
                 ->one()
 
-            ->relationship('nthChild|{context.childNumber}', MockResourceDefinition::class)
+            ->relationship('nthChild:{context.childNumber}', MockResourceDefinition::class)
                 ->display('nthChild')
                 ->expanded()
                 ->visible()

@@ -40,7 +40,7 @@ final class PropertyResolverTest extends BaseTest
         );
 
         $this->assertEquals(
-            [ 'filteredAttachments|{context.revision}|{context.currentUser}' ],
+            [ 'filteredAttachments:{context.revision}:{context.currentUser}' ],
             $propertyResolver->splitPathParameters('filteredAttachments|{context.revision}|{context.currentUser}')
         );
     }
