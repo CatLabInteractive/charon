@@ -40,8 +40,8 @@ final class PropertyResolverTest extends BaseTest
         );
 
         $this->assertEquals(
-            [ 'filteredAttachments:{context.revision}:{context.currentUser}' ],
-            $propertyResolver->splitPathParameters('filteredAttachments:{context.revision}:{context.currentUser}')
+            [ 'filteredAttachments|{context.revision}|{context.currentUser}' ],
+            $propertyResolver->splitPathParameters('filteredAttachments|{context.revision}|{context.currentUser}')
         );
     }
 
@@ -58,8 +58,8 @@ final class PropertyResolverTest extends BaseTest
         );
 
         $this->assertEquals(
-            [ 'method:{variable.subtype}', 'parameter' ],
-            $propertyResolver->splitPathParameters('method:{variable.subtype}.parameter')
+            [ 'method|{variable.subtype}', 'parameter' ],
+            $propertyResolver->splitPathParameters('method|{variable.subtype}.parameter')
         );
     }
 
@@ -85,7 +85,7 @@ final class PropertyResolverTest extends BaseTest
 
         $this->assertEquals(
             '/url/2',
-            $propertyResolver->resolvePathParameters($transformer, $model, '/url/{model.nthChild:0.id}', $context)
+            $propertyResolver->resolvePathParameters($transformer, $model, '/url/{model.nthChild|0.id}', $context)
         );
 
         $this->assertEquals(

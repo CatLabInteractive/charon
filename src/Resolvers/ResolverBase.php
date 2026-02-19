@@ -23,7 +23,7 @@ class ResolverBase
 {
     public const CHILDPATH_PATH_SEPARATOR = '.';
 
-    public const CHILDPATH_PARAMETER_SEPARATOR = ':';
+    public const CHILDPATH_PARAMETER_SEPARATOR = '|';
 
     public const CHILDPATH_VARIABLE_OPEN = '{';
 
