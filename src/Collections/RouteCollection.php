@@ -297,6 +297,14 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
             $this->addIdParameterToRoutePath($deleteRoute, $id, $options);
         }
 
+        if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
+            $group->delete($path, $controller . '@bulkDestroy', [], 'bulkDestroy')
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
+                    return 'Bulk delete ' . $entityName;
+                });
+        }
+
         return $group;
     }
 
@@ -401,6 +409,16 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 });
 
             $this->addIdParameterToRoutePath($destroyRoute, $id, $options);
+        }
+
+        if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
+            $bulkDestroyRoute = $group->delete($parentPath, $controller . '@bulkDestroy', [], 'bulkDestroy')
+                ->summary(function () use ($resourceDefinitionFactory) {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(true);
+                    return 'Bulk delete ' . $entityName;
+                });
+
+            $this->addIdParameterToRoutePath($bulkDestroyRoute, $parentId, $options);
         }
 
         return $group;

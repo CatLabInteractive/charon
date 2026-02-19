@@ -121,6 +121,10 @@ class JsonBodyInputParser extends AbstractInputParser implements InputParser
             $resourceCollection->add($resource);
         }
 
+        if ($this->getHeader('X-Bulk-Request') == '1') {
+            $resourceCollection->addMeta('bulk', true);
+        }
+
         return $resourceCollection;
     }
 
