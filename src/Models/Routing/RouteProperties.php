@@ -338,7 +338,7 @@ abstract class RouteProperties implements RouteMutator
      * @param $b
      * @return array|string
      */
-    private function mergeOptions(int|string $name, string $a, string $b): array|string
+    private function mergeOptions(int|string $name, string|array $a, string|array $b): array|string
     {
         if (is_array($a) && is_array($b)) {
             return array_merge($a, $b);

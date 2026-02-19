@@ -4,7 +4,7 @@
   "version": "1.8.0",
   "type": "library",
   "require": {
-    "php": ">=7.1",
+    "php": ">=8.0",
     "catlabinteractive/requirements": "^1.0.7",
     "ext-mbstring": "*"
   },
