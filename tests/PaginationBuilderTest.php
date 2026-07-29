@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Charon\Exceptions\NotImplementedException;
 use CatLab\Charon\Processors\PaginationProcessor;
 use CatLab\Charon\ResourceTransformer;
 
@@ -62,40 +63,36 @@ final class PaginationBuilderTest extends BaseTest
      */
     public function testDate(): void
     {
-        // temporary disabled
-        return;
         $cursors = $this->getCursorsToTest('someDate');
 
+        // Cursors encode the date-sortable field using DateTime's default (RFC 2822-ish)
+        // string format, followed by the auto-appended identifier ('pet-id') used as a
+        // tie-breaker.
         $this->assertEquals('{"someDate":"Wed, 02 Apr 86 10:00:00 +0000","pet-id":1}', base64_decode($cursors['before']));
         $this->assertEquals('{"someDate":"Fri, 04 Apr 86 10:00:00 +0000","pet-id":3}', base64_decode($cursors['after']));
+    }
 
-        /**
-         * Test after
-         */
-        $cursors = $this->getCursorsToTest('someDate', $cursors['after']);
+    /**
+     * Sorting on 'someDate' produces a cursor with two columns: 'someDate' and the
+     * auto-appended 'pet-id' identifier (used as a tie-breaker for equal dates).
+     * Applying such a multi-column cursor back onto a query requires a nested/compound
+     * WHERE clause (an OR of ANDs), which CatLab\Charon\Processors\PaginationProcessor
+     * explicitly does not support: it throws NotImplementedException as soon as a WHERE
+     * clause has children (see PaginationProcessor::processProcessorFilters()).
+     *
+     * This is exactly why testDate() originally exercised (and then disabled, see commit
+     * deac2ece "Fixing tests, and disabling one that isn't implemented (anymore).") a
+     * round-trip through the 'after'/'before' cursor: that round-trip has never worked
+     * for a multi-column sort since that 2019 refactor. This is a pre-existing library
+     * limitation, out of scope to fix here — this test documents the current behaviour so
+     * it fails loudly (rather than silently) if/when that limitation is ever lifted.
+     */
+    public function testDateCursorWithMultipleSortColumnsIsNotYetSupported(): void
+    {
+        $cursors = $this->getCursorsToTest('someDate');
 
-        /** @var SelectQueryParameters $filters */
-        $filters = $cursors['filters'];
-
-        $whereQueries = $filters->getWhere();
-        $dateWhere = $whereQueries[0];
-
-        $this->assertEquals('1986-04-04 10:00:00', $dateWhere->getComparison()->getValue()->format('Y-m-d H:i:s'));
-
-        /**
-         * Test before
-         */
-        $this->assertEquals('>=', $dateWhere->getComparison()->getOperator());
-        $cursors = $this->getCursorsToTest('someDate', null, $cursors['before']);
-
-        /** @var SelectQueryParameters $filters */
-        $filters = $cursors['filters'];
-
-        $whereQueries = $filters->getWhere();
-        $dateWhere = $whereQueries[0];
-
-        $this->assertEquals('<=', $dateWhere->getComparison()->getOperator());
-        $this->assertEquals('1986-04-02 10:00:00', $dateWhere->getComparison()->getValue()->format('Y-m-d H:i:s'));
+        $this->expectException(NotImplementedException::class);
+        $this->getCursorsToTest('someDate', $cursors['after']);
     }
 
     private function getCursorsToTest(string $sortOrder, $afterCursor = null, $beforeCursor = null): array

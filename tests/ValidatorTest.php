@@ -43,7 +43,13 @@ final class ValidatorTest extends BaseTest
             $context
         );
 
+        // The resource properties should have round-tripped correctly from the input array.
+        $this->assertEquals('Foobar', $resource->getProperties()->getFromName('name')->getValue());
+        $this->assertCount(2, $resource->getProperties()->getFromName('photos')->getChildren());
+
+        // validate() must not throw for valid input.
         $resource->validate($context);
+        $this->assertTrue(true, 'Pet::validate() did not throw for valid input.');
     }
 
     /**
