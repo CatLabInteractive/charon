@@ -46,8 +46,8 @@ interface ResourceTransformer
         $resourceDefinition,
         $entities,
         Context $context,
-        FilterResults $filterResults = null,
-        RelationshipValue $parent = null,
+        ?FilterResults $filterResults = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ) : ResourceCollection;
 
@@ -63,7 +63,7 @@ interface ResourceTransformer
         $resourceDefinition,
         $entity,
         Context $context,
-        RelationshipValue $parent = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ) : RESTResource;
 
@@ -130,7 +130,7 @@ interface ResourceTransformer
      * @param Context $context
      * @return void
      */
-    public function processEagerLoading($entities, $resourceDefinition = null, Context $context = null);
+    public function processEagerLoading($entities, $resourceDefinition = null, ?Context $context = null);
 
     /**
      * Create resources from whatever is in the inputs defined from the input parsers.

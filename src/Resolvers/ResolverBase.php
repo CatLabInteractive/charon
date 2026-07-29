@@ -133,7 +133,7 @@ class ResolverBase
         ResourceTransformer $transformer,
         array $parameters,
         Context $context,
-        Field $field = null,
+        ?Field $field = null,
         $entity = null
     ): array {
         $out = [];

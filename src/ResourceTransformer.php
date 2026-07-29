@@ -94,11 +94,11 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ResourceFactoryContract $resourceFactory
      */
     public function __construct(
-        PropertyResolverContract $propertyResolver = null,
-        PropertySetterContract $propertySetter = null,
-        RequestResolverContract $requestResolver = null,
-        QueryAdapterContract $queryAdapter = null,
-        ResourceFactoryContract $resourceFactory = null
+        ?PropertyResolverContract $propertyResolver = null,
+        ?PropertySetterContract $propertySetter = null,
+        ?RequestResolverContract $requestResolver = null,
+        ?QueryAdapterContract $queryAdapter = null,
+        ?ResourceFactoryContract $resourceFactory = null
     ) {
         $this->propertyResolver = $propertyResolver ?? new SimplePropertyResolver();
         $this->propertySetter = $propertySetter ?? new SimplePropertySetter();
@@ -138,8 +138,8 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $resourceDefinition,
         $entities,
         ContextContract $context,
-        FilterResults $filterResults = null,
-        RelationshipValue $parent = null,
+        ?FilterResults $filterResults = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ) : \CatLab\Charon\Interfaces\ResourceCollection {
 
@@ -208,7 +208,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $resourceDefinition,
         $entity,
         ContextContract $context,
-        RelationshipValue $parent = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ) : ResourceContract {
         $resourceDefinition = $this->getResourceDefinition($resourceDefinition, $entity);
@@ -516,7 +516,7 @@ abstract class ResourceTransformer implements ResourceTransformerContract
      * @param ContextContract $context
      * @throws Exceptions\InvalidResourceDefinition
      */
-    public function processEagerLoading($entities, $resourceDefinition = null, ContextContract $context = null): void
+    public function processEagerLoading($entities, $resourceDefinition = null, ?ContextContract $context = null): void
     {
         if (!$resourceDefinition) {
             return;

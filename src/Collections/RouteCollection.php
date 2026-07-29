@@ -70,7 +70,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
      * @param callable $callback
      * @return RouteCollection
      */
-    public function group($options, callable $callback = null): static
+    public function group($options, ?callable $callback = null): static
     {
         if (!isset($callback) && is_callable($options)) {
             $callback = $options;

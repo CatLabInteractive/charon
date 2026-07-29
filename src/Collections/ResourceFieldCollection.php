@@ -120,7 +120,7 @@ class ResourceFieldCollection extends Collection
      * @param CurrentPath|null $path
      * @return array|ResourceFieldCollection
      */
-    public function getIncludedInContext(Context $context, CurrentPath $path = null): self
+    public function getIncludedInContext(Context $context, ?CurrentPath $path = null): self
     {
         if (!isset($path)) {
             $path = new CurrentPath();

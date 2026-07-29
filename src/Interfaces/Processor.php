@@ -46,8 +46,8 @@ interface Processor
         ResourceCollection $collection,
         ResourceDefinitionFactory $definition,
         Context $context,
-        FilterResults $filterResults = null,
-        RelationshipValue $parent = null,
+        ?FilterResults $filterResults = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     );
 
@@ -65,7 +65,7 @@ interface Processor
         RESTResource $resource,
         ResourceDefinition $definition,
         Context $context,
-        RelationshipValue $parent = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     );
 }

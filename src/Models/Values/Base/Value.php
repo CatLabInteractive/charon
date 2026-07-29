@@ -66,7 +66,7 @@ abstract class Value
      * @return \CatLab\Charon\Interfaces\Transformer|mixed|null
      * @throws \CatLab\Charon\Exceptions\InvalidTransformer
      */
-    public function getTransformedEntityValue(Context $context = null)
+    public function getTransformedEntityValue(?Context $context = null)
     {
         $value = $this->getValue();
 

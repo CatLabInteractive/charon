@@ -175,7 +175,7 @@ class ReturnValue implements RouteMutator
      * @return ReturnValue
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function returns($type = null, string $action = null) : ReturnValue
+    public function returns($type = null, ?string $action = null) : ReturnValue
     {
         return $this->parent->returns($type, $action);
     }

@@ -132,7 +132,7 @@ abstract class RouteProperties implements RouteMutator
      * @return ReturnValue
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function returns($type = null, string $action = null) : ReturnValue
+    public function returns($type = null, ?string $action = null) : ReturnValue
     {
         $this->context = $action;
         $returnValue = new ReturnValue($this, $type);

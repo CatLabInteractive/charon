@@ -46,8 +46,8 @@ class ProcessorCollection extends Collection implements Processor
         ResourceCollection $collection,
         ResourceDefinitionFactory $definition,
         Context $context,
-        FilterResults $filterResults = null,
-        RelationshipValue $parent = null,
+        ?FilterResults $filterResults = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ): void {
         foreach ($this as $processor) {
@@ -64,7 +64,7 @@ class ProcessorCollection extends Collection implements Processor
         RESTResource $resource,
         ResourceDefinition $definition,
         Context $context,
-        RelationshipValue $parent = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ): void {
         foreach ($this as $processor) {

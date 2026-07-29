@@ -14,7 +14,7 @@ use Tests\Models\MockQueryAdapter;
 
 abstract class BaseTest extends TestCase
 {
-    public function getResourceTransformer(PropertyResolverContract $propertyResolver = null)
+    public function getResourceTransformer(?PropertyResolverContract $propertyResolver = null)
     {
         if (!$propertyResolver instanceof \CatLab\Charon\Interfaces\PropertyResolver) {
             $propertyResolver = new MockPropertyResolver();

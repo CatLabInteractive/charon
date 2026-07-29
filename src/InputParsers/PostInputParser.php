@@ -148,7 +148,7 @@ class PostInputParser extends AbstractInputParser implements InputParser
         Route $route,
         ParameterCollection $parameterCollection,
         ResourceDefinition $resourceDefinition,
-        Context $context = null
+        ?Context $context = null
     ) {
         if (!$context instanceof \CatLab\Charon\Interfaces\Context) {
             $context = new \CatLab\Charon\Models\Context(

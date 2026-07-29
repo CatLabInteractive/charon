@@ -25,7 +25,7 @@ class OpenApiV3Builder extends OpenApiV2Builder
     public function __construct(
         string $host,
         string $basePath,
-        ResourceFactoryInterface $resourceFactory = null
+        ?ResourceFactoryInterface $resourceFactory = null
     ) {
         parent::__construct($host, $basePath, $resourceFactory);
     }

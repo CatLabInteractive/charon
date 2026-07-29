@@ -74,7 +74,7 @@ class ChildValue extends RelationshipValue
     /**
      * @inheritDoc
      */
-    public function getTransformedEntityValue(Context $context = null, string $attribute = null)
+    public function getTransformedEntityValue(?Context $context = null, ?string $attribute = null)
     {
         if (!$this->child instanceof \CatLab\Charon\Models\RESTResource) {
             return null;

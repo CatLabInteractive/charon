@@ -243,7 +243,7 @@ class Parameter implements RouteMutator, Property
      * @return ReturnValue
      * @throws \CatLab\Charon\Exceptions\InvalidContextAction
      */
-    public function returns($type = null, string $action = null) : ReturnValue
+    public function returns($type = null, ?string $action = null) : ReturnValue
     {
         return $this->route->returns($type, $action);
     }

@@ -22,7 +22,7 @@ class CharonException extends \Exception
      * @param Throwable|null $previous
      * @return CharonException
      */
-    public static function makeTranslatable(string $template, array $values = [], $code = 0, Throwable $previous = null): static
+    public static function makeTranslatable(string $template, array $values = [], $code = 0, ?Throwable $previous = null): static
     {
         $message = new TranslatableErrorMessage($template, $values);
         return new static($message, $code, $previous);
@@ -33,7 +33,7 @@ class CharonException extends \Exception
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(ErrorMessage $message, $code = 0, Throwable $previous = null)
+    public function __construct(ErrorMessage $message, $code = 0, ?Throwable $previous = null)
     {
         $this->errorMessage = $message;
         parent::__construct($message->getMessage(), $code, $previous);

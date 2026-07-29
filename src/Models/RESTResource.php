@@ -146,7 +146,7 @@ class RESTResource implements ResourceContract
         ContextContract $context,
         Field $field,
         $url,
-        ResourceContract $child = null,
+        ?ResourceContract $child = null,
         $visible = true
     ): static {
         $childProperty = $this->properties->getChild($field);
@@ -282,7 +282,7 @@ class RESTResource implements ResourceContract
     public function validate(
         ContextContract $context,
         $original = null,
-        CurrentPath $path = null,
+        ?CurrentPath $path = null,
         bool $validateNonProvidedFields = true
     ): void {
         if (!$path instanceof \CatLab\Charon\Models\CurrentPath) {

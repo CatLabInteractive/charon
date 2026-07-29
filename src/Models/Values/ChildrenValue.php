@@ -45,7 +45,7 @@ class ChildrenValue extends RelationshipValue
      * @param string|null $path
      * @return array
      */
-    public function getValue(string $path = null)
+    public function getValue(?string $path = null)
     {
         $items = $this->children->toArray();
         return $items[ResourceTransformer::RELATIONSHIP_ITEMS];
@@ -55,7 +55,7 @@ class ChildrenValue extends RelationshipValue
      * @inheritDoc
      * @return mixed[]
      */
-    public function getTransformedEntityValue(Context $context = null): array
+    public function getTransformedEntityValue(?Context $context = null): array
     {
         $out = [];
         foreach ($this->children as $child) {

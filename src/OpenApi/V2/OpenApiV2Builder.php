@@ -112,7 +112,7 @@ class OpenApiV2Builder implements DescriptionBuilder
     public function __construct(
         string $host,
         string $basePath,
-        ResourceFactoryInterface $resourceFactory = null
+        ?ResourceFactoryInterface $resourceFactory = null
     ) {
         $this->resourceFactory = $resourceFactory ?? new ResourceFactory();
         $this->entityNameLibrary = new PrettyEntityNameLibrary();

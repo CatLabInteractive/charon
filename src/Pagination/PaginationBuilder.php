@@ -71,7 +71,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
      * @param \closure|null $transformer
      * @return \CatLab\Base\Interfaces\Pagination\PaginationBuilder
      */
-    public function registerPropertyName(string $column, string $publicName, \closure $transformer = null)
+    public function registerPropertyName(string $column, string $publicName, ?\closure $transformer = null)
     {
         // not required
         return $this;
@@ -91,7 +91,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
      * @param SelectQueryParameters $queryBuilder
      * @return SelectQueryParameters
      */
-    public function build(SelectQueryParameters $queryBuilder = null)
+    public function build(?SelectQueryParameters $queryBuilder = null)
     {
         if (!isset($queryBuilder)) {
             $queryBuilder = new SelectQueryParameters();
@@ -174,7 +174,7 @@ class PaginationBuilder implements \CatLab\Base\Interfaces\Pagination\Pagination
      * @param FilterResults|null $filterResults
      * @return mixed[]
      */
-    public function processCollection($results, FilterResults $filterResults = null)
+    public function processCollection($results, ?FilterResults $filterResults = null)
     {
         $this->hasPreviousPage = $this->page > 1;
         $this->hasNextPage = count($results) >= $this->records;

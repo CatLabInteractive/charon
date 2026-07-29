@@ -189,8 +189,8 @@ class PaginationProcessor implements Processor
         ResourceCollection $collection,
         ResourceDefinitionFactory $definition,
         Context $context,
-        FilterResults $filterResults = null,
-        RelationshipValue $parent = null,
+        ?FilterResults $filterResults = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ): void {
         [$url, $cursor] = $this->prepareCursor(
@@ -225,8 +225,8 @@ class PaginationProcessor implements Processor
         ResourceCollection $collection,
         ResourceDefinition $definition,
         Context $context,
-        FilterResults $filterResults = null,
-        RelationshipValue $parent = null,
+        ?FilterResults $filterResults = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ): ?array {
         $builder = $this->getPaginationBuilderFromDefinition($transformer, $definition, $context, null);
@@ -336,7 +336,7 @@ class PaginationProcessor implements Processor
         RESTResource $resource,
         ResourceDefinition $definition,
         Context $context,
-        RelationshipValue $parent = null,
+        ?RelationshipValue $parent = null,
         $parentEntity = null
     ): void {
         // Nothing to do here...
