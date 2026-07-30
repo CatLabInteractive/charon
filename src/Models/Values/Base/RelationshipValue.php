@@ -283,15 +283,11 @@ abstract class RelationshipValue extends Value
         // A pure client-reference link target: {"$ref": "tmp-1"} with no
         // identifiers of its own. Resolve it through the request-scoped
         // ClientReferenceMap instead of the database.
-        if (
-            $child->getClientRef() !== null &&
-            $child->getIdentifiers()->count() === 0 &&
-            $field->canLinkExistingEntities($context)
-        ) {
+        if ($this->isClientReferenceLink($child, $field, $context)) {
             $map = $context->getClientReferenceMap();
             $resolved = $map->resolve($child->getClientRef());
 
-            if ($resolved) {
+            if ($resolved !== null) {
                 $childrenToAdd[] = $resolved;
 
                 // Without an identifier to keep, removeAllChildrenExcept() (called
