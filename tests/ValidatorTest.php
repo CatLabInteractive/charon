@@ -82,4 +82,76 @@ final class ValidatorTest extends BaseTest
 
         $resource->validate($context);
     }
+
+    /**
+     * PetDefinition's 'photos' relationship is writeable-only (->writeable(),
+     * no ->linkable()) - a "many" relationship that only ever creates/edits
+     * full child resources, never links existing ones by identifier. Its
+     * child resource (PhotoDefinition) declares 'url' ->required().
+     *
+     * Regression test for RelationshipValue::validate(): a writeable-only,
+     * non-linkable relationship must still run full per-child validation
+     * (required/enum/etc. field validators), not silently skip it because
+     * there is no linkable path to fall back from.
+     */
+    public function testPetPhotoMissingRequiredUrlFailsValidation(): void
+    {
+        $this->expectException(\CatLab\Requirements\Exceptions\ResourceValidationException::class);
+
+        $transformer = $this->getResourceTransformer();
+        $context = new Context(Action::CREATE);
+
+        $resource = $transformer->fromArray(
+            PetDefinition::class,
+            [
+                'name' => 'Foobar',
+                'photos' => [
+                    'items' => [
+                        [
+                            // 'url' deliberately omitted - PhotoDefinition
+                            // requires it.
+                        ],
+                        [
+                            'url' => 'photo2.jpg'
+                        ]
+                    ]
+                ]
+            ],
+            $context
+        );
+
+        $resource->validate($context);
+    }
+
+    /**
+     * Sibling of the above: the same writeable-only 'photos' relationship
+     * must still validate successfully when every child does carry its
+     * required field, i.e. the fix doesn't over-trigger.
+     */
+    public function testPetPhotoWithRequiredUrlPassesValidation(): void
+    {
+        $transformer = $this->getResourceTransformer();
+        $context = new Context(Action::CREATE);
+
+        $resource = $transformer->fromArray(
+            PetDefinition::class,
+            [
+                'name' => 'Foobar',
+                'photos' => [
+                    'items' => [
+                        [
+                            'url' => 'photo1.jpg'
+                        ],
+                        [
+                            'url' => 'photo2.jpg'
+                        ]
+                    ]
+                ]
+            ],
+            $context
+        );
+
+        $resource->validate($context);
+        $this->assertTrue(true, 'Pet::validate() did not throw when every writeable-only child satisfied its required field.');
+    }
 }

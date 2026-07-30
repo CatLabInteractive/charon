@@ -27,6 +27,7 @@ class PhotoDefinition extends ResourceDefinition
             ->field('url')
                 ->visible(true, true)
                 ->writeable()
+                ->required()
         ;
     }
 }

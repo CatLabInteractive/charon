@@ -424,23 +424,38 @@ abstract class RelationshipValue extends Value
                         continue;
                     }
 
-                    // First check if this could be a 'linkable' request
-                    try {
-                        if ($field->canLinkExistingEntities($context)) {
-                            $this->validateLinkableResource($child, $path);
-                        }
-                    } catch (PropertyValidationException $e) {
-                        // If not, do a full validation.
+                    // First check if this could be a 'linkable' request. Note
+                    // that this is deliberately not a plain "if / else": when
+                    // the field can't link at all (a writeable-only, non-
+                    // linkable relationship), there is nothing here to throw,
+                    // so the old code (a bare `if (canLinkExistingEntities)`
+                    // guarding the only call to validateLinkableResource(),
+                    // with the fallback living in that call's catch block)
+                    // silently skipped child validation entirely for that
+                    // case -- required/enum/etc. field validators on nested
+                    // writeable-only children never ran. Falling through to
+                    // the full validation below (instead of only reaching it
+                    // via a caught exception) fixes that while leaving the
+                    // linkable path identical: a successful link validation
+                    // still short-circuits via `continue` before reaching it.
+                    if ($field->canLinkExistingEntities($context)) {
                         try {
-                            $child->validate(
-                                $context,
-                                null,
-                                $this->appendToPath($path, $field),
-                                $validateNonProvidedFields
-                            );
-                        } catch (ResourceValidationException $e) {
-                            $messages->merge($e->getMessages());
+                            $this->validateLinkableResource($child, $path);
+                            continue;
+                        } catch (PropertyValidationException $e) {
+                            // Not a valid link - fall through to a full validation.
                         }
+                    }
+
+                    try {
+                        $child->validate(
+                            $context,
+                            null,
+                            $this->appendToPath($path, $field),
+                            $validateNonProvidedFields
+                        );
+                    } catch (ResourceValidationException $e) {
+                        $messages->merge($e->getMessages());
                     }
 
                 } else {
