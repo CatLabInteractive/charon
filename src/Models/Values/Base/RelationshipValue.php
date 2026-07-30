@@ -293,6 +293,21 @@ abstract class RelationshipValue extends Value
 
             if ($resolved) {
                 $childrenToAdd[] = $resolved;
+
+                // Without an identifier to keep, removeAllChildrenExcept() (called
+                // right after addChildren() applies $childrenToAdd) would treat
+                // this field as having nothing to keep and immediately clear the
+                // link it was just given -- see ChildValue::removeAllChildrenExcept().
+                // Build one from the resolved entity itself, the same way the
+                // existing-identifier linkable branch below does from the child
+                // resource's own (database-sourced) identifier.
+                $identifiersToKeep[] = $this->identifierFromEntity(
+                    $resourceTransformer,
+                    $propertyResolver,
+                    $field,
+                    $resolved,
+                    $context
+                );
             } else {
                 // Forward reference: the entity carrying this ref hasn't been
                 // created yet. Charon can't apply the link itself (no
@@ -404,6 +419,15 @@ abstract class RelationshipValue extends Value
             foreach ($this->getChildrenToProcess() as $child) {
                 /** @var RESTResource $child */
                 if ($child) {
+                    // A pure client-reference link target ({"$ref": "tmp-1"}, no
+                    // identifiers of its own): it is resolved through the
+                    // ClientReferenceMap at toEntity() time (immediately, or as a
+                    // pending link), not validated as either a full resource or an
+                    // existing-entity link -- it may not have an id yet.
+                    if ($this->isClientReferenceLink($child, $field, $context)) {
+                        continue;
+                    }
+
                     // First check if this could be a 'linkable' request
                     try {
                         if ($field->canLinkExistingEntities($context)) {
@@ -437,6 +461,10 @@ abstract class RelationshipValue extends Value
              */
             foreach ($this->getChildrenToProcess() as $child) {
                 if ($child) {
+                    if ($this->isClientReferenceLink($child, $field, $context)) {
+                        continue;
+                    }
+
                     $this->validateLinkableResource($child, $path);
                 } else {
                     try {
@@ -455,6 +483,61 @@ abstract class RelationshipValue extends Value
         if (count($messages) > 0) {
             throw PropertyValidationException::make($field, $messages);
         }
+    }
+
+    /**
+     * Build an Identifier for $entity, an already-resolved entity that has no
+     * corresponding RESTResource with identifier properties of its own (a
+     * client-reference link target only ever carries '$ref', never an id).
+     * Reads each of the field's child resource definition's identifier
+     * fields straight off the entity, through the same PropertyResolver used
+     * everywhere else to turn an entity's fields into resource values (so it
+     * follows getId()-style getters, not just public properties).
+     * @param ResourceTransformer $resourceTransformer
+     * @param PropertyResolver $propertyResolver
+     * @param RelationshipField $field
+     * @param mixed $entity
+     * @param Context $context
+     * @return \CatLab\Charon\Models\Identifier
+     * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
+     * @throws InvalidPropertyException
+     * @throws \CatLab\Charon\Exceptions\VariableNotFoundInContext
+     */
+    private function identifierFromEntity(
+        ResourceTransformer $resourceTransformer,
+        PropertyResolver $propertyResolver,
+        RelationshipField $field,
+        $entity,
+        Context $context
+    ): \CatLab\Charon\Models\Identifier {
+        $resourceDefinition = $field->getChildResourceDefinition();
+        $identifier = new \CatLab\Charon\Models\Identifier($resourceDefinition);
+
+        foreach ($resourceDefinition->getFields()->getIdentifiers() as $idField) {
+            $value = $propertyResolver->resolveProperty($resourceTransformer, $entity, $idField, $context);
+            $identifier->setProperty($idField, $value, true);
+        }
+
+        return $identifier;
+    }
+
+    /**
+     * Whether $child is a pure client-reference link target: {"$ref": "tmp-1"}
+     * with no identifiers of its own, on a field that can link existing
+     * entities. Mirrors the check childResourceToEntity() uses to resolve such
+     * a child through the ClientReferenceMap instead of the database -- kept
+     * here too so validate() doesn't reject it for lacking an id before
+     * toEntity() ever gets a chance to resolve it.
+     * @param RESTResource $child
+     * @param RelationshipField $field
+     * @param Context $context
+     * @return bool
+     */
+    private function isClientReferenceLink(RESTResource $child, RelationshipField $field, Context $context): bool
+    {
+        return $child->getClientRef() !== null
+            && $child->getIdentifiers()->count() === 0
+            && $field->canLinkExistingEntities($context);
     }
 
     /**
