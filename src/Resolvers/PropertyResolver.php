@@ -153,7 +153,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
         $children = $this->resolveChildrenListInput($transformer, $input, $field, $context);
         if ($children) {
             foreach ($children as $child) {
-                $childContext = $this->getInputChildContext($transformer, $field, $context);
+                $childContext = $this->getInputChildContext($transformer, $field, $context, $child);
                 $out->add($transformer->fromArray($field->getChildResourceDefinitionFactory(), $child, $childContext));
             }
         }
@@ -196,7 +196,7 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
             $child = $this->resolvePropertyInput($transformer, $input, $field, $context);
 
             if (is_array($child)) {
-                $childContext = $this->getInputChildContext($transformer, $field, $context);
+                $childContext = $this->getInputChildContext($transformer, $field, $context, $child);
                 return $transformer->fromArray($field->getChildResource(), $child, $childContext);
             }
         } catch (ValueUndefined $valueUndefined) {
@@ -210,10 +210,14 @@ abstract class PropertyResolver extends ResolverBase implements \CatLab\Charon\I
      * @param ResourceTransformer $transformer
      * @param RelationshipField $field
      * @param Context $context
+     * @param mixed $input The raw input for this specific child (eg. one item
+     *        of a "many" relationship's array, or the resolved sub-array of a
+     *        "one" relationship) - used to detect whether the child carries
+     *        an existing identifier (edit) or not (create).
      * @return Context
      * @throws \CatLab\Charon\Exceptions\InvalidResourceDefinition
      */
-    private function getInputChildContext(ResourceTransformer $transformer, RelationshipField $field, Context $context): \CatLab\Charon\Interfaces\Context
+    private function getInputChildContext(ResourceTransformer $transformer, RelationshipField $field, Context $context, &$input): \CatLab\Charon\Interfaces\Context
     {
         $childResourceDefinition = $field->getChildResource();
 
