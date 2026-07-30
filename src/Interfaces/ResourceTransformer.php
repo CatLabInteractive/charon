@@ -20,6 +20,12 @@ interface ResourceTransformer
 
     public const RELATIONSHIP_ITEMS = 'items';
 
+    /**
+     * Input key carrying a client-supplied reference for this resource. See
+     * ClientReferenceMap.
+     */
+    public const CLIENT_REF = '$ref';
+
     public const SORT_PARAMETER = 'sort';
 
     public const EXPAND_PARAMETER = 'expand';

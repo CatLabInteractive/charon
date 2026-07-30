@@ -400,6 +400,13 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         $resource = new RESTResource($resourceDefinition);
         $resource->setSource($body);
 
+        // Capture (and strip) the client reference before any field processing,
+        // so it never gets mistaken for a regular field value.
+        if (isset($body[self::CLIENT_REF]) && is_string($body[self::CLIENT_REF])) {
+            $resource->setClientRef($body[self::CLIENT_REF]);
+            unset($body[self::CLIENT_REF]);
+        }
+
         $fields = $resourceDefinition->getFields();
 
         foreach ($fields as $field) {

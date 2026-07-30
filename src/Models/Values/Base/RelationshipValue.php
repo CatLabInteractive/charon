@@ -280,6 +280,30 @@ abstract class RelationshipValue extends Value
         /** @var RelationshipField $field */
         $field = $this->getField();
 
+        // A pure client-reference link target: {"$ref": "tmp-1"} with no
+        // identifiers of its own. Resolve it through the request-scoped
+        // ClientReferenceMap instead of the database.
+        if (
+            $child->getClientRef() !== null &&
+            $child->getIdentifiers()->count() === 0 &&
+            $field->canLinkExistingEntities($context)
+        ) {
+            $map = $context->getClientReferenceMap();
+            $resolved = $map->resolve($child->getClientRef());
+
+            if ($resolved) {
+                $childrenToAdd[] = $resolved;
+            } else {
+                // Forward reference: the entity carrying this ref hasn't been
+                // created yet. Charon can't apply the link itself (no
+                // PropertySetter context here) -- record it so the consumer
+                // can apply it once the whole payload has been processed.
+                $map->addPendingLink($parent, $field, $child->getClientRef());
+            }
+
+            return;
+        }
+
         /** @var bool $isNew */
         $isNew = $child->isNew();
 
@@ -341,6 +365,12 @@ abstract class RelationshipValue extends Value
             $context,
             $childEntity
         );
+
+        // A newly created child carrying a '$ref' becomes resolvable for any
+        // sibling resource linking to it, immediately or via a pending link.
+        if ($child->getClientRef() !== null) {
+            $context->getClientReferenceMap()->register($child->getClientRef(), $entity);
+        }
 
         if (!isset($childEntity)) {
             $childrenToAdd[] = $entity;

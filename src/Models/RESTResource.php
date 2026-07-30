@@ -40,6 +40,13 @@ class RESTResource implements ResourceContract
     private $source;
 
     /**
+     * Client-supplied reference ('$ref' input key) this resource was tagged
+     * with, if any. See ClientReferenceMap.
+     * @var string|null
+     */
+    private ?string $clientRef = null;
+
+    /**
      * Resource constructor.
      * @param ResourceDefinitionContract $resourceDefinition
      */
@@ -267,6 +274,24 @@ class RESTResource implements ResourceContract
     public function getType()
     {
         return $this->getResourceDefinition()->getType();
+    }
+
+    /**
+     * @param string|null $clientRef
+     * @return $this
+     */
+    public function setClientRef(?string $clientRef): static
+    {
+        $this->clientRef = $clientRef;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClientRef(): ?string
+    {
+        return $this->clientRef;
     }
 
     /**

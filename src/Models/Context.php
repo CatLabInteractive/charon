@@ -50,6 +50,8 @@ class Context implements ContextContract
 
     private \CatLab\Charon\Collections\InputParserCollection $inputParsers;
 
+    private ?ClientReferenceMap $clientReferenceMap = null;
+
     /**
      *
      */
@@ -139,7 +141,25 @@ class Context implements ContextContract
         $childContext->fieldsToExpand = $this->fieldsToExpand;
         $childContext->processors = $this->processors;
 
+        // Client references must resolve across the whole payload, not per
+        // relationship subtree, so every child context shares the same map.
+        $childContext->clientReferenceMap = $this->getClientReferenceMap();
+
         return $childContext;
+    }
+
+    /**
+     * Request-scoped registry of client-supplied '$ref' references, lazily
+     * created and shared with every child context derived from this one.
+     * @return ClientReferenceMap
+     */
+    public function getClientReferenceMap(): ClientReferenceMap
+    {
+        if ($this->clientReferenceMap === null) {
+            $this->clientReferenceMap = new ClientReferenceMap();
+        }
+
+        return $this->clientReferenceMap;
     }
 
     /**

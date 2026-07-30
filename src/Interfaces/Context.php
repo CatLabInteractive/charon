@@ -6,6 +6,7 @@ namespace CatLab\Charon\Interfaces;
 
 use CatLab\Charon\Collections\ProcessorCollection;
 use CatLab\Charon\Enums\Action;
+use CatLab\Charon\Models\ClientReferenceMap;
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Properties\Base\Field;
 
@@ -74,4 +75,11 @@ interface Context
      * @return self
      */
     public function fork();
+
+    /**
+     * Request-scoped registry of client-supplied '$ref' references, shared by
+     * this context and every child context derived from it.
+     * @return ClientReferenceMap
+     */
+    public function getClientReferenceMap(): ClientReferenceMap;
 }
