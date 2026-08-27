@@ -153,6 +153,118 @@ final class ResourceDefinitionValidatorTest extends BaseTest
         $this->assertSame([], $this->validator()->validate($definition));
     }
 
+    /**
+     * A relationship that is neither writeable nor linkable promises nothing,
+     * so there is nothing to check it against.
+     */
+    public function testReadOnlyRelationshipsAreIgnored(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition->relationship('child', ResourceDefinition::class)
+            ->one()
+            ->expandable()
+            ->visible(true, true);
+
+        $this->assertSame([], $this->validator()->validate($definition));
+    }
+
+    /**
+     * An entity class that cannot be loaded (a typo, a class from a package
+     * that is not installed) has no methods to inspect. Guessing here would
+     * turn a definition-time typo into a wall of unrelated relationship
+     * errors.
+     */
+    public function testDefinitionWithAnUnloadableEntityClassIsSkipped(): void
+    {
+        $definition = new ResourceDefinition('Tests\\NoSuchEntityClassAnywhere');
+        $definition->relationship('child', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        $this->assertSame([], $this->validator()->validate($definition));
+    }
+
+    /**
+     * Declaring both does not excuse the writeable() half: charon still routes
+     * an already-attached child into editChildren(), so the entity still needs
+     * to be able to edit.
+     */
+    public function testARelationshipThatIsBothWriteableAndLinkableIsStillChecked(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition->relationship('child', ResourceDefinition::class)
+            ->one()
+            ->linkable()
+            ->writeable()
+            ->visible(true, true);
+
+        $this->assertCount(1, $this->validator()->validate($definition));
+    }
+
+    /**
+     * Every broken relationship has to be reported, not just the first - a
+     * definition is usually fixed in one pass.
+     */
+    public function testEveryBrokenRelationshipIsReported(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition
+            ->relationship('first', ResourceDefinition::class)
+                ->one()
+                ->writeable(true, true)
+                ->visible(true, true)
+
+            ->relationship('second', ResourceDefinition::class)
+                ->many()
+                ->writeable(true, true)
+                ->visible(true, true);
+
+        $problems = $this->validator()->validate($definition);
+
+        $this->assertCount(2, $problems);
+        $this->assertStringContainsString('"first"', $problems[0]);
+        $this->assertStringContainsString('"second"', $problems[1]);
+    }
+
+    /**
+     * The complement of testParameterisedFieldNamesAreCheckedAgainstTheirBaseName:
+     * when the base name really is unsupported, the relationship is reported,
+     * and the report names the method the setter will actually look for -
+     * editChild(), not editChild:0().
+     */
+    public function testAParameterisedNameIsReportedUnderItsBaseName(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition->relationship('child:0', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        $problems = $this->validator()->validate($definition);
+
+        $this->assertCount(1, $problems);
+        $this->assertStringContainsString('editChild()', $problems[0]);
+        $this->assertStringNotContainsString('child:0', $problems[0]);
+    }
+
+    /**
+     * ... and the accepting side of the same, on a name the base-name check
+     * actually reaches. (The existing '{context.model}' case never gets that
+     * far: it contains a '.', so it is skipped by the dotted-path rule above
+     * it.)
+     */
+    public function testAParameterisedNameIsAcceptedOnItsBaseName(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithEditor::class);
+        $definition->relationship('child:0', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        $this->assertSame([], $this->validator()->validate($definition));
+    }
+
     public function testAssertValidThrows(): void
     {
         $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
@@ -163,6 +275,46 @@ final class ResourceDefinitionValidatorTest extends BaseTest
 
         $this->expectException(InvalidResourceDefinition::class);
         $this->validator()->assertValid($definition);
+    }
+
+    /**
+     * assertValid() is what a build-time test calls, so the exception has to
+     * carry every problem - otherwise fixing a definition becomes one
+     * test run per relationship.
+     */
+    public function testAssertValidReportsEveryProblemInOneException(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition
+            ->relationship('first', ResourceDefinition::class)
+                ->one()
+                ->writeable(true, true)
+                ->visible(true, true)
+
+            ->relationship('second', ResourceDefinition::class)
+                ->many()
+                ->writeable(true, true)
+                ->visible(true, true);
+
+        try {
+            $this->validator()->assertValid($definition);
+            $this->fail('Expected an InvalidResourceDefinition.');
+        } catch (InvalidResourceDefinition $e) {
+            $this->assertStringContainsString('"first"', $e->getMessage());
+            $this->assertStringContainsString('"second"', $e->getMessage());
+        }
+    }
+
+    public function testAssertValidAcceptsASoundDefinition(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithEditor::class);
+        $definition->relationship('child', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        $this->validator()->assertValid($definition);
+        $this->assertTrue(true, 'assertValid() did not throw for a sound definition.');
     }
 }
 
