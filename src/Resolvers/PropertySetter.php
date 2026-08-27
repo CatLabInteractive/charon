@@ -268,10 +268,12 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
         $existingChild = $this->getValueFromEntity($entity, $name, $parameters, $context);
 
         // Don't remove any new entities
+        // The existing child is a child entity, so its identity is described by
+        // the child resource definition, not by the parent's.
         if (!$this->entityExists(
             $transformer,
             $existingChild,
-            $field->getResourceDefinition()->getFields()->getIdentifiers(),
+            $field->getChildResourceDefinition()->getFields()->getIdentifiers(),
             $context
         )) {
             return;
