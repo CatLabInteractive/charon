@@ -62,8 +62,11 @@ class ResourceDefinitionValidator
 
             // A dotted name walks down to some other entity before the child is
             // set (PropertySetter::resolvePath), and which entity that lands on
-            // is not knowable from here - so leave those alone.
-            if (str_contains($field->getName(), self::CHILDPATH_PATH_SEPARATOR)) {
+            // is not knowable from here - so leave those alone. Only dots
+            // *outside* a {variable} count: "reply:{context.model}" is one name
+            // with one parameter, not a path, and testing the raw string made
+            // this skip swallow every such field before baseName() ever ran.
+            if (str_contains($this->withoutVariables($field->getName()), self::CHILDPATH_PATH_SEPARATOR)) {
                 continue;
             }
 
@@ -110,6 +113,11 @@ class ResourceDefinitionValidator
     private const CHILDPATH_PATH_SEPARATOR = '.';
 
     private const CHILDPATH_PARAMETER_SEPARATOR = ':';
+
+    private function withoutVariables(string $fieldName): string
+    {
+        return preg_replace('/\{[^}]*\}/', '', $fieldName);
+    }
 
     private function baseName(string $fieldName): string
     {

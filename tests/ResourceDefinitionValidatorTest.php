@@ -117,6 +117,28 @@ final class ResourceDefinitionValidatorTest extends BaseTest
     }
 
     /**
+     * The dot inside {context.model} is part of a variable reference, not a
+     * path separator. Testing the raw name made the dotted-path skip below
+     * swallow every parameterised field before baseName() ran - so the test
+     * above passed without exercising what it names.
+     */
+    public function testAVariableContainingADotIsNotTreatedAsAPath(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition->relationship('child:{context.model}', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        // Reaches baseName(), resolves to "child", finds no editChild() - so it
+        // is reported rather than silently skipped.
+        $problems = $this->validator()->validate($definition);
+
+        $this->assertCount(1, $problems);
+        $this->assertStringContainsString('editChild()', $problems[0]);
+    }
+
+    /**
      * A dotted name sets the child on some other entity entirely, and which one
      * is not knowable from the definition - so it is left alone.
      */
