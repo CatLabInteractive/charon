@@ -326,9 +326,11 @@ final class RelationshipRoutingTest extends BaseTest
      * identifiersToKeep, so ChildValue::removeAllChildrenExcept() clears the
      * child.
      *
-     * Note this only holds when the PARENT resource definition declares an
-     * identifier - see PropertySetter::clearChild(), which checks the existing
-     * child against $field->getResourceDefinition() (the parent's) identifiers.
+     * This used to hold only when the PARENT definition declared an identifier,
+     * because PropertySetter::clearChild() checked the existing child against
+     * the parent's identifiers instead of the child's (#30). That is fixed, so
+     * this runs on the ordinary definition; ClearChildTest covers the
+     * no-identifier case that used to fail.
      */
     public function testNullOnAOneRelationshipClearsIt(): void
     {
@@ -338,7 +340,7 @@ final class RelationshipRoutingTest extends BaseTest
         $parent->setChild($existing);
 
         $this->write(
-            RoutingIdentifiedLinkableOneDefinition::class,
+            RoutingLinkableOneDefinition::class,
             $parent,
             [ 'child' => null ]
         );
@@ -608,24 +610,6 @@ class RoutingLinkableOneDefinition extends ResourceDefinition
  * Same as RoutingLinkableOneDefinition, but the parent resource itself declares
  * an identifier.
  */
-class RoutingIdentifiedLinkableOneDefinition extends ResourceDefinition
-{
-    public function __construct()
-    {
-        parent::__construct(RoutingParent::class);
-
-        $this
-            ->identifier('id')
-                ->int()
-
-            ->relationship('child', RoutingChildDefinition::class)
-                ->one()
-                ->linkable()
-                ->visible()
-        ;
-    }
-}
-
 class RoutingEntityFactory implements EntityFactory
 {
     /**
