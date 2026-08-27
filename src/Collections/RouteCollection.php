@@ -213,6 +213,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
             self::OPTIONS_METHOD_VIEW,
             self::OPTIONS_METHOD_STORE,
             self::OPTIONS_METHOD_EDIT,
+            self::OPTIONS_METHOD_PATCH,
             self::OPTIONS_METHOD_DESTROY
         ];
 
@@ -346,6 +347,7 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
             self::OPTIONS_METHOD_VIEW,
             self::OPTIONS_METHOD_STORE,
             self::OPTIONS_METHOD_EDIT,
+            self::OPTIONS_METHOD_PATCH,
             self::OPTIONS_METHOD_DESTROY
         ];
 
@@ -398,6 +400,19 @@ class RouteCollection extends RouteProperties implements \ArrayAccess
                 ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
 
             $this->addIdParameterToRoutePath($editRoute, $id, $options);
+        }
+
+        if (in_array(self::OPTIONS_METHOD_PATCH, $only)) {
+            $patchRoute = $group->patch($childPath . '/{' . $id . '}', $controller . '@patch', [], 'patch')
+                ->summary(function () use ($resourceDefinitionFactory): string {
+                    $entityName = $resourceDefinitionFactory->getDefault()->getEntityName(false);
+
+                    return 'Patch an existing ' . $entityName;
+                })
+                ->parameters()->resource($resourceDefinitionFactory->getDefault())->required()
+                ->returns()->statusCode(200)->one($resourceDefinitionFactory->getDefault());
+
+            $this->addIdParameterToRoutePath($patchRoute, $id, $options);
         }
 
         if (in_array(self::OPTIONS_METHOD_DESTROY, $only)) {
