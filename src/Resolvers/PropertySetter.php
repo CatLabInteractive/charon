@@ -7,6 +7,7 @@ namespace CatLab\Charon\Resolvers;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\PropertyResolver as PropertyResolverContract;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Exceptions\ChildNotEditableException;
 use CatLab\Charon\Exceptions\InvalidPropertyException;
 use CatLab\Charon\Models\Identifier;
 use CatLab\Charon\Models\Properties\Base\Field;
@@ -54,8 +55,16 @@ class PropertySetter extends ResolverBase implements \CatLab\Charon\Interfaces\P
             array_unshift($parameters, $childEntities);
             call_user_func_array([$entity, 'edit'.ucfirst($name)], $parameters);
         } else {
-            throw InvalidPropertyException::create($name, get_class($entity));
+            throw ChildNotEditableException::create(get_class($entity), $name, static::class);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function supportsChildEditing(string $entityClassName, string $childFieldName): bool
+    {
+        return method_exists($entityClassName, 'edit' . ucfirst($childFieldName));
     }
 
     /**

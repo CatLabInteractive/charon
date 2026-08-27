@@ -32,6 +32,27 @@ interface PropertySetter
     );
 
     /**
+     * Can this setter write *into* the children of $entityClassName for the
+     * relationship $childFieldName - that is, hand an already-existing child
+     * back to the parent to be edited?
+     *
+     * A relationship declared writeable() (as opposed to linkable()) promises
+     * exactly that, and there is no way to honour the promise unless the entity
+     * offers somewhere to put it. Answering here rather than at declaration
+     * time is deliberate: what counts as "somewhere" is framework-specific, and
+     * the setter is the component that knows.
+     *
+     * Answer conservatively. A false negative turns into a validation error the
+     * developer must act on, so only return false when the write is certain to
+     * fail.
+     *
+     * @param string $entityClassName
+     * @param string $childFieldName
+     * @return bool
+     */
+    public function supportsChildEditing(string $entityClassName, string $childFieldName): bool;
+
+    /**
      * @param ResourceTransformer $transformer
      * @param mixed $entity
      * @param RelationshipField $field
