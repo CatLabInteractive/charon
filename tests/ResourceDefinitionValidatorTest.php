@@ -99,6 +99,38 @@ final class ResourceDefinitionValidatorTest extends BaseTest
         $this->assertSame([], $this->validator()->validate($definition));
     }
 
+    /**
+     * "reply:{context.model}" is a field name carrying childpath parameters;
+     * the setter resolves those separately and calls editReply(). Checking the
+     * decorated name would look for editReply:{context.model}() and report
+     * every parameterised relationship as broken.
+     */
+    public function testParameterisedFieldNamesAreCheckedAgainstTheirBaseName(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithEditor::class);
+        $definition->relationship('child:{context.model}', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        $this->assertSame([], $this->validator()->validate($definition));
+    }
+
+    /**
+     * A dotted name sets the child on some other entity entirely, and which one
+     * is not knowable from the definition - so it is left alone.
+     */
+    public function testDottedPathsAreSkipped(): void
+    {
+        $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);
+        $definition->relationship('nested.child', ResourceDefinition::class)
+            ->one()
+            ->writeable(true, true)
+            ->visible(true, true);
+
+        $this->assertSame([], $this->validator()->validate($definition));
+    }
+
     public function testAssertValidThrows(): void
     {
         $definition = new ResourceDefinition(ValidatorParentWithoutEditor::class);

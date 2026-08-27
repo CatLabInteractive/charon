@@ -60,7 +60,19 @@ class ResourceDefinitionValidator
                 continue;
             }
 
-            if ($this->propertySetter->supportsChildEditing($entityClassName, $field->getName())) {
+            // A dotted name walks down to some other entity before the child is
+            // set (PropertySetter::resolvePath), and which entity that lands on
+            // is not knowable from here - so leave those alone.
+            if (str_contains($field->getName(), self::CHILDPATH_PATH_SEPARATOR)) {
+                continue;
+            }
+
+            // "reply:{context.model}" is the field name; the setter resolves the
+            // parameters separately and calls editReply(). Check the name it
+            // will actually use, not the decorated one.
+            $name = $this->baseName($field->getName());
+
+            if ($this->propertySetter->supportsChildEditing($entityClassName, $name)) {
                 continue;
             }
 
@@ -69,11 +81,11 @@ class ResourceDefinitionValidator
                 '%s can be edited through it, but %s offers no edit%s() method and %s cannot edit ' .
                 'its children any other way. Declare it linkable() instead if it should only point ' .
                 'at an existing record - linkable() already makes the field writeable.',
-                $field->getName(),
+                $name,
                 $definition::class,
                 $entityClassName,
                 $entityClassName,
-                ucfirst($field->getName()),
+                ucfirst($name),
                 $this->propertySetter::class
             );
         }
@@ -93,6 +105,17 @@ class ResourceDefinitionValidator
         }
 
         throw InvalidResourceDefinition::makeTranslatable(implode("\n", $problems));
+    }
+
+    private const CHILDPATH_PATH_SEPARATOR = '.';
+
+    private const CHILDPATH_PARAMETER_SEPARATOR = ':';
+
+    private function baseName(string $fieldName): string
+    {
+        $separator = strpos($fieldName, self::CHILDPATH_PARAMETER_SEPARATOR);
+
+        return $separator === false ? $fieldName : substr($fieldName, 0, $separator);
     }
 
     private function editsChildren(RelationshipField $field): bool
