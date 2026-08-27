@@ -224,8 +224,11 @@ class Field implements Property, ResourceDefinitionManipulator
     }
 
     /**
-     * @param bool $edit
-     * @param bool $create
+     * Whether the field accepts input on create and on edit. The argument
+     * order is create first, then edit (mirroring visible($index, $view)).
+     *
+     * @param bool $create accepted on CREATE (POST)
+     * @param bool $edit accepted on EDIT (PUT/PATCH)
      *
      * @return $this
      */
