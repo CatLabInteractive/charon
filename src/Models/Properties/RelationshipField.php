@@ -251,8 +251,11 @@ class RelationshipField extends Field
     }
 
     /**
-     * @param bool $edit
-     * @param bool $create
+     * Whether related entities may be created inline on create and on edit.
+     * The argument order is create first, then edit (like linkable()).
+     *
+     * @param bool $create accepted on CREATE (POST)
+     * @param bool $edit accepted on EDIT (PUT/PATCH)
      *
      * @return $this
      */
