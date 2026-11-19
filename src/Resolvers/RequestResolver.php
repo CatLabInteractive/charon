@@ -30,11 +30,32 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
     public function getFilter($request, ResourceField $field, $operator = Operator::EQ)
     {
         $value = $this->getParameter($request, $field->getDisplayName());
-        if ($field->getTransformer()) {
-            return $field->getTransformer()->toParameterValue($value);
+        return $this->transformFilterValue($field, $value);
+    }
+
+    /**
+     * Run a filter value through the field's transformer. An array is a
+     * filter with an operator ([ 'op' => ..., 'value' => ... ], see
+     * FilterOperator); only its value is transformed.
+     * @param ResourceField $field
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function transformFilterValue(ResourceField $field, $value)
+    {
+        $transformer = $field->getTransformer();
+        if (!$transformer) {
+            return $value;
         }
 
-        return $value;
+        if (is_array($value)) {
+            if (isset($value['value']) && is_scalar($value['value'])) {
+                $value['value'] = $transformer->toParameterValue($value['value']);
+            }
+            return $value;
+        }
+
+        return $transformer->toParameterValue($value);
     }
 
     /**

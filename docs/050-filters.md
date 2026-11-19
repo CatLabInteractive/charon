@@ -52,6 +52,24 @@ class PetDefinition extends ResourceDefinition
 }
 ```
 
+Operators
+---------
+
+A plain parameter filters on equality: `GET /pets?name=Bolt`. To filter otherwise, pass an array with an operator
+(`op`) and, where the operator compares with something, a `value`:
+
+| Request | Matches |
+|---|---|
+| `?name[op]=eq&name[value]=Bolt` | name is `Bolt` (same as `?name=Bolt`) |
+| `?name[op]=neq&name[value]=Bolt` | name is not `Bolt` |
+| `?name[op]=contains&name[value]=ol` | name contains `ol` |
+| `?name[op]=empty` | name is null or an empty string |
+| `?name[op]=not_empty` | name is set and not an empty string |
+
+An unknown operator, or one that needs a value without one, filters nothing. The operators live in
+`CatLab\Charon\Enums\FilterOperator`; a QueryAdapter receives `Operator::EQ`, `Operator::NEQ`, `Operator::SEARCH`,
+`FilterOperator::EMPTY` or `FilterOperator::NOT_EMPTY`.
+
 A simplified controller would look like this:
 
 ```php

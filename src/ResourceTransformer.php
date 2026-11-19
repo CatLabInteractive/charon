@@ -37,6 +37,7 @@ use CatLab\Charon\Exceptions\InvalidPropertyException;
 
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Cardinality;
+use CatLab\Charon\Enums\FilterOperator;
 
 use CatLab\Charon\Models\CurrentPath;
 use CatLab\Charon\Models\Filter;
@@ -576,7 +577,10 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                 ) {
 
                     $value = $this->getRequestResolver()->getFilter($request, $field);
-                    $filterCollection->add(new Filter($field, Operator::EQ, $value));
+                    $filter = $this->makeFilter($field, $value);
+                    if ($filter) {
+                        $filterCollection->add($filter);
+                    }
 
                 } elseif (
                     $field->isSearchable() &&
@@ -589,6 +593,43 @@ abstract class ResourceTransformer implements ResourceTransformerContract
         }
 
         return $filterCollection;
+    }
+
+    /**
+     * The filter a request asks for on a filterable field: a plain value
+     * filters on equality, an array picks the operator (see FilterOperator):
+     * [ 'op' => 'not_empty' ] or [ 'op' => 'contains', 'value' => 'foo' ].
+     * Null when there is nothing to filter on (an unknown operator, or one
+     * that needs a value without one).
+     * @param ResourceField $field
+     * @param mixed $value
+     * @return Filter|null
+     */
+    protected function makeFilter(ResourceField $field, $value): ?Filter
+    {
+        if (!is_array($value)) {
+            return new Filter($field, Operator::EQ, $value);
+        }
+
+        $requestOperator = $value['op'] ?? null;
+        $operator = is_string($requestOperator) || $requestOperator === null ?
+            FilterOperator::fromRequest($requestOperator) :
+            null;
+
+        if ($operator === null) {
+            return null;
+        }
+
+        if (!FilterOperator::takesValue($operator)) {
+            return new Filter($field, $operator, null);
+        }
+
+        $operand = $value['value'] ?? null;
+        if ($operand === null || $operand === '' || !is_scalar($operand)) {
+            return null;
+        }
+
+        return new Filter($field, $operator, $operand);
     }
 
     /**
