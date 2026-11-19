@@ -6,6 +6,7 @@ namespace CatLab\Charon;
 
 use CatLab\Charon\Collections\FilterCollection;
 use CatLab\Charon\Collections\ResourceCollection;
+use CatLab\Charon\Exceptions\InvalidFilterException;
 use CatLab\Charon\Exceptions\InvalidResourceDefinition;
 use CatLab\Charon\Interfaces\Context as ContextContract;
 use CatLab\Charon\Interfaces\DynamicContext as DynamicContextContract;
@@ -575,19 +576,20 @@ abstract class ResourceTransformer implements ResourceTransformerContract
                     $field->isFilterable() &&
                     $this->getRequestResolver()->hasFilter($request, $field, Operator::EQ)
                 ) {
-
                     $value = $this->getRequestResolver()->getFilter($request, $field);
-                    $filter = $this->makeFilter($field, $value);
-                    if ($filter) {
-                        $filterCollection->add($filter);
-                    }
-
+                    $plainOperator = Operator::EQ;
                 } elseif (
                     $field->isSearchable() &&
                     $this->getRequestResolver()->hasFilter($request, $field, Operator::SEARCH)
                 ) {
                     $value = $this->getRequestResolver()->getFilter($request, $field, Operator::SEARCH);
-                    $filterCollection->add(new Filter($field, Operator::SEARCH, $value));
+                    $plainOperator = Operator::SEARCH;
+                } else {
+                    continue;
+                }
+
+                foreach ($this->makeFilters($field, $value, $plainOperator) as $filter) {
+                    $filterCollection->add($filter);
                 }
             }
         }
@@ -596,40 +598,53 @@ abstract class ResourceTransformer implements ResourceTransformerContract
     }
 
     /**
-     * The filter a request asks for on a filterable field: a plain value
-     * filters on equality, an array picks the operator (see FilterOperator):
-     * [ 'op' => 'not_empty' ] or [ 'op' => 'contains', 'value' => 'foo' ].
-     * Null when there is nothing to filter on (an unknown operator, or one
-     * that needs a value without one).
+     * The filters a request asks for on a field. A plain value (or a list,
+     * ?status[]=a) filters with the field's plain operator: equality on a
+     * filterable field, SEARCH on a searchable one. An array with condition
+     * keys (see FilterOperator) gives one filter per condition:
+     * ?date[neq]=x, ?url[not_empty]=1, ?name[contains]=foo.
+     * A condition without the value it needs (a blank form input) filters
+     * nothing.
      * @param ResourceField $field
      * @param mixed $value
-     * @return Filter|null
+     * @param string $plainOperator
+     * @return Filter[]
+     * @throws InvalidFilterException an unknown condition, or one the field does not allow
      */
-    protected function makeFilter(ResourceField $field, $value): ?Filter
+    protected function makeFilters(ResourceField $field, $value, string $plainOperator = Operator::EQ): array
     {
-        if (!is_array($value)) {
-            return new Filter($field, Operator::EQ, $value);
+        if (!is_array($value) || array_is_list($value)) {
+            return [ new Filter($field, $plainOperator, $value) ];
         }
 
-        $requestOperator = $value['op'] ?? null;
-        $operator = is_string($requestOperator) || $requestOperator === null ?
-            FilterOperator::fromRequest($requestOperator) :
-            null;
+        $filters = [];
+        foreach ($value as $condition => $operand) {
+            $operator = FilterOperator::fromRequest($condition);
+            if ($operator === null) {
+                throw InvalidFilterException::unknownCondition($field->getDisplayName(), (string) $condition);
+            }
 
-        if ($operator === null) {
-            return null;
+            // Searchable-only fields only search; 'contains' needs searchable().
+            if (
+                (!$field->isFilterable() && $operator !== Operator::SEARCH) ||
+                ($operator === Operator::SEARCH && !$field->isSearchable())
+            ) {
+                throw InvalidFilterException::notAllowed($field->getDisplayName(), (string) $condition);
+            }
+
+            if (!FilterOperator::takesValue($operator)) {
+                $filters[] = new Filter($field, $operator, null);
+                continue;
+            }
+
+            if ($operand === null || $operand === '' || !is_scalar($operand)) {
+                continue;
+            }
+
+            $filters[] = new Filter($field, $operator, $operand);
         }
 
-        if (!FilterOperator::takesValue($operator)) {
-            return new Filter($field, $operator, null);
-        }
-
-        $operand = $value['value'] ?? null;
-        if ($operand === null || $operand === '' || !is_scalar($operand)) {
-            return null;
-        }
-
-        return new Filter($field, $operator, $operand);
+        return $filters;
     }
 
     /**

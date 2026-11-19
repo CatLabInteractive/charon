@@ -99,7 +99,7 @@
             "type": "integer",
             "in": "query",
             "required": false,
-            "description": "Filter results on pet-id"
+            "description": "Filter results on pet-id. Other conditions: pet-id[neq]=value, pet-id[empty]=1, pet-id[not_empty]=1."
           },
           {
             "name": "sort",

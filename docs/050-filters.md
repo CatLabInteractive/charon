@@ -52,23 +52,33 @@ class PetDefinition extends ResourceDefinition
 }
 ```
 
-Operators
----------
+Conditions
+----------
 
-A plain parameter filters on equality: `GET /pets?name=Bolt`. To filter otherwise, pass an array with an operator
-(`op`) and, where the operator compares with something, a `value`:
+A plain parameter filters on equality: `GET /pets?name=Bolt` (a list, `?status[]=a`, is passed on as before). Other
+conditions are the keys of an array, one parameter per condition, so several can be combined:
 
 | Request | Matches |
 |---|---|
-| `?name[op]=eq&name[value]=Bolt` | name is `Bolt` (same as `?name=Bolt`) |
-| `?name[op]=neq&name[value]=Bolt` | name is not `Bolt` |
-| `?name[op]=contains&name[value]=ol` | name contains `ol` |
-| `?name[op]=empty` | name is null or an empty string |
-| `?name[op]=not_empty` | name is set and not an empty string |
+| `?name[eq]=Bolt` | name is `Bolt` (same as `?name=Bolt`) |
+| `?name[neq]=Bolt` | name is not `Bolt`; rows without a name are included |
+| `?name[contains]=ol` | name contains `ol` (only on `searchable()` fields) |
+| `?name[empty]=1` | name is null or an empty string |
+| `?name[not_empty]=1` | name is set and not an empty string |
+| `?name[neq]=Bolt&name[not_empty]=1` | both |
 
-An unknown operator, or one that needs a value without one, filters nothing. The operators live in
-`CatLab\Charon\Enums\FilterOperator`; a QueryAdapter receives `Operator::EQ`, `Operator::NEQ`, `Operator::SEARCH`,
-`FilterOperator::EMPTY` or `FilterOperator::NOT_EMPTY`.
+With the JSON:API request resolver the same goes inside `filter`: `?filter[name][neq]=Bolt`.
+
+- An unknown condition, or one the field does not allow, throws `InvalidFilterException` (an `InputDataException`;
+  charon-laravel answers it with a 400). A condition without the value it needs (`?name[neq]=`) filters nothing,
+  so a blank form input is harmless.
+- A QueryAdapter receives `Operator::EQ`, `Operator::NEQ`, `Operator::SEARCH`, `FilterOperator::EMPTY` or
+  `FilterOperator::NOT_EMPTY` (`CatLab\Charon\Enums\FilterOperator`). Adapters written before 1.13 do not know the
+  last two; charon-laravel needs ^1.13.
+- An entity with its own `filter<Name>()` method only gets `=` and `SEARCH` on that field unless it implements
+  `CatLab\Charon\Interfaces\FiltersWithOperators`; other conditions on that field are refused.
+- `FilterCollection::getFromName()` / `getFromDisplayName()` only return an equality (or search) filter, so a policy
+  that checks "owner is me" is not fooled by `?owner[neq]=me`. `getAllFromName()` returns every filter on a field.
 
 A simplified controller would look like this:
 

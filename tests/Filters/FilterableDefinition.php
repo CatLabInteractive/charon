@@ -19,6 +19,12 @@ class FilterableDefinition extends \CatLab\Charon\Models\ResourceDefinition
             ->visible()
             ->filterable();
 
+        $this->field('title')
+            ->string()
+            ->visible()
+            ->filterable()
+            ->searchable();
+
         $this->field('name')
             ->string()
             ->visible()

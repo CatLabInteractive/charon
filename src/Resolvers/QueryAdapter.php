@@ -7,7 +7,10 @@ namespace CatLab\Charon\Resolvers;
 use CatLab\Base\Enum\Operator;
 use CatLab\Base\Models\Database\LimitParameter;
 use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Charon\Enums\FilterOperator;
+use CatLab\Charon\Exceptions\InvalidFilterException;
 use CatLab\Charon\Exceptions\NotImplementedException;
+use CatLab\Charon\Interfaces\FiltersWithOperators;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -152,6 +155,17 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         $value,
         $operator = Operator::EQ
     ): void {
+        // A filter<Name>() method that predates the conditions of
+        // FilterOperator may ignore $operator ("is not X" would return X), so
+        // it only gets those when the entity says it handles them.
+        if (
+            FilterOperator::isConditionOnly((string) $operator) &&
+            $this->hasEntitySpecificMethod($transformer, $field, $context, self::FILTER_METHOD_PREFIX) &&
+            !is_a($definition->getEntityClassName(), FiltersWithOperators::class, true)
+        ) {
+            throw InvalidFilterException::notAllowed($field->getDisplayName(), (string) $operator);
+        }
+
         // do we have a specific 'filter' method?
         if ($this->callEntitySpecificMethodIfExists(
             $transformer,

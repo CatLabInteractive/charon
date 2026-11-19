@@ -7,14 +7,19 @@ namespace CatLab\Charon\Enums;
 use CatLab\Base\Enum\Operator;
 
 /**
- * The operators a filterable field accepts in a request.
+ * The conditions a filterable field accepts in a request.
  *
- * A plain parameter (?name=Foo) still filters on equality. An array picks the
- * operator: ?name[op]=contains&name[value]=Foo, ?url[op]=not_empty.
+ * A plain parameter (?name=Foo) still filters on equality. A condition is
+ * the key of an array, one parameter per condition:
+ *
+ *   ?name[neq]=Foo        name is not Foo (rows without a name included)
+ *   ?name[contains]=oo    only on searchable() fields
+ *   ?url[empty]=1         null or ''
+ *   ?url[not_empty]=1
  *
  * Equality, inequality and 'contains' use the operators of catlab/base, so
  * query adapters that already handle those need nothing new. EMPTY and
- * NOT_EMPTY are new: no value, the field is (not) null or an empty string.
+ * NOT_EMPTY are new and take no value.
  */
 class FilterOperator
 {
@@ -40,12 +45,12 @@ class FilterOperator
     ];
 
     /**
-     * The operator for a request name ('' or null is equality), null when unknown.
+     * The operator for a request name, null when unknown.
      */
-    public static function fromRequest(?string $name): ?string
+    public static function fromRequest(string|int|null $name): ?string
     {
-        if ($name === null || $name === '') {
-            return Operator::EQ;
+        if (!is_string($name)) {
+            return null;
         }
 
         return self::OPERATORS[$name] ?? null;
@@ -57,6 +62,17 @@ class FilterOperator
     public static function takesValue(string $operator): bool
     {
         return $operator !== self::EMPTY && $operator !== self::NOT_EMPTY;
+    }
+
+    /**
+     * Operators that only exist since conditions could be requested: entity
+     * specific filter methods (filter<Name>()) that predate them may ignore
+     * the operator, so they only get these when the entity opts in
+     * (FiltersWithOperators).
+     */
+    public static function isConditionOnly(string $operator): bool
+    {
+        return in_array($operator, [ Operator::NEQ, self::EMPTY, self::NOT_EMPTY ], true);
     }
 
     /**
