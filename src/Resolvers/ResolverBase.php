@@ -435,13 +435,46 @@ class ResolverBase
     }
 
     /**
-     * Try to call a static method on the resource' entity.
+     * The resource' entity's static {prefix}{Name}() method for the field, if any.
+     * @param ResourceTransformer $transformer
+     * @param Field $field
+     * @param Context $context
+     * @param string $methodPrefix
+     * @return array{0: string, 1: array}|null [ 'Entity::method', route parameters ]
+     */
+    protected function getEntitySpecificMethod(
+        ResourceTransformer $transformer,
+        Field $field,
+        Context $context,
+        string $methodPrefix
+    ): ?array {
+        $path = $this->splitPathParameters($field->getName());
+        $fieldName = array_shift($path);
+
+        try {
+            [$name, $parameters] = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+        } catch (VariableNotFoundInContext $variableNotFoundInContext) {
+            return null;
+        }
+
+        $entityClassName = $field->getResourceDefinition()->getEntityClassName();
+        $method = $methodPrefix . ucfirst($name);
+
+        if (!$this->methodExists($entityClassName, $method)) {
+            return null;
+        }
+
+        return [ $entityClassName . '::' . $method, $parameters ];
+    }
+
+    /**
+     * Call {prefix}{Name}() on the entity class when it exists.
      * @param ResourceTransformer $transformer
      * @param Field $field
      * @param Context $context
      * @param string $methodPrefix
      * @param mixed[] $additionalParameters These parameters will be added after the route parameters
-     * @return mixed|null
+     * @return bool whether the method existed
      */
     protected function callEntitySpecificMethodIfExists(
         ResourceTransformer $transformer,

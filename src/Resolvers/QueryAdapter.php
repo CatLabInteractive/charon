@@ -7,7 +7,10 @@ namespace CatLab\Charon\Resolvers;
 use CatLab\Base\Enum\Operator;
 use CatLab\Base\Models\Database\LimitParameter;
 use CatLab\Base\Models\Database\SelectQueryParameters;
+use CatLab\Charon\Enums\FilterOperator;
+use CatLab\Charon\Exceptions\InvalidFilterException;
 use CatLab\Charon\Exceptions\NotImplementedException;
+use CatLab\Charon\Models\ConditionFilter;
 use CatLab\Charon\Interfaces\Context;
 use CatLab\Charon\Interfaces\ResourceDefinition;
 use CatLab\Charon\Interfaces\ResourceTransformer;
@@ -152,25 +155,79 @@ abstract class QueryAdapter extends ResolverBase implements \CatLab\Charon\Inter
         $value,
         $operator = Operator::EQ
     ): void {
-        // do we have a specific 'filter' method?
-        if ($this->callEntitySpecificMethodIfExists(
-            $transformer,
-            $field,
-            $context,
-            self::FILTER_METHOD_PREFIX,
-            [
+        $method = $this->getEntitySpecificMethod($transformer, $field, $context, self::FILTER_METHOD_PREFIX);
+        if ($method !== null) {
+            [ $callable, $routeParameters ] = $method;
+
+            // filter<Name>($query, ConditionFilter $filter, $context, $entityClass):
+            // the method says, by the type of its parameter, that it handles every operator.
+            if ($this->acceptsConditionFilter($callable, count($routeParameters) + 1)) {
+                call_user_func_array($callable, array_merge($routeParameters, [
+                    $queryBuilder,
+                    new ConditionFilter($field, $operator, $value),
+                    $context,
+                    $definition->getEntityClassName()
+                ]));
+                return;
+            }
+
+            // filter<Name>($query, $value, $operator, ...) predates the conditions of
+            // FilterOperator and may ignore $operator ("is not X" would return X).
+            if (FilterOperator::isConditionOnly((string) $operator)) {
+                throw InvalidFilterException::notAllowed($field->getDisplayName(), (string) $operator);
+            }
+
+            call_user_func_array($callable, array_merge($routeParameters, [
                 $queryBuilder,
                 $value,
                 $operator,
                 $context,
                 $definition->getEntityClassName()
-            ]
-        )
-        ) {
+            ]));
             return;
         }
 
         $this->applySimpleWhere($transformer, $definition, $context, $field, $queryBuilder, $value, $operator);
+    }
+
+    /**
+     * Whether the callable's parameter at $position is declared with a type
+     * that a ConditionFilter satisfies (ConditionFilter itself, or a union
+     * containing it). Untyped, mixed and object parameters do not count: they
+     * are the old signature.
+     * @param callable|string $callable
+     * @param int $position
+     * @return bool
+     */
+    protected function acceptsConditionFilter($callable, int $position): bool
+    {
+        try {
+            $reflection = is_string($callable) && str_contains($callable, '::') ?
+                new \ReflectionMethod($callable) :
+                new \ReflectionFunction(\Closure::fromCallable($callable));
+        } catch (\ReflectionException $e) {
+            return false;
+        }
+
+        $parameters = $reflection->getParameters();
+        if (!isset($parameters[$position])) {
+            return false;
+        }
+
+        $type = $parameters[$position]->getType();
+        $types = $type instanceof \ReflectionUnionType ? $type->getTypes() : [ $type ];
+
+        foreach ($types as $namedType) {
+            if (
+                $namedType instanceof \ReflectionNamedType &&
+                !$namedType->isBuiltin() &&
+                is_a($namedType->getName(), ConditionFilter::class, true)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

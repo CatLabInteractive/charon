@@ -52,6 +52,37 @@ class PetDefinition extends ResourceDefinition
 }
 ```
 
+Conditions
+----------
+
+A plain parameter filters on equality: `GET /pets?name=Bolt` (a list, `?status[]=a`, is passed on as before). Other
+conditions are the keys of an array, one parameter per condition, so several can be combined:
+
+| Request | Matches |
+|---|---|
+| `?name[eq]=Bolt` | name is `Bolt` (same as `?name=Bolt`) |
+| `?name[neq]=Bolt` | name is not `Bolt`; rows without a name are included |
+| `?name[contains]=ol` | name contains `ol` (only on `searchable()` fields) |
+| `?name[empty]=1` | name is null or an empty string |
+| `?name[not_empty]=1` | name is set and not an empty string |
+| `?name[neq]=Bolt&name[not_empty]=1` | both |
+
+With the JSON:API request resolver the same goes inside `filter`: `?filter[name][neq]=Bolt`.
+
+- An unknown condition, or one the field does not allow, throws `InvalidFilterException` (an `InputDataException`;
+  charon-laravel answers it with a 400). A condition without the value it needs (`?name[neq]=`) filters nothing,
+  so a blank form input is harmless.
+- A QueryAdapter receives `Operator::EQ`, `Operator::NEQ`, `Operator::SEARCH`, `FilterOperator::EMPTY` or
+  `FilterOperator::NOT_EMPTY` (`CatLab\Charon\Enums\FilterOperator`). Adapters written before 1.13 do not know the
+  last two; charon-laravel needs ^1.13.
+- An entity's own `filter<Name>($query, $value, $operator, $context, $entityClass)` method only gets `=` and `SEARCH`
+  (and the cursor's `<`/`>`); other conditions on that field are refused, because such a method may ignore
+  `$operator`. To handle every condition, declare the second parameter as a `ConditionFilter`:
+  `filter<Name>($query, ConditionFilter $filter, $context, $entityClass)` and read `$filter->getOperator()` and
+  `$filter->getValue()`. Charon checks the parameter type with reflection.
+- `FilterCollection::getFromName()` / `getFromDisplayName()` only return an equality (or search) filter, so a policy
+  that checks "owner is me" is not fooled by `?owner[neq]=me`. `getAllFromName()` returns every filter on a field.
+
 A simplified controller would look like this:
 
 ```php

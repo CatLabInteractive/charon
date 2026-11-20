@@ -6,6 +6,7 @@ namespace CatLab\Charon\Resolvers;
 
 use CatLab\Base\Enum\Operator;
 use CatLab\Charon\Interfaces\ResourceTransformer;
+use CatLab\Charon\Enums\FilterOperator;
 use CatLab\Charon\Models\Properties\ResourceField;
 
 /**
@@ -30,8 +31,39 @@ class RequestResolver implements \CatLab\Charon\Interfaces\RequestResolver
     public function getFilter($request, ResourceField $field, $operator = Operator::EQ)
     {
         $value = $this->getParameter($request, $field->getDisplayName());
-        if ($field->getTransformer()) {
-            return $field->getTransformer()->toParameterValue($value);
+        return $this->transformFilterValue($field, $value);
+    }
+
+    /**
+     * Run a filter value through the field's transformer. For an array of
+     * conditions ([ 'neq' => '2024-01-01' ], see FilterOperator) or a list,
+     * each scalar value is transformed, except those of conditions that do
+     * not compare with the field's value (empty, not_empty, contains).
+     * @param ResourceField $field
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function transformFilterValue(ResourceField $field, $value)
+    {
+        $transformer = $field->getTransformer();
+        if (!$transformer) {
+            return $value;
+        }
+
+        if (!is_array($value)) {
+            return $transformer->toParameterValue($value);
+        }
+
+        $untransformed = [
+            FilterOperator::REQUEST_EMPTY,
+            FilterOperator::REQUEST_NOT_EMPTY,
+            FilterOperator::REQUEST_CONTAINS
+        ];
+
+        foreach ($value as $key => $operand) {
+            if (is_scalar($operand) && !in_array($key, $untransformed, true)) {
+                $value[$key] = $transformer->toParameterValue($operand);
+            }
         }
 
         return $value;

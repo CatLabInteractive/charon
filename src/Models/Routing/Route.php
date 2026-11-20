@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CatLab\Charon\Models\Routing;
 
+use CatLab\Charon\Models\Properties\ResourceField;
+
 use CatLab\Charon\Collections\RouteCollection;
 use CatLab\Charon\Enums\Action;
 use CatLab\Charon\Enums\Method;
@@ -329,7 +331,13 @@ class Route extends RouteProperties implements RouteMutator
     {
         $filter = (new QueryParameter($field->getDisplayName()))
             ->setType($field->getType())
-            ->describe('Filter results on ' . $field->getDisplayName());
+            ->describe(
+                'Filter results on ' . $field->getDisplayName() . '. ' .
+                'Other conditions: ' . $field->getDisplayName() . '[neq]=value, ' .
+                $field->getDisplayName() . '[empty]=1, ' . $field->getDisplayName() . '[not_empty]=1' .
+                ($field instanceof ResourceField && $field->isSearchable() ? ', ' . $field->getDisplayName() . '[contains]=value' : '') .
+                '.'
+            );
 
         // Check for applicable requirements
         foreach ($field->getRequirements() as $requirement) {
