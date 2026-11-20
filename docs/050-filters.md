@@ -75,8 +75,11 @@ With the JSON:API request resolver the same goes inside `filter`: `?filter[name]
 - A QueryAdapter receives `Operator::EQ`, `Operator::NEQ`, `Operator::SEARCH`, `FilterOperator::EMPTY` or
   `FilterOperator::NOT_EMPTY` (`CatLab\Charon\Enums\FilterOperator`). Adapters written before 1.13 do not know the
   last two; charon-laravel needs ^1.13.
-- An entity with its own `filter<Name>()` method only gets `=` and `SEARCH` on that field unless it implements
-  `CatLab\Charon\Interfaces\FiltersWithOperators`; other conditions on that field are refused.
+- An entity's own `filter<Name>($query, $value, $operator, $context, $entityClass)` method only gets `=` and `SEARCH`
+  (and the cursor's `<`/`>`); other conditions on that field are refused, because such a method may ignore
+  `$operator`. To handle every condition, declare the second parameter as a `ConditionFilter`:
+  `filter<Name>($query, ConditionFilter $filter, $context, $entityClass)` and read `$filter->getOperator()` and
+  `$filter->getValue()`. Charon checks the parameter type with reflection.
 - `FilterCollection::getFromName()` / `getFromDisplayName()` only return an equality (or search) filter, so a policy
   that checks "owner is me" is not fooled by `?owner[neq]=me`. `getAllFromName()` returns every filter on a field.
 

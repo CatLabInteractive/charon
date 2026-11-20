@@ -67,8 +67,7 @@ class FilterOperator
     /**
      * Operators that only exist since conditions could be requested: entity
      * specific filter methods (filter<Name>()) that predate them may ignore
-     * the operator, so they only get these when the entity opts in
-     * (FiltersWithOperators).
+     * the operator, so they only get these when they take a ConditionFilter.
      */
     public static function isConditionOnly(string $operator): bool
     {

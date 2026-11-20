@@ -435,32 +435,36 @@ class ResolverBase
     }
 
     /**
-     * Whether the resource' entity has a static {prefix}{Name}() method for the field.
+     * The resource' entity's static {prefix}{Name}() method for the field, if any.
      * @param ResourceTransformer $transformer
      * @param Field $field
      * @param Context $context
      * @param string $methodPrefix
-     * @return bool
+     * @return array{0: string, 1: array}|null [ 'Entity::method', route parameters ]
      */
-    protected function hasEntitySpecificMethod(
+    protected function getEntitySpecificMethod(
         ResourceTransformer $transformer,
         Field $field,
         Context $context,
         string $methodPrefix
-    ): bool {
+    ): ?array {
         $path = $this->splitPathParameters($field->getName());
         $fieldName = array_shift($path);
 
         try {
-            [$name] = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
+            [$name, $parameters] = $this->getPropertyNameAndParameters($transformer, $fieldName, $context, $field);
         } catch (VariableNotFoundInContext $variableNotFoundInContext) {
-            return false;
+            return null;
         }
 
-        return $this->methodExists(
-            $field->getResourceDefinition()->getEntityClassName(),
-            $methodPrefix . ucfirst($name)
-        );
+        $entityClassName = $field->getResourceDefinition()->getEntityClassName();
+        $method = $methodPrefix . ucfirst($name);
+
+        if (!$this->methodExists($entityClassName, $method)) {
+            return null;
+        }
+
+        return [ $entityClassName . '::' . $method, $parameters ];
     }
 
     /**
